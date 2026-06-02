@@ -1813,14 +1813,16 @@ function aggiornaDistrib() {
     else { elVT.textContent = '✗ ' + sommaTot + '/' + totRef; elVT.style.color = '#C62828'; elVT.style.fontWeight = '700'; }
   }
 
-  // Aggiorna contratti
-  set('contratti-orch', totEst);
-  // Solisti esterni — conta le righe con qualifica "Collaboratore esterno"
-  var solExt = document.querySelectorAll('#personale-tbody select[name^="pers_qual_"]');
-  var nSolExt = 0;
-  solExt.forEach(function(s) { if (s.value === 'Collaboratore esterno') nSolExt++; });
-  set('contratti-sol', nSolExt);
-  set('contratti-tot', totEst + nSolExt);
+  // Aggiorna contratti — conta solo righe con nome compilato E qualifica "Collaboratore esterno"
+  var righePersonale = document.querySelectorAll('#personale-tbody tr');
+  var nEst = 0;
+  righePersonale.forEach(function(tr) {
+    var nome = tr.querySelector('input[name^="pers_nome_"]');
+    var qual = tr.querySelector('select[name^="pers_qual_"]');
+    if (nome && nome.value.trim() && qual && qual.value === 'Collaboratore esterno') nEst++;
+  });
+  set('contratti-sol', nEst);
+  set('contratti-tot', totEst + nEst);
 }
 
 // ── Schede personale ──
