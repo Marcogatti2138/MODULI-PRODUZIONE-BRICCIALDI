@@ -1190,6 +1190,94 @@
 
 </div><!-- /wrapper -->
 
+  <!-- ══ SEZ 11 — DISTRIBUZIONE ORGANICO (RESPONSABILE) ══ -->
+  <div class="section" id="sezione-distribuzione" style="margin:0 auto 20px;max-width:980px;margin-left:auto;margin-right:auto">
+    <div class="section-header" onclick="toggleSection(this)" style="background:#2A5C9B">
+      <div><h2>11. Distribuzione Organico — Responsabile Produzione</h2><p>Sezione riservata — da completare dopo ricezione del modulo Referente</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body" style="padding:0">
+
+      <!-- Tabella distribuzione per sezione -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Distribuzione per sezione strumentale</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--blu)">
+              <th style="padding:8px 12px;text-align:left;color:white;font-size:11px">Sezione</th>
+              <th style="padding:8px 12px;text-align:center;color:white;font-size:11px">Totale<br>Referente</th>
+              <th style="padding:8px 12px;text-align:center;color:#A5D6A7;font-size:11px">Docenti<br>interni</th>
+              <th style="padding:8px 12px;text-align:center;color:#90CAF9;font-size:11px">Studenti<br>interni</th>
+              <th style="padding:8px 12px;text-align:center;color:#FFAB91;font-size:11px">Collaboratori<br>esterni</th>
+              <th style="padding:8px 12px;text-align:center;color:white;font-size:11px">Verifica</th>
+            </tr>
+          </thead>
+          <tbody id="distrib-tbody">
+            <!-- generata da JS -->
+          </tbody>
+          <tfoot>
+            <tr style="background:var(--blu-light);font-weight:700">
+              <td style="padding:8px 12px;color:var(--blu)">TOTALE</td>
+              <td style="text-align:center;color:var(--blu)" id="distrib-tot-ref">0</td>
+              <td style="text-align:center;color:#2E7D32" id="distrib-tot-doc">0</td>
+              <td style="text-align:center;color:#1565C0" id="distrib-tot-stu">0</td>
+              <td style="text-align:center;color:var(--rosso)" id="distrib-tot-est">0</td>
+              <td id="distrib-tot-verifica" style="text-align:center"></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;font-style:italic">La colonna Verifica mostra ✓ se la somma corrisponde al totale del Referente, ✗ se c'è uno scarto.</div>
+      </div>
+
+      <!-- Riepilogo contratti -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo);background:var(--giallo)">
+        <div style="font-size:11px;font-weight:700;color:var(--arancio);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Contratti da attivare</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:12px;text-align:center">
+            <div style="font-size:24px;font-weight:700;color:var(--rosso)" id="contratti-orch">0</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Orchestrali<br>esterni</div>
+          </div>
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:12px;text-align:center">
+            <div style="font-size:24px;font-weight:700;color:var(--rosso)" id="contratti-sol">0</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Solisti / Direttori<br>esterni</div>
+          </div>
+          <div style="background:var(--rosso);border-radius:7px;padding:12px;text-align:center">
+            <div style="font-size:24px;font-weight:700;color:white" id="contratti-tot">0</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:2px">TOTALE<br>CONTRATTI</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schede personale -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Elenco nominativo — tutti gli esecutori</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Per ogni musicista coinvolto indica ruolo, qualifica e contatti. I collaboratori esterni richiedono contratto.</p>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--blu)">
+              <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:22%">Cognome e Nome</th>
+              <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:18%">Ruolo / Strumento</th>
+              <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:16%">Qualifica</th>
+              <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:24%">Email</th>
+              <th style="padding:7px 10px;text-align:left;color:white;font-size:11px">Telefono</th>
+            </tr>
+          </thead>
+          <tbody id="personale-tbody"></tbody>
+        </table>
+        <button class="btn-add" onclick="addPersona()" style="margin-top:10px">+ Aggiungi musicista</button>
+      </div>
+
+      <!-- Note responsabile -->
+      <div style="padding:16px 20px">
+        <div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Note Responsabile</div>
+        <textarea name="note_responsabile" placeholder="Note interne, decisioni organizzative, problemi aperti..." style="width:100%;border:1px solid var(--bordo);border-radius:6px;padding:10px;font-family:inherit;font-size:13px;min-height:80px;outline:none;resize:vertical"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
 <!-- Modal PDF -->
 <div id="modal-pdf" class="modal-overlay">
   <div class="modal-box">
@@ -1358,6 +1446,7 @@ window.addEventListener('DOMContentLoaded', function() {
     document.getElementById('schermata-avvio').style.display = 'block';
   }
   aggiornaChecklist();
+  setTimeout(costruisciTabellaDistrib, 200);
 });
 
 // ── Toggle sezioni ──
@@ -1663,10 +1752,113 @@ function apriMailSollecito() {
   window.location.href = 'mailto:' + emailRef + '?subject=' + sogg + '&body=' + corpo;
 }
 
+// ── Sezione 11 — Distribuzione Organico ──
+var sezioniOrganico = [
+  { id: 'legni',  label: 'Fiati Legni',   totId: 'sint_legni_p' },
+  { id: 'ottoni', label: 'Fiati Ottoni',  totId: 'sint_ottoni_p' },
+  { id: 'archi',  label: 'Archi',         totId: 'sint_archi_p' },
+  { id: 'perc',   label: 'Percussioni',   totId: 'sint_perc_p' },
+  { id: 'coro',   label: 'Coro',          totId: 'sint_coro_p' },
+];
+
+function costruisciTabellaDistrib() {
+  var tbody = document.getElementById('distrib-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  sezioniOrganico.forEach(function(sez, idx) {
+    var totRef = parseInt(document.getElementById(sez.totId) ? document.getElementById(sez.totId).textContent : '0') || 0;
+    var bg = idx % 2 === 1 ? 'background:#F4F7FC' : '';
+    var tr = document.createElement('tr');
+    tr.style.cssText = bg + ';border-bottom:1px solid #D0D7E3';
+    tr.innerHTML =
+      '<td style="padding:7px 12px;font-weight:600;color:var(--blu)">' + sez.label + '</td>' +
+      '<td style="text-align:center;padding:7px;font-weight:700;color:var(--blu)">' + totRef + '</td>' +
+      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_doc_' + sez.id + '" value="0" oninput="aggiornaDistrib()" style="width:60px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_stu_' + sez.id + '" value="0" oninput="aggiornaDistrib()" style="width:60px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_est_' + sez.id + '" value="0" oninput="aggiornaDistrib()" style="width:60px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+      '<td style="text-align:center;padding:7px;font-size:16px" id="verifica_' + sez.id + '">—</td>';
+    tbody.appendChild(tr);
+  });
+  aggiornaDistrib();
+}
+
+function aggiornaDistrib() {
+  var totRef = 0, totDoc = 0, totStu = 0, totEst = 0;
+  sezioniOrganico.forEach(function(sez) {
+    var ref = parseInt(document.getElementById(sez.totId) ? document.getElementById(sez.totId).textContent : '0') || 0;
+    var doc = parseInt((document.querySelector('[name="dist_doc_' + sez.id + '"]') || {}).value) || 0;
+    var stu = parseInt((document.querySelector('[name="dist_stu_' + sez.id + '"]') || {}).value) || 0;
+    var est = parseInt((document.querySelector('[name="dist_est_' + sez.id + '"]') || {}).value) || 0;
+    var somma = doc + stu + est;
+    var elV = document.getElementById('verifica_' + sez.id);
+    if (elV) {
+      if (ref === 0 && somma === 0) { elV.textContent = '—'; elV.style.color = '#6B7280'; }
+      else if (somma === ref) { elV.textContent = '✓'; elV.style.color = '#2E7D32'; }
+      else { elV.textContent = '✗ ' + somma + '/' + ref; elV.style.color = '#C62828'; }
+    }
+    totRef += ref; totDoc += doc; totStu += stu; totEst += est;
+  });
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  set('distrib-tot-ref', totRef);
+  set('distrib-tot-doc', totDoc);
+  set('distrib-tot-stu', totStu);
+  set('distrib-tot-est', totEst);
+
+  // Verifica totale
+  var elVT = document.getElementById('distrib-tot-verifica');
+  if (elVT) {
+    var sommaTot = totDoc + totStu + totEst;
+    if (totRef === 0) { elVT.textContent = '—'; elVT.style.color = '#6B7280'; }
+    else if (sommaTot === totRef) { elVT.textContent = '✓'; elVT.style.color = '#2E7D32'; elVT.style.fontWeight = '700'; elVT.style.fontSize = '16px'; }
+    else { elVT.textContent = '✗ ' + sommaTot + '/' + totRef; elVT.style.color = '#C62828'; elVT.style.fontWeight = '700'; }
+  }
+
+  // Aggiorna contratti
+  set('contratti-orch', totEst);
+  // Solisti esterni — conta le righe con qualifica "Collaboratore esterno"
+  var solExt = document.querySelectorAll('#personale-tbody select[name^="pers_qual_"]');
+  var nSolExt = 0;
+  solExt.forEach(function(s) { if (s.value === 'Collaboratore esterno') nSolExt++; });
+  set('contratti-sol', nSolExt);
+  set('contratti-tot', totEst + nSolExt);
+}
+
+// ── Schede personale ──
+var personaleCount = 0;
+function addPersona() {
+  personaleCount++;
+  var tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid #D0D7E3';
+  if (personaleCount % 2 === 0) tr.style.background = '#F4F7FC';
+  tr.innerHTML =
+    '<td style="padding:3px 4px"><input type="text" name="pers_nome_' + personaleCount + '" placeholder="Cognome Nome" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:3px 4px"><input type="text" name="pers_ruolo_' + personaleCount + '" placeholder="es. Violino I" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:3px 4px"><select name="pers_qual_' + personaleCount + '" onchange="aggiornaDistrib()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 4px;font-family:inherit;font-size:11px;outline:none">' +
+    '<option value="">— qualifica —</option>' +
+    '<option value="Docente interno">Docente interno</option>' +
+    '<option value="Studente interno">Studente interno</option>' +
+    '<option value="Collaboratore esterno">Collaboratore esterno</option>' +
+    '</select></td>' +
+    '<td style="padding:3px 4px"><input type="email" name="pers_email_' + personaleCount + '" placeholder="email" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:3px 4px"><input type="tel" name="pers_tel_' + personaleCount + '" placeholder="+39 ..." style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>';
+  document.getElementById('personale-tbody').appendChild(tr);
+}
+// 5 righe iniziali
+for (var pp = 0; pp < 5; pp++) addPersona();
+
 // Avvia checklist e aggiorna ad ogni input
 aggiornaChecklist();
-document.addEventListener('input', function() { aggiornaChecklist(); aggiornaSintesiEvento(); });
-document.addEventListener('change', function() { aggiornaChecklist(); aggiornaSintesiEvento(); });
+document.addEventListener('input', function() {
+  aggiornaChecklist();
+  aggiornaSintesiEvento();
+  // Aggiorna distribuzione quando cambiano i totali organico
+  var n = event.target ? event.target.name : '';
+  if (n && n.indexOf('org_') === 0) setTimeout(aggiornaDistrib, 50);
+});
+document.addEventListener('change', function() {
+  aggiornaChecklist();
+  aggiornaSintesiEvento();
+});
 
 // ── Collaboratori Esterni ──
 var collabCount = 0;
