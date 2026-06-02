@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Briccialdi — Lettore Modulo Referente</title>
+<style>
+  :root {
+    --blu: #1A3C6B; --blu-mid: #2A5C9B; --blu-light: #EEF3FA;
+    --verde: #2E7D32; --verde-l: #E8F5E9;
+    --arancio: #B85C00; --giallo: #FFF8E1;
+    --rosso: #C62828; --rosso-l: #FFEBEE;
+    --bordo: #D0D7E3; --grigio: #F5F5F5; --muted: #6B7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #ECF0F8; color: #1a1a2e; font-size: 14px; line-height: 1.5;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--blu); color: white; padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(26,60,107,.3);
+  }
+  header h1 { font-family: Georgia, serif; font-size: 18px; font-weight: 600; }
+  header p  { font-size: 11px; opacity: .7; margin-top: 2px; }
+  .badge { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 600; }
+
+  .wrapper { max-width: 860px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  .card {
+    background: white; border: 1px solid var(--bordo); border-radius: 10px;
+    margin-bottom: 20px; overflow: hidden;
+    box-shadow: 0 1px 5px rgba(0,0,0,.05);
+  }
+  .card-header {
+    background: var(--blu); color: white; padding: 12px 20px;
+    font-size: 13px; font-weight: 600; letter-spacing: .3px;
+  }
+  .card-body { padding: 20px; }
+
+  /* Upload area */
+  .upload-area {
+    border: 2px dashed var(--bordo); border-radius: 8px;
+    padding: 36px 20px; text-align: center; cursor: pointer;
+    transition: all .2s; background: var(--grigio);
+  }
+  .upload-area:hover, .upload-area.drag { border-color: var(--blu-mid); background: var(--blu-light); }
+  .upload-area .icon { font-size: 36px; margin-bottom: 8px; }
+  .upload-area p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .upload-area strong { color: var(--blu); }
+  #file-input { display: none; }
+
+  /* Status */
+  .status {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 7px; font-size: 13px;
+    margin-top: 12px; display: none;
+  }
+  .status.loading { background: var(--giallo); color: var(--arancio); }
+  .status.ok      { background: var(--verde-l); color: var(--verde); }
+  .status.err     { background: var(--rosso-l); color: var(--rosso); }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--arancio); border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Dati estratti */
+  .field-grid { display: grid; grid-template-columns: 180px 1fr; border-bottom: 1px solid var(--bordo); min-height: 36px; }
+  .field-grid:last-child { border-bottom: none; }
+  .field-grid:nth-child(even) { background: #F4F7FC; }
+  .field-label { padding: 8px 12px; font-size: 11px; font-weight: 700; color: var(--blu); border-right: 1px solid var(--bordo); display: flex; align-items: center; text-transform: uppercase; letter-spacing: .4px; }
+  .field-val   { padding: 8px 12px; font-size: 13px; display: flex; align-items: center; }
+  .field-val.empty { color: var(--muted); font-style: italic; }
+  .field-val.ok    { color: var(--verde); }
+
+  /* Tabelle dati */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+  .data-table th { background: var(--blu); color: white; padding: 7px 10px; text-align: left; font-size: 11px; }
+  .data-table td { border: 1px solid var(--bordo); padding: 5px 8px; }
+  .data-table tr:nth-child(even) td { background: var(--grigio); }
+
+  /* Sezione organico */
+  .org-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+  .org-box { border: 1px solid var(--bordo); border-radius: 6px; overflow: hidden; }
+  .org-box-title { background: var(--blu-mid); color: white; padding: 5px 10px; font-size: 11px; font-weight: 600; letter-spacing: .3px; }
+  .org-row { display: flex; justify-content: space-between; padding: 4px 10px; font-size: 12px; border-bottom: 1px solid var(--bordo); }
+  .org-row:last-child { border-bottom: none; }
+  .org-row:nth-child(even) { background: var(--grigio); }
+  .org-row .num { font-weight: 700; color: var(--blu); }
+
+  /* Link generato */
+  .link-box { background: var(--blu-light); border: 1px solid #C5D5EA; border-radius: 8px; padding: 16px; margin-top: 14px; }
+  .link-box label { font-size: 11px; font-weight: 700; color: var(--blu); text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 6px; }
+  .link-row { display: flex; gap: 8px; }
+  .link-row input { flex: 1; border: 1px solid var(--bordo); border-radius: 5px; padding: 8px 10px; font-family: monospace; font-size: 11px; background: white; outline: none; color: var(--blu); }
+  .btn { padding: 9px 20px; border-radius: 7px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+  .btn-primary   { background: var(--blu); color: white; }
+  .btn-primary:hover { background: var(--blu-mid); }
+  .btn-success   { background: var(--verde); color: white; }
+  .btn-success:hover { background: #1B5E20; }
+  .btn-secondary { background: var(--grigio); color: #333; border: 1px solid var(--bordo); }
+  .confirm { display: none; color: var(--verde); font-size: 11px; margin-top: 6px; }
+
+  .actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 600px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .org-grid   { grid-template-columns: 1fr; }
+    header { padding: 12px 16px; }
+    header h1 { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Conservatorio «G. Briccialdi» — Terni</h1>
+    <p>Strumento Responsabile Produzione — Lettore Modulo Referente</p>
+  </div>
+  <div class="badge">Solo uso interno</div>
+</header>
+
+<div class="wrapper">
+
+  <!-- Step 1: Carica PDF -->
+  <div class="card" id="card-upload">
+    <div class="card-header">1. Carica il PDF ricevuto dal Referente</div>
+    <div class="card-body">
+      <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <div class="icon">📄</div>
+        <strong>Clicca per selezionare il PDF</strong>
+        <p>oppure trascina il file qui</p>
+        <p id="file-name" style="margin-top:8px;font-size:12px;color:var(--blu);font-weight:600"></p>
+      </div>
+      <input type="file" id="file-input" accept=".pdf" onchange="handleFile(this.files[0])">
+      <div class="status loading" id="status-loading"><div class="spinner"></div> Claude sta leggendo il modulo...</div>
+      <div class="status ok"      id="status-ok">✓ Dati estratti correttamente</div>
+      <div class="status err"     id="status-err">✗ <span id="err-msg">Errore nella lettura del PDF</span></div>
+    </div>
+  </div>
+
+  <!-- Step 2: Dati estratti -->
+  <div class="card" id="card-dati" style="display:none">
+    <div class="card-header">2. Dati estratti dal modulo</div>
+    <div class="card-body" id="dati-body">
+      <!-- popolato da JS -->
+    </div>
+  </div>
+
+  <!-- Step 3: Link generato -->
+  <div class="card" id="card-link" style="display:none">
+    <div class="card-header">3. Apri modulo pre-compilato</div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+        Il modulo è pronto con tutti i dati del Referente. Aprilo per completare le sezioni di tua competenza (9-11).
+      </p>
+      <div class="link-box">
+        <label>Link modulo pre-compilato</label>
+        <div class="link-row">
+          <input type="text" id="link-output" readonly>
+          <button class="btn btn-secondary" onclick="copiaLink()">Copia</button>
+        </div>
+        <p class="confirm" id="link-confirm">✓ Link copiato!</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-success" onclick="apriModulo()" style="flex:1">Apri modulo →</button>
+        <button class="btn btn-secondary" onclick="ricomincia()">Carica altro PDF</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var BASE_URL = 'https://marcogatti2138.github.io/MODULI-PRODUZIONE-BRICCIALDI/Modulo_1_SinfonicoCORALE.html';
+var datiEstratti = {};
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-area').classList.remove('drag');
+  var file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') handleFile(file);
+  else mostraErrore('Il file deve essere un PDF.');
+}
+
+function handleFile(file) {
+  if (!file) return;
+  document.getElementById('file-name').textContent = file.name;
+  leggiPDF(file);
+}
+
+async function leggiPDF(file) {
+  mostraStato('loading');
+
+  // Converti PDF in base64
+  var base64 = await new Promise(function(res, rej) {
+    var r = new FileReader();
+    r.onload = function() { res(r.result.split(',')[1]); };
+    r.onerror = function() { rej(new Error('Lettura file fallita')); };
+    r.readAsDataURL(file);
+  });
+
+  var prompt = `Sei un assistente per la gestione produzioni del Conservatorio G. Briccialdi di Terni.
+Leggi questo PDF che è un modulo compilato da un docente referente e estrai TUTTI i dati presenti.
+Restituisci SOLO un oggetto JSON valido, senza testo aggiuntivo, senza markdown, senza backtick.
+
+Il JSON deve avere questa struttura (usa stringa vuota "" per i campi non trovati):
+{
+  "titolo": "",
+  "referente": "",
+  "email_referente": "",
+  "tel_referente": "",
+  "delibera": "",
+  "data_delibera": "",
+  "budget": "",
+  "sede": "",
+  "scadenza": "",
+  "data_evento": "",
+  "ora_evento": "",
+  "durata": "",
+  "luogo_concerto": "",
+  "note_evento": "",
+  "repliche": [{"data":"","ora":"","luogo":""}],
+  "brani": [{"titolo":"","autore":"","nato":"","morto":"","durata":"","note":""}],
+  "organico": {
+    "legni": {"fl1":0,"fl2":0,"fl3":0,"ob1":0,"ob2":0,"ci":0,"cl1":0,"cl2":0,"cl3":0,"clb":0,"fg1":0,"fg2":0,"cfg":0,"sxs":0,"sxa":0,"sxt":0,"sxb":0},
+    "ottoni": {"cr1":0,"cr2":0,"cr3":0,"cr4":0,"tr1":0,"tr2":0,"tr3":0,"tb1":0,"tb2":0,"tbb":0,"tuba":0,"flics":0,"frica":0,"fricb":0,"fricbs":0},
+    "archi": {"vi1":0,"vi2":0,"vla":0,"vc":0,"cb":0},
+    "perc": {"arpa":0,"cel":0,"timp":0,"perc":0},
+    "coro": {"sopr":0,"cont":0,"ten":0,"bas":0,"indiviso":0}
+  },
+  "solisti": [{"nome":"","ruolo":"","voce":"","giorni":"","note":""}],
+  "collaboratori": [{"nome":"","ruolo":"","ente":"","giorni":"","note":""}],
+  "prove": [{"data":"","inizio":"","fine":"","luogo":"","sezioni":"","note":""}],
+  "trasferta": "",
+  "dest_trasferta": "",
+  "tipo_trasporto": "",
+  "n_colli": "",
+  "note_trasporti": "",
+  "dot_sedie": "",
+  "dot_leggii": "",
+  "dot_piano": "",
+  "dot_audio": "",
+  "dot_luci": "",
+  "dot_service": "",
+  "pernottamento": "",
+  "n_persone_trasferta": "",
+  "docenti": [{"nome":"","ruolo":"","email":"","tel":""}],
+  "ref_ext_nome": "",
+  "ref_ext_ente": "",
+  "ref_ext_email": "",
+  "ref_ext_tel": "",
+  "foto_ensemble": "",
+  "foto_solisti": "",
+  "locandina": "",
+  "testo_descr": "",
+  "bio_artisti": ""
+}`;
+
+  try {
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: 'Sei un estrattore di dati strutturati. Rispondi SEMPRE e SOLO con un oggetto JSON valido. Non aggiungere mai testo, spiegazioni, markdown o backtick. La tua risposta deve iniziare con { e finire con }.',
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    var data = await response.json();
+    if (!response.ok) throw new Error('API Error ' + response.status + ': ' + JSON.stringify(data));
+
+    var testo = data.content.filter(function(b) { return b.type === 'text'; }).map(function(b) { return b.text; }).join('');
+    
+    // Mostra debug temporaneo
+    console.log('Risposta API:', testo.substring(0, 500));
+    
+    // Parser robusto
+    var jsonMatch = testo.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Nessun JSON. Risposta ricevuta: ' + testo.substring(0, 200));
+    var clean = jsonMatch[0];
+    datiEstratti = JSON.parse(clean);
+
+    mostraStato('ok');
+    mostraDati(datiEstratti);
+    generaLink(datiEstratti);
+
+  } catch(e) {
+    mostraErrore(e.message || 'Errore nella lettura del PDF');
+  }
+}
+
+function mostraStato(tipo) {
+  ['loading','ok','err'].forEach(function(t) {
+    document.getElementById('status-' + t).style.display = t === tipo ? 'flex' : 'none';
+  });
+}
+
+function mostraErrore(msg) {
+  document.getElementById('err-msg').textContent = msg;
+  mostraStato('err');
+}
+
+function mostraDati(d) {
+  var body = document.getElementById('dati-body');
+  var html = '';
+
+  // Dati evento
+  html += '<div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Dati Evento</div>';
+  var campiEvento = [
+    ['Titolo', d.titolo], ['Referente', d.referente], ['Email referente', d.email_referente],
+    ['Data evento', d.data_evento], ['Ora', d.ora_evento], ['Luogo', d.luogo_concerto],
+    ['Durata', d.durata], ['Scadenza risposta', d.scadenza]
+  ];
+  campiEvento.forEach(function(c) {
+    html += '<div class="field-grid"><div class="field-label">' + c[0] + '</div><div class="field-val ' + (c[1] ? 'ok' : 'empty') + '">' + (c[1] || 'non compilato') + '</div></div>';
+  });
+
+  // Brani SIAE
+  if (d.brani && d.brani.length > 0 && d.brani[0].titolo) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px">Programma SIAE (' + d.brani.length + ' brani)</div>';
+    html += '<table class="data-table"><thead><tr><th>Titolo</th><th>Autore</th><th>Nato</th><th>Morto</th><th>Durata</th></tr></thead><tbody>';
+    d.brani.forEach(function(b) {
+      html += '<tr><td>' + (b.titolo||'—') + '</td><td>' + (b.autore||'—') + '</td><td>' + (b.nato||'—') + '</td><td>' + (b.morto||'—') + '</td><td>' + (b.durata||'—') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+
+  // Organico
+  var orgNomi = {
+    legni:  {fl1:'Flauto I',fl2:'Flauto II',fl3:'Flauto III/Ottavino',ob1:'Oboe I',ob2:'Oboe II',ci:'Corno Inglese',cl1:'Clarinetto I',cl2:'Clarinetto II',cl3:'Clarinetto III',clb:'Clarinetto Basso',fg1:'Fagotto I',fg2:'Fagotto II',cfg:'Controfagotto',sxs:'Sax Soprano',sxa:'Sax Contralto',sxt:'Sax Tenore',sxb:'Sax Baritono'},
+    ottoni: {cr1:'Corno I',cr2:'Corno II',cr3:'Corno III',cr4:'Corno IV',tr1:'Tromba I',tr2:'Tromba II',tr3:'Tromba III',tb1:'Trombone I',tb2:'Trombone II',tbb:'Trombone Basso',tuba:'Tuba',flics:'Flicorno Soprano',frica:'Flicorno Contralto',fricb:'Flicorno Baritono',fricbs:'Flicorno Basso'},
+    archi:  {vi1:'Violini I',vi2:'Violini II',vla:'Viole',vc:'Violoncelli',cb:'Contrabbassi'},
+    perc:   {arpa:'Arpa',cel:'Celesta/Pianoforte',timp:'Timpani',perc:'Percussioni varie'},
+    coro:   {sopr:'Soprani',cont:'Contralti/Mezzosoprani',ten:'Tenori',bas:'Baritoni/Bassi'}
+  };
+  var orgTitoli = {legni:'🎵 Fiati Legni',ottoni:'🎺 Fiati Ottoni',archi:'🎻 Archi',perc:'🥁 Percussioni',coro:'🎤 Coro'};
+  var haOrganico = false;
+  if (d.organico) {
+    Object.keys(d.organico).forEach(function(sez) {
+      if (sez === 'coro' && d.organico.coro && d.organico.coro.indiviso) haOrganico = true;
+      if (d.organico[sez]) {
+        Object.values(d.organico[sez]).forEach(function(v) { if (v > 0) haOrganico = true; });
+      }
+    });
+  }
+  if (haOrganico) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px">Organico Richiesto</div>';
+    html += '<div class="org-grid">';
+    Object.keys(orgNomi).forEach(function(sez) {
+      if (!d.organico || !d.organico[sez]) return;
+      var righe = Object.entries(orgNomi[sez]).filter(function(e) { return d.organico[sez][e[0]] > 0; });
+      if (sez === 'coro' && d.organico.coro && d.organico.coro.indiviso > 0) righe.push(['indiviso', 'Totale coro indiviso']);
+      if (!righe.length) return;
+      html += '<div class="org-box"><div class="org-box-title">' + orgTitoli[sez] + '</div>';
+      righe.forEach(function(e) {
+        var val = sez === 'coro' && e[0] === 'indiviso' ? d.organico.coro.indiviso : d.organico[sez][e[0]];
+        html += '<div class="org-row"><span>' + e[1] + '</span><span class="num">' + val + '</span></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Solisti
+  if (d.solisti && d.solisti.length > 0 && d.solisti[0].nome) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px">Solisti e Direzione</div>';
+    html += '<table class="data-table"><thead><tr><th>Nome</th><th>Ruolo</th><th>Voce/Strumento</th><th>Giorni</th></tr></thead><tbody>';
+    d.solisti.forEach(function(s) {
+      if (!s.nome) return;
+      html += '<tr><td>' + s.nome + '</td><td>' + (s.ruolo||'—') + '</td><td>' + (s.voce||'—') + '</td><td>' + (s.giorni||'—') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+
+  // Piano prove
+  if (d.prove && d.prove.length > 0 && d.prove[0].data) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px">Piano Prove (' + d.prove.length + ' sessioni)</div>';
+    html += '<table class="data-table"><thead><tr><th>Data</th><th>Inizio</th><th>Fine</th><th>Luogo</th><th>Sezioni</th></tr></thead><tbody>';
+    d.prove.forEach(function(p) {
+      if (!p.data) return;
+      html += '<tr><td>' + p.data + '</td><td>' + (p.inizio||'—') + '</td><td>' + (p.fine||'—') + '</td><td>' + (p.luogo||'—') + '</td><td>' + (p.sezioni||'—') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+
+  body.innerHTML = html;
+  document.getElementById('card-dati').style.display = 'block';
+  document.getElementById('card-link').style.display = 'block';
+}
+
+function generaLink(d) {
+  var orgFlat = {};
+  if (d.organico) {
+    Object.keys(d.organico).forEach(function(sez) {
+      if (d.organico[sez]) {
+        Object.entries(d.organico[sez]).forEach(function(e) {
+          if (e[1] > 0) orgFlat['org_' + e[0]] = e[1];
+        });
+      }
+    });
+  }
+
+  var params = {
+    id:            d.delibera || '',
+    titolo:        d.titolo || '',
+    referente:     d.referente || '',
+    email:         d.email_referente || '',
+    delibera:      d.delibera || '',
+    data_delibera: d.data_delibera || '',
+    budget:        d.budget || '',
+    sede:          d.sede || '',
+    scadenza:      d.scadenza || '',
+    // dati evento
+    data_evento:   d.data_evento || '',
+    ora_evento:    d.ora_evento || '',
+    durata:        d.durata || '',
+    luogo_concerto:d.luogo_concerto || '',
+    // logistica
+    trasferta:     d.trasferta || '',
+    tipo_trasporto:d.tipo_trasporto || '',
+    pernottamento: d.pernottamento || '',
+    // grafica
+    testo_descr:   d.testo_descr ? d.testo_descr.substring(0,200) : '',
+  };
+
+  // Aggiungi organico
+  Object.assign(params, orgFlat);
+
+  // Brani (max 12 per lunghezza URL)
+  if (d.brani) {
+    d.brani.slice(0,12).forEach(function(b, i) {
+      if (b.titolo) {
+        params['brano_titolo_' + (i+1)] = b.titolo;
+        params['brano_autore_' + (i+1)] = b.autore || '';
+        params['brano_nato_'   + (i+1)] = b.nato   || '';
+        params['brano_morto_'  + (i+1)] = b.morto  || '';
+        params['brano_durata_' + (i+1)] = b.durata || '';
+      }
+    });
+  }
+
+  // Solisti (max 5)
+  if (d.solisti) {
+    d.solisti.slice(0,5).forEach(function(s, i) {
+      if (s.nome) {
+        params['sol_nome_'  + (i+1)] = s.nome;
+        params['sol_ruolo_' + (i+1)] = s.ruolo || '';
+        params['sol_voce_'  + (i+1)] = s.voce  || '';
+        params['sol_gg_'    + (i+1)] = s.giorni || '';
+      }
+    });
+  }
+
+  // Docenti contatti (max 3)
+  if (d.docenti) {
+    d.docenti.slice(0,3).forEach(function(dc, i) {
+      if (dc.nome) {
+        params['doc_nome_'  + (i+1)] = dc.nome;
+        params['doc_ruolo_' + (i+1)] = dc.ruolo || '';
+        params['doc_email_' + (i+1)] = dc.email || '';
+        params['doc_tel_'   + (i+1)] = dc.tel   || '';
+      }
+    });
+  }
+
+  var p = new URLSearchParams(params);
+  var link = BASE_URL + '?' + p.toString();
+  document.getElementById('link-output').value = link;
+}
+
+function copiaLink() {
+  var el = document.getElementById('link-output');
+  el.select();
+  try { document.execCommand('copy'); document.getElementById('link-confirm').style.display = 'block'; } catch(e) {}
+}
+
+function apriModulo() {
+  var link = document.getElementById('link-output').value;
+  if (link) window.open(link, '_blank');
+}
+
+function ricomincia() {
+  document.getElementById('card-dati').style.display = 'none';
+  document.getElementById('card-link').style.display = 'none';
+  document.getElementById('file-name').textContent = '';
+  document.getElementById('file-input').value = '';
+  mostraStato('');
+  ['loading','ok','err'].forEach(function(t) {
+    document.getElementById('status-' + t).style.display = 'none';
+  });
+}
+</script>
+</body>
+</html>
