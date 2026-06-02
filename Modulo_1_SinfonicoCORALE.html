@@ -803,38 +803,10 @@
     </div>
   </div>
 
-  <!-- ══ SEZ 4 — COLLABORATORI ESTERNI RICHIESTI ══ -->
+  <!-- ══ SEZ 4 — PIANO PROVE ══ (ex sezione 5, collaboratori spostati in sez. 11) -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
-      <div><h2>4. Collaboratori Esterni Richiesti</h2><p>Elenco delle figure professionali esterne necessarie alla produzione</p></div>
-      <span class="toggle">▾</span>
-    </div>
-    <div class="section-body">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Elencare i collaboratori esterni necessari (musicisti aggiunti, maestro del coro esterno, ecc.). I dati completi (CF, IBAN, autorizzazione ente di appartenenza) saranno raccolti separatamente dall'Ufficio Personale.</p>
-      <div style="background:#FFF8E1;border:1px solid #F5C542;border-radius:7px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#B85C00">
-        ⚠ Se il nominativo non è ancora identificato, indicare il ruolo scoperto e selezionare "Ricerca a cura della Segreteria" — il modulo non richiede dati anagrafici in questo caso.
-      </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="width:28%">Cognome e Nome</th>
-            <th style="width:25%">Strumento / Ruolo</th>
-            <th style="width:20%">Ente / Orchestra provenienza</th>
-            <th style="width:15%">N° giorni servizio</th>
-            <th style="width:16%">Stato</th>
-            <th>Note / Contatto</th>
-          </tr>
-        </thead>
-        <tbody id="collab-body"></tbody>
-      </table>
-      <button class="btn-add" onclick="addCollab()">+ Aggiungi collaboratore esterno</button>
-    </div>
-  </div>
-
-  <!-- ══ SEZ 5 — PIANO PROVE ══ -->
-  <div class="section">
-    <div class="section-header" onclick="toggleSection(this)">
-      <div><h2>5. Piano delle Prove</h2><p>Date, orari e luoghi — necessario per Ufficio Personale (turni coadiutori) · Per giornate con più turni aggiungere una riga per turno</p></div>
+      <div><h2>4. Piano delle Prove</h2><p>Date, orari e luoghi — necessario per Ufficio Personale (turni coadiutori) · Per giornate con più turni aggiungere una riga per turno</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body">
@@ -858,7 +830,7 @@
   <!-- ══ SEZ 6 — LOGISTICA ══ -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
-      <div><h2>6. Esigenze Logistiche</h2><p>Trasporti, dotazione tecnica, vitto e alloggio</p></div>
+      <div><h2>5. Esigenze Logistiche</h2><p>Trasporti, dotazione tecnica, vitto e alloggio</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body">
@@ -947,7 +919,7 @@
   <!-- ══ SEZ 7 — CONTATTI ══ -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
-      <div><h2>7. Referenti e Contatti</h2><p>Email istituzionale e cellulare — obbligatori</p></div>
+      <div><h2>6. Referenti e Contatti</h2><p>Email istituzionale e cellulare — obbligatori</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body">
@@ -983,7 +955,7 @@
   <!-- ══ SEZ 8 — MATERIALE GRAFICO ══ -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
-      <div><h2>8. Materiale Grafico e Testo</h2><p>Necessario per Ufficio Comunicazione</p></div>
+      <div><h2>7. Materiale Grafico e Testo</h2><p>Necessario per Ufficio Comunicazione</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body">
@@ -1013,7 +985,7 @@
   <!-- ══ SEZ 9 — CHECKLIST RESPONSABILE ══ -->
   <div class="section" id="sezione-checklist">
     <div class="section-header" onclick="toggleSection(this)" style="background:#1A3C6B">
-      <div><h2>9. Checklist di Verifica — Responsabile Produzione</h2><p>Si aggiorna in tempo reale durante la compilazione</p></div>
+      <div><h2>8. Checklist di Verifica — Responsabile Produzione</h2><p>Si aggiorna in tempo reale durante la compilazione</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body" style="padding:0">
@@ -1101,41 +1073,42 @@
             <tr style="border-bottom:1px solid var(--bordo)">
               <td style="padding:6px 10px;font-weight:600">Fiati Legni</td>
               <td style="text-align:center" id="sint_legni_p">0</td>
-              <td style="text-align:center;color:var(--verde)" id="sint_legni_i">0</td>
-              <td style="text-align:center;color:var(--rosso)" id="sint_legni_e">0</td>
+              <td style="text-align:center;color:var(--verde)" id="sint_legni_i">—</td>
+              <td style="text-align:center;color:var(--rosso)" id="sint_legni_e">—</td>
             </tr>
             <tr style="border-bottom:1px solid var(--bordo);background:var(--grigio)">
               <td style="padding:6px 10px;font-weight:600">Fiati Ottoni</td>
               <td style="text-align:center" id="sint_ottoni_p">0</td>
-              <td style="text-align:center;color:var(--verde)" id="sint_ottoni_i">0</td>
-              <td style="text-align:center;color:var(--rosso)" id="sint_ottoni_e">0</td>
+              <td style="text-align:center;color:var(--verde)" id="sint_ottoni_i">—</td>
+              <td style="text-align:center;color:var(--rosso)" id="sint_ottoni_e">—</td>
             </tr>
             <tr style="border-bottom:1px solid var(--bordo)">
               <td style="padding:6px 10px;font-weight:600">Archi</td>
               <td style="text-align:center" id="sint_archi_p">0</td>
-              <td style="text-align:center;color:var(--verde)" id="sint_archi_i">0</td>
-              <td style="text-align:center;color:var(--rosso)" id="sint_archi_e">0</td>
+              <td style="text-align:center;color:var(--verde)" id="sint_archi_i">—</td>
+              <td style="text-align:center;color:var(--rosso)" id="sint_archi_e">—</td>
             </tr>
             <tr style="border-bottom:1px solid var(--bordo);background:var(--grigio)">
               <td style="padding:6px 10px;font-weight:600">Percussioni</td>
               <td style="text-align:center" id="sint_perc_p">0</td>
-              <td style="text-align:center;color:var(--verde)" id="sint_perc_i">0</td>
-              <td style="text-align:center;color:var(--rosso)" id="sint_perc_e">0</td>
+              <td style="text-align:center;color:var(--verde)" id="sint_perc_i">—</td>
+              <td style="text-align:center;color:var(--rosso)" id="sint_perc_e">—</td>
             </tr>
             <tr style="border-bottom:1px solid var(--bordo)">
               <td style="padding:6px 10px;font-weight:600">Coro</td>
               <td style="text-align:center" id="sint_coro_p">0</td>
-              <td style="text-align:center;color:var(--verde)" id="sint_coro_i">0</td>
-              <td style="text-align:center;color:var(--rosso)" id="sint_coro_e">0</td>
+              <td style="text-align:center;color:var(--verde)" id="sint_coro_i">—</td>
+              <td style="text-align:center;color:var(--rosso)" id="sint_coro_e">—</td>
             </tr>
             <tr style="background:var(--blu-light);font-weight:700;font-size:13px">
               <td style="padding:8px 10px;color:var(--blu)">TOTALE ORGANICO</td>
               <td style="text-align:center;color:var(--blu)" id="sint_org_tot">0</td>
-              <td style="text-align:center;color:var(--verde)" id="sint_org_int">0</td>
-              <td style="text-align:center;color:var(--rosso)" id="sint_org_est">0</td>
+              <td style="text-align:center;color:var(--verde)" id="sint_org_int">—</td>
+              <td style="text-align:center;color:var(--rosso)" id="sint_org_est">—</td>
             </tr>
           </tbody>
         </table>
+      <div style="font-size:10px;color:var(--muted);font-style:italic;padding:6px 12px">Interni / Esterni: compilati nella sezione 10 — Distribuzione Organico</div>
       </div>
 
       <!-- Solisti e Direzione -->
@@ -1193,7 +1166,7 @@
   <!-- ══ SEZ 11 — DISTRIBUZIONE ORGANICO (RESPONSABILE) ══ -->
   <div class="section" id="sezione-distribuzione" style="margin:0 auto 20px;max-width:980px;margin-left:auto;margin-right:auto">
     <div class="section-header" onclick="toggleSection(this)" style="background:#2A5C9B">
-      <div><h2>11. Distribuzione Organico — Responsabile Produzione</h2><p>Sezione riservata — da completare dopo ricezione del modulo Referente</p></div>
+      <div><h2>10. Distribuzione Organico — Responsabile Produzione</h2><p>Sezione riservata — da completare dopo ricezione del modulo Referente</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body" style="padding:0">
@@ -1804,6 +1777,22 @@ function aggiornaDistrib() {
   set('distrib-tot-stu', totStu);
   set('distrib-tot-est', totEst);
 
+  // Specchia interni/esterni nella scheda sintesi
+  var mapSez = {legni:'legni', ottoni:'ottoni', archi:'archi', perc:'perc', coro:'coro'};
+  var totInt = 0, totEst2 = 0;
+  sezioniOrganico.forEach(function(sez) {
+    var doc = parseInt((document.querySelector('[name="dist_doc_' + sez.id + '"]') || {}).value) || 0;
+    var stu = parseInt((document.querySelector('[name="dist_stu_' + sez.id + '"]') || {}).value) || 0;
+    var est = parseInt((document.querySelector('[name="dist_est_' + sez.id + '"]') || {}).value) || 0;
+    var interni = doc + stu;
+    set('sint_' + mapSez[sez.id] + '_i', interni);
+    set('sint_' + mapSez[sez.id] + '_e', est);
+    totInt += interni;
+    totEst2 += est;
+  });
+  set('sint_org_int', totInt);
+  set('sint_org_est', totEst2);
+
   // Verifica totale
   var elVT = document.getElementById('distrib-tot-verifica');
   if (elVT) {
@@ -1861,22 +1850,6 @@ document.addEventListener('change', function() {
   aggiornaChecklist();
   aggiornaSintesiEvento();
 });
-
-// ── Collaboratori Esterni ──
-var collabCount = 0;
-function addCollab() {
-  collabCount++;
-  var tr = document.createElement('tr');
-  tr.innerHTML =
-    '<td><input type="text" name="col_nome_' + collabCount + '" placeholder="Cognome Nome — o lasciare vuoto se non identificato"></td>' +
-    '<td><input type="text" name="col_ruolo_' + collabCount + '" placeholder="es. Baritono, Violino I aggiunto"></td>' +
-    '<td><input type="text" name="col_ente_' + collabCount + '" placeholder="Orchestra / Conservatorio"></td>' +
-    '<td><input type="text" name="col_gg_' + collabCount + '" placeholder="es. 3"></td>' +
-    '<td><select name="col_stato_' + collabCount + '" style="width:100%;border:none;background:transparent;font-family:inherit;font-size:11px;padding:4px;outline:none"><option value="noto">Nominativo noto</option><option value="ricerca">Ricerca a cura Segreteria</option></select></td>' +
-    '<td><textarea name="col_note_' + collabCount + '" rows="1" placeholder="contatto / note"></textarea></td>';
-  document.getElementById('collab-body').appendChild(tr);
-}
-for (var k = 0; k < 4; k++) addCollab();
 
 // ── Piano prove ──
 var proveCount = 0;
