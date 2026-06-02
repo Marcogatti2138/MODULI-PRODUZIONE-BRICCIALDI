@@ -460,22 +460,88 @@
   </div>
   <div class="badge-tipologia">
     <span class="icon">🎼</span>
-    Produzione Sinfonico-Corale &nbsp;|&nbsp; ID {XX}
+    Produzione Sinfonico-Corale &nbsp;|&nbsp; <span id="header-id">ID —</span>
   </div>
 </header>
+
+<!-- ══ SCHERMATA DI AVVIO — solo Responsabile ══ -->
+<div id="schermata-avvio" style="display:none;position:fixed;inset:0;background:rgba(10,20,50,.85);z-index:500;overflow-y:auto;padding:20px">
+  <div style="background:white;border-radius:12px;max-width:640px;margin:40px auto;padding:28px;box-shadow:0 8px 40px rgba(0,0,0,.3)">
+    <h2 style="font-family:Georgia,serif;font-size:20px;color:#1A3C6B;margin-bottom:4px">Configura progetto</h2>
+    <p style="font-size:12px;color:#6B7280;margin-bottom:20px">Inserisci i dati del progetto. Una volta confermati verrà generato il link da inviare al Referente.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="grid-column:1/-1">
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Titolo produzione *</label>
+        <input type="text" id="av_titolo" placeholder="es. Produzione Verdi" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">ID Progetto *</label>
+        <input type="text" id="av_id" placeholder="es. 001" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Sede istituzionale *</label>
+        <input type="text" id="av_sede" placeholder="es. Conservatorio Briccialdi" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Docente Referente *</label>
+        <input type="text" id="av_referente" placeholder="es. Gualtieri Massimo" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Email Referente *</label>
+        <input type="email" id="av_email" placeholder="es. gualtieri@briccialditerni.it" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">N° Delibera C.A. *</label>
+        <input type="text" id="av_delibera" placeholder="es. 12" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Data Delibera *</label>
+        <input type="text" id="av_data_delibera" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Budget autorizzato (€) *</label>
+        <input type="text" id="av_budget" placeholder="es. 5000" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Scadenza risposta *</label>
+        <input type="text" id="av_scadenza" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+    </div>
+
+    <p id="av-errore" style="display:none;color:#C62828;font-size:12px;margin-top:10px">⚠ Compila tutti i campi obbligatori prima di procedere.</p>
+
+    <div style="margin-top:20px;display:flex;gap:10px">
+      <button onclick="confermaAvvio()" style="flex:1;background:#1A3C6B;color:white;border:none;border-radius:7px;padding:11px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">Genera link e apri modulo</button>
+    </div>
+
+    <!-- Box link generato -->
+    <div id="av-link-box" style="display:none;margin-top:16px;background:#EEF3FA;border:1px solid #C5D5EA;border-radius:8px;padding:14px">
+      <div style="font-size:11px;font-weight:700;color:#1A3C6B;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Link da inviare al Referente:</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="av-link-testo" readonly style="flex:1;border:1px solid #C5D5EA;border-radius:5px;padding:7px 10px;font-family:monospace;font-size:11px;background:white;outline:none;color:#1A3C6B">
+        <button onclick="copiaLink()" style="background:#1A3C6B;color:white;border:none;border-radius:5px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Copia</button>
+      </div>
+      <p id="link-copiato" style="display:none;color:#2E7D32;font-size:11px;margin-top:6px">✓ Link copiato!</p>
+      <button onclick="apriModulo()" style="width:100%;margin-top:10px;background:#2E7D32;color:white;border:none;border-radius:7px;padding:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Apri modulo compilato →</button>
+    </div>
+  </div>
+</div>
 
 <div class="wrapper">
 
   <!-- Info Banner -->
   <div class="info-banner">
-    <div class="info-item"><label>Progetto</label><span>{Titolo Progetto}</span></div>
-    <div class="info-item"><label>Docente Referente</label><span>{Docente Referente}</span></div>
+    <div class="info-item"><label>Progetto</label><span id="meta-titolo">—</span></div>
+    <div class="info-item"><label>Docente Referente</label><span id="meta-referente">—</span></div>
+    <div class="info-item"><label>Delibera C.A.</label><span id="meta-delibera">—</span></div>
+    <div class="info-item"><label>Budget autorizzato</label><span id="meta-budget">—</span></div>
   </div>
 
   <!-- Scadenza -->
   <div class="scadenza-bar">
     <span>⚠</span>
-    <strong>Restituire entro: {Data Scadenza}</strong>
+    <strong>Restituire entro: <span id="meta-scadenza">—</span></strong>
     <span style="color:var(--muted);font-size:12px">Inviare a: <strong>produzione@briccialditerni.it</strong></span>
   </div>
 
@@ -945,28 +1011,54 @@
   </div>
 
   <!-- ══ SEZ 9 — CHECKLIST RESPONSABILE ══ -->
-  <div class="section">
+  <div class="section" id="sezione-checklist">
     <div class="section-header" onclick="toggleSection(this)" style="background:#1A3C6B">
-      <div><h2>9. Checklist di Verifica — Responsabile Produzione</h2><p>Da compilare all'arrivo del modulo</p></div>
+      <div><h2>9. Checklist di Verifica — Responsabile Produzione</h2><p>Si aggiorna in tempo reale durante la compilazione</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body" style="padding:0">
-      <ul class="checklist">
-        <li class="todo"><span class="check-icon">○</span> Data e ora evento confermate <span class="obblig">OBBLIGATORIO</span></li>
-        <li class="todo"><span class="check-icon">○</span> Luogo concerto specificato <span class="obblig">OBBLIGATORIO</span></li>
-        <li class="todo"><span class="check-icon">○</span> Programma artistico completo (titoli, autori, date) <span class="obblig">SIAE</span></li>
-        <li class="todo"><span class="check-icon">○</span> Organico completo — N° parti per ogni sezione <span class="obblig">OBBLIGATORIO</span></li>
-        <li class="todo"><span class="check-icon">○</span> Distinzione interni / collaboratori esterni verificata</li>
-        <li class="todo"><span class="check-icon">○</span> Elenco collaboratori esterni con strumento e ruolo <span class="obblig">CONTRATTI</span></li>
-        <li class="todo"><span class="check-icon">○</span> Piano prove con tutte le date e sedi <span class="obblig">PERSONALE</span></li>
-        <li class="todo"><span class="check-icon">○</span> Esigenze logistiche sala complete (sedie, leggii, audio...)</li>
-        <li class="todo"><span class="check-icon">○</span> Trasferta: destinazione, tipo trasporto, N° colli</li>
-        <li class="todo"><span class="check-icon">○</span> Vitto e alloggio: N° persone e date (se trasferta)</li>
-        <li class="todo"><span class="check-icon">○</span> Contatti docenti: email istituzionale + cellulare <span class="obblig">OBBLIGATORIO</span></li>
-        <li class="todo"><span class="check-icon">○</span> Foto ensemble e solisti allegate (min. 300 dpi) <span class="obblig">STAMPA</span></li>
-        <li class="todo"><span class="check-icon">○</span> Testo descrittivo per comunicazione ricevuto</li>
-        <li class="todo"><span class="check-icon">○</span> Biografie solisti / direttore ricevute</li>
-      </ul>
+
+      <!-- Barra stato globale -->
+      <div id="checklist-stato-bar" style="padding:12px 20px;background:#F5F5F5;border-bottom:1px solid #D0D7E3;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;flex-wrap:wrap">
+          <span id="cl-count-ok" style="color:#2E7D32">✓ 0 compilati</span>
+          <span style="color:#D0D7E3">|</span>
+          <span id="cl-count-warn" style="color:#B85C00">○ 0 facoltativi mancanti</span>
+          <span style="color:#D0D7E3">|</span>
+          <span id="cl-count-err" style="color:#C62828">✗ 0 obbligatori mancanti</span>
+        </div>
+        <div id="checklist-stato-label" style="margin-left:auto;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#FFEBEE;color:#C62828">
+          Modulo incompleto
+        </div>
+      </div>
+
+      <!-- Lista voci -->
+      <ul class="checklist" id="checklist-voci"></ul>
+
+      <!-- Pulsante sollecito -->
+      <div id="blocco-sollecito" style="padding:14px 20px;border-top:1px solid #D0D7E3;display:none">
+        <div style="font-size:12px;color:#C62828;margin-bottom:10px;font-weight:600">⚠ Campi obbligatori mancanti — genera un sollecito al Referente:</div>
+        <button class="btn btn-primary" onclick="generaSollecito()" style="font-size:13px;padding:8px 20px">✉ Genera sollecito</button>
+      </div>
+
+      <!-- Modal sollecito -->
+      <div id="modal-sollecito" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+        <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Sollecito — dati mancanti</h2>
+            <button onclick="chiudiSollecito()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
+          </div>
+          <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo al Referente, oppure apri direttamente in Mail.</p>
+          <textarea id="testo-sollecito" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <button onclick="copiaSollecito()" class="btn btn-primary" style="flex:1">Copia testo</button>
+            <button onclick="apriMailSollecito()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
+            <button onclick="chiudiSollecito()" class="btn btn-secondary" style="flex:1">Chiudi</button>
+          </div>
+          <p id="copia-confirm-sol" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1159,6 +1251,93 @@ function propagaAutoreUnico() {
   }
 }
 
+// ── Gestione URL params e schermata avvio ──
+var metadati = {};
+
+function leggiParams() {
+  var params = new URLSearchParams(window.location.search);
+  metadati = {
+    id:            params.get('id') || '',
+    titolo:        params.get('titolo') || '',
+    referente:     params.get('referente') || '',
+    email:         params.get('email') || '',
+    delibera:      params.get('delibera') || '',
+    data_delibera: params.get('data_delibera') || '',
+    budget:        params.get('budget') || '',
+    sede:          params.get('sede') || '',
+    scadenza:      params.get('scadenza') || '',
+  };
+  return metadati.titolo !== '';
+}
+
+function popolaMetadati() {
+  var el = function(id) { return document.getElementById(id); };
+  if (el('header-id'))     el('header-id').textContent = 'ID ' + (metadati.id || '—');
+  if (el('meta-titolo'))   el('meta-titolo').textContent = metadati.titolo || '—';
+  if (el('meta-referente'))el('meta-referente').textContent = metadati.referente || '—';
+  if (el('meta-delibera')) el('meta-delibera').textContent = (metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
+  if (el('meta-budget'))   el('meta-budget').textContent = metadati.budget ? '€ ' + metadati.budget : '—';
+  if (el('meta-scadenza')) el('meta-scadenza').textContent = metadati.scadenza || '—';
+  // Aggiorna sintesi
+  if (el('sint_titolo'))   el('sint_titolo').textContent = metadati.titolo || '{Titolo Progetto}';
+  // Aggiorna sollecito email referente
+  window._emailReferente = metadati.email || '';
+}
+
+function confermaAvvio() {
+  var campi = ['av_titolo','av_id','av_sede','av_referente','av_email','av_delibera','av_data_delibera','av_budget','av_scadenza'];
+  var ok = true;
+  campi.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el || !el.value.trim()) { ok = false; el && (el.style.borderColor = '#C62828'); }
+    else el && (el.style.borderColor = '#D0D7E3');
+  });
+  if (!ok) { document.getElementById('av-errore').style.display = 'block'; return; }
+  document.getElementById('av-errore').style.display = 'none';
+
+  // Costruisci URL
+  var base = window.location.origin + window.location.pathname;
+  var p = new URLSearchParams({
+    id:            document.getElementById('av_id').value.trim(),
+    titolo:        document.getElementById('av_titolo').value.trim(),
+    referente:     document.getElementById('av_referente').value.trim(),
+    email:         document.getElementById('av_email').value.trim(),
+    delibera:      document.getElementById('av_delibera').value.trim(),
+    data_delibera: document.getElementById('av_data_delibera').value.trim(),
+    budget:        document.getElementById('av_budget').value.trim(),
+    sede:          document.getElementById('av_sede').value.trim(),
+    scadenza:      document.getElementById('av_scadenza').value.trim(),
+  });
+  var link = base + '?' + p.toString();
+  document.getElementById('av-link-testo').value = link;
+  document.getElementById('av-link-box').style.display = 'block';
+}
+
+function copiaLink() {
+  var el = document.getElementById('av-link-testo');
+  el.select();
+  try { document.execCommand('copy'); document.getElementById('link-copiato').style.display = 'block'; } catch(e) {}
+}
+
+function apriModulo() {
+  var link = document.getElementById('av-link-testo').value;
+  if (link) window.location.href = link;
+}
+
+// ── Inizializzazione ──
+window.addEventListener('DOMContentLoaded', function() {
+  var haDati = leggiParams();
+  if (haDati) {
+    // Aperto dal Referente con link parametrizzato
+    document.getElementById('schermata-avvio').style.display = 'none';
+    popolaMetadati();
+  } else {
+    // Aperto senza parametri — mostra schermata avvio Responsabile
+    document.getElementById('schermata-avvio').style.display = 'block';
+  }
+  aggiornaChecklist();
+});
+
 // ── Toggle sezioni ──
 function toggleSection(header) {
   var body = header.nextElementSibling;
@@ -1331,15 +1510,141 @@ function aggiornaSintesiEvento() {
   }
 }
 
-// Listener evento dati
-['data_evento','ora_evento','luogo_concerto','n_persone_trasferta'].forEach(function(nm) {
-  var el = document.querySelector('[name="' + nm + '"]');
-  if (el) el.addEventListener('input', aggiornaSintesiEvento);
-});
-['trasferta','pernottamento','tipo_trasporto'].forEach(function(nm) {
-  var el = document.querySelector('[name="' + nm + '"]');
-  if (el) el.addEventListener('change', aggiornaSintesiEvento);
-});
+// ── Checklist reattiva ──
+var checklistVoci = [
+  { id: 'cl_data',      label: 'Data evento',                          tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('data_evento'); } },
+  { id: 'cl_ora',       label: 'Ora inizio evento',                    tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('ora_evento'); } },
+  { id: 'cl_luogo',     label: 'Luogo concerto',                       tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('luogo_concerto'); } },
+  { id: 'cl_durata',    label: 'Durata stimata',                       tag: '',             obblig: false, check: function() { return !!getField('durata'); } },
+  { id: 'cl_brani',     label: 'Programma artistico — almeno 1 brano', tag: 'SIAE',         obblig: true,  check: function() { return !!getField('brano_titolo_1'); } },
+  { id: 'cl_organico',  label: 'Organico — almeno una sezione compilata', tag: 'OBBLIGATORIO', obblig: true, check: function() {
+    var tot = parseInt(document.getElementById('sint_org_tot') ? document.getElementById('sint_org_tot').textContent : '0') || 0;
+    var indiv = getField('coro_indiviso');
+    return tot > 0 || !!indiv;
+  }},
+  { id: 'cl_solisti',   label: 'Solisti / Direzione',                  tag: '',             obblig: false, check: function() { return !!getField('sol_nome_1'); } },
+  { id: 'cl_prove',     label: 'Piano prove — almeno 1 sessione',      tag: 'PERSONALE',    obblig: true,  check: function() { return !!getField('prova_data_1'); } },
+  { id: 'cl_logistica', label: 'Esigenze logistiche sala',             tag: '',             obblig: false, check: function() { return !!getField('dot_sedie') || !!getField('dot_leggii') || !!getField('dot_piano'); } },
+  { id: 'cl_trasferta', label: 'Trasferta — tipo selezionato',         tag: '',             obblig: false, check: function() {
+    var sel = document.querySelector('[name="trasferta"]');
+    return sel && sel.value && sel.value !== '';
+  }},
+  { id: 'cl_contatti',  label: 'Contatti docenti — almeno 1',          tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('doc_email_1'); } },
+  { id: 'cl_foto',      label: 'Foto ensemble / solisti',              tag: 'STAMPA',       obblig: false, check: function() { return !!getField('foto_ensemble'); } },
+  { id: 'cl_testo',     label: 'Testo descrittivo',                    tag: 'STAMPA',       obblig: false, check: function() { return !!getField('testo_descr'); } },
+  { id: 'cl_bio',       label: 'Biografie solisti / direttore',        tag: '',             obblig: false, check: function() { return !!getField('bio_artisti'); } },
+];
+
+function getField(name) {
+  var el = document.querySelector('[name="' + name + '"]');
+  return el ? el.value.trim() : '';
+}
+
+var tagColors = {
+  'OBBLIGATORIO': '#C62828',
+  'SIAE':         '#1565C0',
+  'PERSONALE':    '#6A1B9A',
+  'CONTRATTI':    '#E65100',
+  'STAMPA':       '#2E7D32',
+  '':             'transparent'
+};
+
+function aggiornaChecklist() {
+  var ul = document.getElementById('checklist-voci');
+  if (!ul) return;
+  ul.innerHTML = '';
+  var nOk = 0, nWarn = 0, nErr = 0;
+  var mancanti = [];
+
+  checklistVoci.forEach(function(voce) {
+    var ok = voce.check();
+    if (ok) nOk++;
+    else if (voce.obblig) { nErr++; mancanti.push(voce.label); }
+    else nWarn++;
+
+    var li = document.createElement('li');
+    var bgColor = ok ? '#F1FBF2' : (voce.obblig ? '#FFEBEE' : '#FFF8E1');
+    var iconColor = ok ? '#2E7D32' : (voce.obblig ? '#C62828' : '#B85C00');
+    var icon = ok ? '✓' : (voce.obblig ? '✗' : '○');
+    li.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #D0D7E3;font-size:13px;background:' + bgColor;
+
+    var tagHtml = voce.tag ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:white;background:' + (tagColors[voce.tag] || '#999') + ';padding:2px 6px;border-radius:3px">' + voce.tag + '</span>' : '';
+
+    li.innerHTML = '<span style="font-size:16px;width:20px;text-align:center;flex-shrink:0;color:' + iconColor + '">' + icon + '</span>' +
+      '<span>' + voce.label + '</span>' + tagHtml;
+    ul.appendChild(li);
+  });
+
+  // Aggiorna contatori
+  var elOk = document.getElementById('cl-count-ok');
+  var elWarn = document.getElementById('cl-count-warn');
+  var elErr = document.getElementById('cl-count-err');
+  var elLabel = document.getElementById('checklist-stato-label');
+  var elSollecito = document.getElementById('blocco-sollecito');
+
+  if (elOk) elOk.textContent = '✓ ' + nOk + ' compilati';
+  if (elWarn) elWarn.textContent = '○ ' + nWarn + ' facoltativi mancanti';
+  if (elErr) elErr.textContent = '✗ ' + nErr + ' obbligatori mancanti';
+
+  if (nErr === 0) {
+    if (elLabel) { elLabel.style.background = '#E8F5E9'; elLabel.style.color = '#2E7D32'; elLabel.textContent = nWarn === 0 ? '✓ Modulo completo' : '✓ Pronto — alcuni facoltativi mancanti'; }
+    if (elSollecito) elSollecito.style.display = 'none';
+  } else {
+    if (elLabel) { elLabel.style.background = '#FFEBEE'; elLabel.style.color = '#C62828'; elLabel.textContent = 'Modulo incompleto'; }
+    if (elSollecito) elSollecito.style.display = 'block';
+  }
+
+  // Aggiorna mancanti per sollecito
+  window._mancanti = mancanti;
+}
+
+// ── Sollecito ──
+function generaSollecito() {
+  var referente = getField('doc_nome_1') || '{Docente Referente}';
+  var titolo = document.getElementById('sint_titolo') ? document.getElementById('sint_titolo').textContent : '{Titolo Progetto}';
+  var mancanti = window._mancanti || [];
+  var lines = [];
+  lines.push('Gentile ' + referente + ',');
+  lines.push('');
+  lines.push('in riferimento al progetto "' + titolo + '", ti chiedo cortesemente di integrare il modulo con i seguenti dati mancanti:');
+  lines.push('');
+  mancanti.forEach(function(m, i) { lines.push((i+1) + '. ' + m); });
+  lines.push('');
+  lines.push('Ti chiedo di compilare il modulo al seguente link e inviare il PDF aggiornato entro il prima possibile:');
+  lines.push('https://marcogatti2138.github.io/MODULI-PRODUZIONE-BRICCIALDI/Modulo_1_SinfonicoCORALE.html');
+  lines.push('');
+  lines.push('Grazie per la collaborazione.');
+  lines.push('');
+  lines.push('Marco Gatti');
+  lines.push('Responsabile Produzione — Conservatorio G. Briccialdi, Terni');
+  lines.push('produzione@briccialditerni.it');
+
+  var ta = document.getElementById('testo-sollecito');
+  if (ta) ta.value = lines.join('\n');
+  document.getElementById('modal-sollecito').style.display = 'block';
+  document.getElementById('copia-confirm-sol').style.display = 'none';
+}
+
+function chiudiSollecito() { document.getElementById('modal-sollecito').style.display = 'none'; }
+
+function copiaSollecito() {
+  var ta = document.getElementById('testo-sollecito');
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); document.getElementById('copia-confirm-sol').style.display = 'block'; } catch(e) {}
+}
+
+function apriMailSollecito() {
+  var titolo = metadati.titolo || 'Progetto';
+  var emailRef = metadati.email || '';
+  var sogg = encodeURIComponent('[Sollecito] ' + titolo + ' — dati mancanti');
+  var corpo = encodeURIComponent(document.getElementById('testo-sollecito').value);
+  window.location.href = 'mailto:' + emailRef + '?subject=' + sogg + '&body=' + corpo;
+}
+
+// Avvia checklist e aggiorna ad ogni input
+aggiornaChecklist();
+document.addEventListener('input', function() { aggiornaChecklist(); aggiornaSintesiEvento(); });
+document.addEventListener('change', function() { aggiornaChecklist(); aggiornaSintesiEvento(); });
 
 // ── Collaboratori Esterni ──
 var collabCount = 0;
