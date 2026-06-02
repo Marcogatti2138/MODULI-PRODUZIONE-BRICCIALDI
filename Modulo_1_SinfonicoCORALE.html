@@ -470,8 +470,6 @@
   <div class="info-banner">
     <div class="info-item"><label>Progetto</label><span>{Titolo Progetto}</span></div>
     <div class="info-item"><label>Docente Referente</label><span>{Docente Referente}</span></div>
-    <div class="info-item"><label>Delibera C.A.</label><span>{N° Delibera} del {Data Delibera}</span></div>
-    <div class="info-item"><label>Budget autorizzato</label><span>€ {Budget}</span></div>
   </div>
 
   <!-- Scadenza -->
@@ -538,6 +536,18 @@
     </div>
     <div class="section-body">
       <div class="nota-siae">✓ Accordo MUR-SIAE attivo: nessun costo per attività istituzionali — è obbligatoria solo la comunicazione preventiva del programma.</div>
+      <div style="background:#F4F7FC;border:1px solid #D0D7E3;border-radius:7px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#1A3C6B;cursor:pointer">
+          <input type="checkbox" id="toggle-monografico" onchange="toggleMonografico(this)" style="width:auto">
+          Progetto monografico — interamente dedicato a un solo autore
+        </label>
+        <span style="font-size:11px;color:#6B7280">Se selezionato, autore e date si compilano una sola volta per tutti i brani</span>
+        <div id="autore-unico-fields" style="display:none;width:100%;display:none;grid-template-columns:1fr 100px 100px;gap:8px;margin-top:6px">
+          <input type="text" id="autore_unico" placeholder="Autore / Compositore" style="border:1px solid #D0D7E3;border-radius:4px;padding:5px 8px;font-family:inherit;font-size:12px;outline:none">
+          <input type="text" id="nato_unico" placeholder="Nato (aaaa)" style="border:1px solid #D0D7E3;border-radius:4px;padding:5px 8px;font-family:inherit;font-size:12px;outline:none;text-align:center">
+          <input type="text" id="morto_unico" placeholder="Morto (aaaa)" style="border:1px solid #D0D7E3;border-radius:4px;padding:5px 8px;font-family:inherit;font-size:12px;outline:none;text-align:center">
+        </div>
+      </div>
       <table class="data-table">
         <thead>
           <tr>
@@ -545,7 +555,7 @@
             <th style="width:24%">Autore / Compositore</th>
             <th style="width:12%">Nato</th>
             <th style="width:12%">Morto</th>
-            <th style="width:10%">Durata</th>
+            <th style="width:10%">Durata<br><small style="font-weight:400;opacity:.7">(indicativa)</small></th>
             <th style="width:10%">Note</th>
           </tr>
         </thead>
@@ -569,7 +579,7 @@
         <div class="org-section">
           <div class="org-section-title">🎵 Fiati Legni</div>
           <table class="org-table">
-            <thead><tr><th>Strumento</th><th>N° parti</th></tr></thead>
+            <thead><tr><th>Strumento</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
               <tr><td class="nome">Flauto I</td><td><input type="text" name="org_fl1" placeholder="0"></td></tr>
               <tr><td class="nome">Flauto II</td><td><input type="text" name="org_fl2" placeholder="0"></td></tr>
@@ -603,7 +613,7 @@
         <div class="org-section">
           <div class="org-section-title">🎺 Fiati Ottoni</div>
           <table class="org-table">
-            <thead><tr><th>Strumento</th><th>N° parti</th></tr></thead>
+            <thead><tr><th>Strumento</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
               <tr><td class="nome">Corno I</td><td><input type="text" name="org_cr1" placeholder="0"></td></tr>
               <tr><td class="nome">Corno II</td><td><input type="text" name="org_cr2" placeholder="0"></td></tr>
@@ -635,7 +645,7 @@
         <div class="org-section">
           <div class="org-section-title">🎻 Archi</div>
           <table class="org-table">
-            <thead><tr><th>Sezione</th><th>N° parti</th></tr></thead>
+            <thead><tr><th>Sezione</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
               <tr><td class="nome">Violini I</td><td><input type="text" name="org_vi1" placeholder="0"></td></tr>
               <tr><td class="nome">Violini II</td><td><input type="text" name="org_vi2" placeholder="0"></td></tr>
@@ -657,7 +667,7 @@
         <div class="org-section">
           <div class="org-section-title">🥁 Percussioni e Altri</div>
           <table class="org-table">
-            <thead><tr><th>Strumento</th><th>N° parti</th></tr></thead>
+            <thead><tr><th>Strumento</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
               <tr><td class="nome">Arpa</td><td><input type="text" name="org_arpa" placeholder="0"></td></tr>
               <tr><td class="nome">Celesta / Pianoforte</td><td><input type="text" name="org_cel" placeholder="0"></td></tr>
@@ -671,11 +681,11 @@
               </tr>
             </tfoot>
           </table>
-          <div class="org-totale" style="margin-bottom:12px">Percussioni varie = totale strumentisti alle perc.</div>
+          <div class="org-totale" style="margin-bottom:12px">Indicare il numero di <strong>strumentisti</strong>, non di strumenti fisici. Es.: 1 timpanista anche se usa 3 timpani.</div>
 
           <div class="org-section-title" style="margin-top:10px">🎤 Coro</div>
           <table class="org-table">
-            <thead><tr><th>Sezione</th><th>N° voci</th></tr></thead>
+            <thead><tr><th>Sezione</th><th>N° voci<br><small style="font-weight:400;opacity:.7">(esecutori)</small></th></tr></thead>
             <tbody>
               <tr><td class="nome">Soprani</td><td><input type="text" name="org_sopr" placeholder="0"></td></tr>
               <tr><td class="nome">Contralti / Mezzosoprani</td><td><input type="text" name="org_cont" placeholder="0"></td></tr>
@@ -689,7 +699,12 @@
               </tr>
             </tfoot>
           </table>
-          <div class="org-totale">Coro esterno: indicare ente/coro di provenienza nelle note</div>
+          <div class="org-totale">Se non si conosce la suddivisione per registro, usare il campo "Totale coro indiviso" qui sotto</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#F4F7FC;border:1px solid #D0D7E3;border-top:none;border-radius:0 0 5px 5px">
+            <label style="font-size:11px;font-weight:600;color:#1A3C6B;white-space:nowrap">Totale coro indiviso:</label>
+            <input type="text" name="coro_indiviso" placeholder="es. 80 elementi totali" style="border:1px solid #D0D7E3;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:12px;outline:none;flex:1">
+            <span style="font-size:10px;color:#6B7280">Compilare questo campo in alternativa alle voci separate</span>
+          </div>
         </div>
 
         <!-- SOLISTI / DIREZIONE -->
@@ -730,6 +745,9 @@
     </div>
     <div class="section-body">
       <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Elencare i collaboratori esterni necessari (musicisti aggiunti, maestro del coro esterno, ecc.). I dati completi (CF, IBAN, autorizzazione ente di appartenenza) saranno raccolti separatamente dall'Ufficio Personale.</p>
+      <div style="background:#FFF8E1;border:1px solid #F5C542;border-radius:7px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#B85C00">
+        ⚠ Se il nominativo non è ancora identificato, indicare il ruolo scoperto e selezionare "Ricerca a cura della Segreteria" — il modulo non richiede dati anagrafici in questo caso.
+      </div>
       <table class="data-table">
         <thead>
           <tr>
@@ -737,6 +755,7 @@
             <th style="width:25%">Strumento / Ruolo</th>
             <th style="width:20%">Ente / Orchestra provenienza</th>
             <th style="width:15%">N° giorni servizio</th>
+            <th style="width:16%">Stato</th>
             <th>Note / Contatto</th>
           </tr>
         </thead>
@@ -749,7 +768,7 @@
   <!-- ══ SEZ 5 — PIANO PROVE ══ -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
-      <div><h2>5. Piano delle Prove</h2><p>Date, orari e luoghi — necessario per Ufficio Personale (turni coadiutori)</p></div>
+      <div><h2>5. Piano delle Prove</h2><p>Date, orari e luoghi — necessario per Ufficio Personale (turni coadiutori) · Per giornate con più turni aggiungere una riga per turno</p></div>
       <span class="toggle">▾</span>
     </div>
     <div class="section-body">
@@ -810,8 +829,8 @@
         </div>
       </div>
       <div class="field-row">
-        <div class="field-label">N° colli stimati</div>
-        <div class="field-input"><input type="text" name="n_colli" placeholder="Es. 3 casse + 1 furgone"></div>
+        <div class="field-label">N° colli stimati<br><small style="font-weight:400;color:var(--muted)">(facoltativo)</small></div>
+        <div class="field-input"><input type="text" name="n_colli" placeholder="Es. 3 casse + 1 furgone — stima indicativa se disponibile"></div>
       </div>
       <div class="field-row">
         <div class="field-label">Note trasporti</div>
@@ -964,6 +983,9 @@
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Dati Evento</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px 20px;font-size:13px">
           <div><span style="color:var(--muted);font-size:11px">Titolo</span><br><strong id="sint_titolo">{Titolo Progetto}</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Docente Referente</span><br><strong>{Docente Referente}</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Delibera C.A.</span><br><strong>{N° Delibera} del {Data Delibera}</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Budget autorizzato</span><br><strong>€ {Budget}</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Data</span><br><strong id="sint_data">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Ora</span><br><strong id="sint_ora">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Luogo</span><br><strong id="sint_luogo">—</strong></div>
@@ -1109,6 +1131,34 @@
 </div>
 
 <script>
+// ── Progetto monografico SIAE ──
+function toggleMonografico(cb) {
+  var fields = document.getElementById('autore-unico-fields');
+  if (cb.checked) {
+    fields.style.display = 'grid';
+    // Aggiorna tutti i brani con i valori dell'autore unico
+    document.getElementById('autore_unico').addEventListener('input', propagaAutoreUnico);
+    document.getElementById('nato_unico').addEventListener('input', propagaAutoreUnico);
+    document.getElementById('morto_unico').addEventListener('input', propagaAutoreUnico);
+  } else {
+    fields.style.display = 'none';
+  }
+}
+
+function propagaAutoreUnico() {
+  var autore = document.getElementById('autore_unico').value;
+  var nato = document.getElementById('nato_unico').value;
+  var morto = document.getElementById('morto_unico').value;
+  for (var i = 1; i <= braniCount; i++) {
+    var a = document.querySelector('[name="brano_autore_' + i + '"]');
+    var n = document.querySelector('[name="brano_nato_' + i + '"]');
+    var m = document.querySelector('[name="brano_morto_' + i + '"]');
+    if (a) a.value = autore;
+    if (n) n.value = nato;
+    if (m) m.value = morto;
+  }
+}
+
 // ── Toggle sezioni ──
 function toggleSection(header) {
   var body = header.nextElementSibling;
@@ -1162,10 +1212,11 @@ function addReplica() {
   div.style.cssText = 'display:grid;grid-template-columns:190px 1fr;border-bottom:1px solid #D0D7E3;min-height:40px;align-items:stretch;';
   div.innerHTML =
     '<div style="padding:10px 12px;font-size:12px;font-weight:600;color:#1A3C6B;border-right:1px solid #D0D7E3;display:flex;align-items:center;">Replica ' + replicheCount + '</div>' +
-    '<div style="padding:4px 8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;align-items:center;">' +
+    '<div style="padding:4px 8px;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:4px;align-items:center;">' +
     '<input type="text" name="replica_data_' + replicheCount + '" placeholder="GG/MM/AAAA" style="border:none;background:transparent;font-family:inherit;font-size:13px;padding:6px 4px;outline:none;width:100%;">' +
     '<input type="text" name="replica_ora_' + replicheCount + '" placeholder="Ora es. 20:30" style="border:none;background:transparent;font-family:inherit;font-size:13px;padding:6px 4px;outline:none;width:100%;">' +
     '<input type="text" name="replica_luogo_' + replicheCount + '" placeholder="Luogo (se diverso)" style="border:none;background:transparent;font-family:inherit;font-size:13px;padding:6px 4px;outline:none;width:100%;">' +
+    '<label style="font-size:11px;color:#6B7280;white-space:nowrap;display:flex;align-items:center;gap:3px;padding:0 6px;cursor:pointer;"><input type="checkbox" name="replica_confermata_' + replicheCount + '" style="width:auto;"> Data confermata</label>' +
     '</div>';
   document.getElementById('repliche-body').appendChild(div);
   // aggiorna sintesi
@@ -1296,11 +1347,12 @@ function addCollab() {
   collabCount++;
   var tr = document.createElement('tr');
   tr.innerHTML =
-    '<td><input type="text" name="col_nome_' + collabCount + '" placeholder="Cognome Nome"></td>' +
-    '<td><input type="text" name="col_ruolo_' + collabCount + '" placeholder="es. Violino I aggiunto"></td>' +
+    '<td><input type="text" name="col_nome_' + collabCount + '" placeholder="Cognome Nome — o lasciare vuoto se non identificato"></td>' +
+    '<td><input type="text" name="col_ruolo_' + collabCount + '" placeholder="es. Baritono, Violino I aggiunto"></td>' +
     '<td><input type="text" name="col_ente_' + collabCount + '" placeholder="Orchestra / Conservatorio"></td>' +
     '<td><input type="text" name="col_gg_' + collabCount + '" placeholder="es. 3"></td>' +
-    '<td><textarea name="col_note_' + collabCount + '" rows="1" placeholder="email / tel di contatto"></textarea></td>';
+    '<td><select name="col_stato_' + collabCount + '" style="width:100%;border:none;background:transparent;font-family:inherit;font-size:11px;padding:4px;outline:none"><option value="noto">Nominativo noto</option><option value="ricerca">Ricerca a cura Segreteria</option></select></td>' +
+    '<td><textarea name="col_note_' + collabCount + '" rows="1" placeholder="contatto / note"></textarea></td>';
   document.getElementById('collab-body').appendChild(tr);
 }
 for (var k = 0; k < 4; k++) addCollab();
