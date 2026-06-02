@@ -554,11 +554,11 @@
     <div class="section-body">
       <div class="field-row">
         <div class="field-label">Titolo evento</div>
-        <div class="field-input"><span class="prefilled">{Titolo Progetto}</span></div>
+        <div class="field-input"><span class="prefilled" id="pre-titolo">{Titolo Progetto}</span></div>
       </div>
       <div class="field-row">
         <div class="field-label">Docente Referente</div>
-        <div class="field-input"><span class="prefilled">{Docente Referente}</span></div>
+        <div class="field-input"><span class="prefilled" id="pre-referente">{Docente Referente}</span></div>
       </div>
       <div class="field-row">
         <div class="field-label">Data evento <span class="req">*</span></div>
@@ -574,7 +574,7 @@
       </div>
       <div class="field-row">
         <div class="field-label">Sede istituzionale</div>
-        <div class="field-input"><span class="prefilled">{Sede}</span></div>
+        <div class="field-input"><span class="prefilled" id="pre-sede">{Sede}</span></div>
       </div>
       <div class="field-row">
         <div class="field-label">Luogo concerto <span class="req">*</span></div>
@@ -1074,10 +1074,10 @@
       <div style="padding:16px 20px;border-bottom:1px solid var(--bordo);background:var(--blu-pale)">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Dati Evento</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px 20px;font-size:13px">
-          <div><span style="color:var(--muted);font-size:11px">Titolo</span><br><strong id="sint_titolo">{Titolo Progetto}</strong></div>
-          <div><span style="color:var(--muted);font-size:11px">Docente Referente</span><br><strong>{Docente Referente}</strong></div>
-          <div><span style="color:var(--muted);font-size:11px">Delibera C.A.</span><br><strong>{N° Delibera} del {Data Delibera}</strong></div>
-          <div><span style="color:var(--muted);font-size:11px">Budget autorizzato</span><br><strong>€ {Budget}</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Titolo</span><br><strong id="sint_titolo">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Docente Referente</span><br><strong id="sint_referente">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Delibera C.A.</span><br><strong id="sint_delibera">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Budget autorizzato</span><br><strong id="sint_budget">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Data</span><br><strong id="sint_data">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Ora</span><br><strong id="sint_ora">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Luogo</span><br><strong id="sint_luogo">—</strong></div>
@@ -1211,7 +1211,7 @@
         <li>Tocca <strong>Salva in File</strong></li>
       </ol>
     </div>
-    <div class="modal-nota">📧 Nominare il file: <strong>ID{XX}_{TitoloProduzione}_Modulo.pdf</strong><br>Inviare a: <strong>produzione@briccialditerni.it</strong></div>
+    <div class="modal-nota">📧 Nominare il file: <strong>ID<span id="pdf-id">XX</span>_<span id="pdf-titolo">TitoloProduzione</span>_Modulo.pdf</strong><br>Inviare a: <strong>produzione@briccialditerni.it</strong></div>
     <button onclick="chiudiPDF()" class="btn btn-primary" style="width:100%;margin-top:16px">Chiudi</button>
   </div>
 </div>
@@ -1272,16 +1272,38 @@ function leggiParams() {
 
 function popolaMetadati() {
   var el = function(id) { return document.getElementById(id); };
-  if (el('header-id'))     el('header-id').textContent = 'ID ' + (metadati.id || '—');
-  if (el('meta-titolo'))   el('meta-titolo').textContent = metadati.titolo || '—';
-  if (el('meta-referente'))el('meta-referente').textContent = metadati.referente || '—';
-  if (el('meta-delibera')) el('meta-delibera').textContent = (metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
-  if (el('meta-budget'))   el('meta-budget').textContent = metadati.budget ? '€ ' + metadati.budget : '—';
-  if (el('meta-scadenza')) el('meta-scadenza').textContent = metadati.scadenza || '—';
-  // Aggiorna sintesi
-  if (el('sint_titolo'))   el('sint_titolo').textContent = metadati.titolo || '{Titolo Progetto}';
-  // Aggiorna sollecito email referente
+  var set = function(id, val) { if (el(id)) el(id).textContent = val || '—'; };
+
+  // Header
+  set('header-id', 'ID ' + (metadati.id || '—'));
+
+  // Info banner
+  set('meta-titolo',    metadati.titolo);
+  set('meta-referente', metadati.referente);
+  set('meta-delibera',  metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
+  set('meta-budget',    metadati.budget ? '€ ' + metadati.budget : '—');
+  set('meta-scadenza',  metadati.scadenza);
+
+  // Campi precompilati sezione 1
+  set('pre-titolo',    metadati.titolo);
+  set('pre-referente', metadati.referente);
+  set('pre-sede',      metadati.sede);
+
+  // Scheda sintesi
+  set('sint_titolo',    metadati.titolo);
+  set('sint_referente', metadati.referente);
+  set('sint_delibera',  metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
+  set('sint_budget',    metadati.budget ? '€ ' + metadati.budget : '—');
+
+  // Modal PDF
+  set('pdf-id',     metadati.id);
+  set('pdf-titolo', metadati.titolo ? metadati.titolo.replace(/\s+/g,'') : 'TitoloProduzione');
+
+  // Email referente per sollecito
   window._emailReferente = metadati.email || '';
+
+  // Titolo pagina
+  if (metadati.titolo) document.title = 'Modulo — ' + metadati.titolo + ' | ID ' + metadati.id;
 }
 
 function confermaAvvio() {
