@@ -453,6 +453,33 @@
 </head>
 <body>
 
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnB-Ck9sE4Tt2m_P5rhG8lruWLfEfpXx8",
+    authDomain: "briccialdi-produzioni.firebaseapp.com",
+    projectId: "briccialdi-produzioni",
+    storageBucket: "briccialdi-produzioni.firebasestorage.app",
+    messagingSenderId: "447173206446",
+    appId: "1:447173206446:web:6bb69d152d286ce957e83f"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.fsDoc = doc;
+  window.fsSetDoc = setDoc;
+  window.fsGetDoc = getDoc;
+  window.fsUpdateDoc = updateDoc;
+  window.fsTimestamp = serverTimestamp;
+  window.firebaseReady = true;
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+
 <header class="site-header">
   <div>
     <h1>Conservatorio «G. Briccialdi» — Terni</h1>
@@ -462,6 +489,7 @@
     <span class="icon">🎼</span>
     Produzione Sinfonico-Corale &nbsp;|&nbsp; <span id="header-id">ID —</span>
   </div>
+  <span id="notifica-salvataggio" style="font-size:11px;color:rgba(255,255,255,.7);transition:opacity 1s;opacity:0;margin-left:12px"></span>
 </header>
 
 <!-- ══ SCHERMATA DI AVVIO — solo Responsabile ══ -->
@@ -1377,10 +1405,9 @@ function confermaAvvio() {
   if (!ok) { document.getElementById('av-errore').style.display = 'block'; return; }
   document.getElementById('av-errore').style.display = 'none';
 
-  // Costruisci URL
-  var base = window.location.origin + window.location.pathname;
-  var p = new URLSearchParams({
-    id:            document.getElementById('av_id').value.trim(),
+  var id = document.getElementById('av_id').value.trim();
+  var dati = {
+    id:            id,
     titolo:        document.getElementById('av_titolo').value.trim(),
     referente:     document.getElementById('av_referente').value.trim(),
     email:         document.getElementById('av_email').value.trim(),
@@ -1389,7 +1416,24 @@ function confermaAvvio() {
     budget:        document.getElementById('av_budget').value.trim(),
     sede:          document.getElementById('av_sede').value.trim(),
     scadenza:      document.getElementById('av_scadenza').value.trim(),
-  });
+  };
+
+  // Salva su Firestore se disponibile
+  if (window.firebaseReady && window.db) {
+    var docRef = window.fsDoc(window.db, 'progetti', id);
+    window.fsSetDoc(docRef, {
+      metadati: dati,
+      stato: { creato_il: window.fsTimestamp(), completato_referente: false, completato_responsabile: false }
+    }, { merge: true }).then(function() {
+      console.log('Progetto salvato su Firestore:', id);
+    }).catch(function(e) {
+      console.warn('Firestore non disponibile, uso URL params:', e);
+    });
+  }
+
+  // Genera link con params URL (fallback sempre disponibile)
+  var base = window.location.origin + window.location.pathname;
+  var p = new URLSearchParams(dati);
   var link = base + '?' + p.toString();
   document.getElementById('av-link-testo').value = link;
   document.getElementById('av-link-box').style.display = 'block';
@@ -1904,18 +1948,85 @@ function addPersona() {
 // 5 righe iniziali
 for (var pp = 0; pp < 5; pp++) addPersona();
 
-// Avvia checklist e aggiorna ad ogni input
-aggiornaChecklist();
+// ── Firestore: carica e salva dati ──
+function caricaDaFirestore(id) {
+  if (!window.firebaseReady || !window.db) return;
+  var docRef = window.fsDoc(window.db, 'progetti', id);
+  window.fsGetDoc(docRef).then(function(snap) {
+    if (!snap.exists()) return;
+    var d = snap.data();
+    // Popola metadati se presenti
+    if (d.metadati) {
+      metadati = d.metadati;
+      popolaMetadati();
+    }
+    // Popola dati referente se presenti
+    if (d.dati_referente) {
+      var dr = d.dati_referente;
+      Object.keys(dr).forEach(function(k) {
+        var el = document.querySelector('[name="' + k + '"]');
+        if (el && dr[k] !== undefined) {
+          el.value = dr[k];
+          if (el.tagName === 'TEXTAREA') { el.style.height = 'auto'; el.style.height = (el.scrollHeight + 2) + 'px'; }
+        }
+      });
+      calcolaTotali();
+      aggiornaChecklist();
+      aggiornaSintesiEvento();
+      setTimeout(costruisciTabellaDistrib, 300);
+    }
+    mostraNotificaSalvataggio('Dati caricati da Firestore');
+  }).catch(function(e) { console.warn('Errore caricamento Firestore:', e); });
+}
+
+var _salvaTimer = null;
+function salvaReferenteSuFirestore() {
+  if (!window.firebaseReady || !window.db || !metadati.id) return;
+  clearTimeout(_salvaTimer);
+  _salvaTimer = setTimeout(function() {
+    var dati = {};
+    document.querySelectorAll('input[name], textarea[name], select[name]').forEach(function(el) {
+      if (el.value && el.value.trim() && !el.name.startsWith('dist_') && !el.name.startsWith('pers_') && el.name !== 'note_responsabile') {
+        dati[el.name] = el.value.trim();
+      }
+    });
+    var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
+    window.fsUpdateDoc(docRef, {
+      dati_referente: dati,
+      'stato.ultimo_aggiornamento': window.fsTimestamp()
+    }).then(function() {
+      mostraNotificaSalvataggio('Salvato ✓');
+    }).catch(function(e) {
+      // Se il documento non esiste ancora, crealo
+      window.fsSetDoc(docRef, { dati_referente: dati }, { merge: true });
+    });
+  }, 2000); // salva 2 secondi dopo l'ultima modifica
+}
+
+function mostraNotificaSalvataggio(msg) {
+  var el = document.getElementById('notifica-salvataggio');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
+  setTimeout(function() { el.style.opacity = '0'; }, 3000);
+}
+
+window.addEventListener('firebaseReady', function() {
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (id && metadati.id) caricaDaFirestore(id);
+});
 document.addEventListener('input', function() {
   aggiornaChecklist();
   aggiornaSintesiEvento();
-  // Aggiorna distribuzione quando cambiano i totali organico
   var n = event.target ? event.target.name : '';
   if (n && n.indexOf('org_') === 0) setTimeout(aggiornaDistrib, 50);
+  salvaReferenteSuFirestore();
 });
 document.addEventListener('change', function() {
   aggiornaChecklist();
   aggiornaSintesiEvento();
+  salvaReferenteSuFirestore();
 });
 
 // ── Piano prove ──
