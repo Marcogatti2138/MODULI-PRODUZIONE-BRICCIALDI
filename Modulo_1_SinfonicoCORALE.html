@@ -1161,10 +1161,9 @@
     </div>
   </div>
 
-</div><!-- /wrapper -->
 
-  <!-- ══ SEZ 11 — DISTRIBUZIONE ORGANICO (RESPONSABILE) ══ -->
-  <div class="section" id="sezione-distribuzione" style="margin:0 auto 20px;max-width:980px;margin-left:auto;margin-right:auto">
+  <!-- ══ SEZ 10 — DISTRIBUZIONE ORGANICO (RESPONSABILE) ══ -->
+  <div class="section" id="sezione-distribuzione">
     <div class="section-header" onclick="toggleSection(this)" style="background:#2A5C9B">
       <div><h2>10. Distribuzione Organico — Responsabile Produzione</h2><p>Sezione riservata — da completare dopo ricezione del modulo Referente</p></div>
       <span class="toggle">▾</span>
@@ -1179,8 +1178,8 @@
             <tr style="background:var(--blu)">
               <th style="padding:8px 12px;text-align:left;color:white;font-size:11px">Sezione</th>
               <th style="padding:8px 12px;text-align:center;color:white;font-size:11px">Totale<br>Referente</th>
-              <th style="padding:8px 12px;text-align:center;color:#A5D6A7;font-size:11px">Docenti<br>interni</th>
-              <th style="padding:8px 12px;text-align:center;color:#90CAF9;font-size:11px">Studenti<br>interni</th>
+              <th style="padding:8px 12px;text-align:center;color:#A5D6A7;font-size:11px">Docenti</th>
+              <th style="padding:8px 12px;text-align:center;color:#90CAF9;font-size:11px">Studenti<br><small style="font-weight:400;opacity:.8">(p.studi/tiro/200h)</small></th>
               <th style="padding:8px 12px;text-align:center;color:#FFAB91;font-size:11px">Collaboratori<br>esterni</th>
               <th style="padding:8px 12px;text-align:center;color:white;font-size:11px">Verifica</th>
             </tr>
@@ -1725,94 +1724,160 @@ function apriMailSollecito() {
   window.location.href = 'mailto:' + emailRef + '?subject=' + sogg + '&body=' + corpo;
 }
 
-// ── Sezione 11 — Distribuzione Organico ──
-var sezioniOrganico = [
-  { id: 'legni',  label: 'Fiati Legni',   totId: 'sint_legni_p' },
-  { id: 'ottoni', label: 'Fiati Ottoni',  totId: 'sint_ottoni_p' },
-  { id: 'archi',  label: 'Archi',         totId: 'sint_archi_p' },
-  { id: 'perc',   label: 'Percussioni',   totId: 'sint_perc_p' },
-  { id: 'coro',   label: 'Coro',          totId: 'sint_coro_p' },
+// ── Sezione 10 — Distribuzione Organico ──
+var strumentiOrganico = [
+  {id:'fl1',label:'Flauto I',sez:'legni',totId:'org_fl1'},
+  {id:'fl2',label:'Flauto II',sez:'legni',totId:'org_fl2'},
+  {id:'fl3',label:'Flauto III / Ottavino',sez:'legni',totId:'org_fl3'},
+  {id:'ob1',label:'Oboe I',sez:'legni',totId:'org_ob1'},
+  {id:'ob2',label:'Oboe II',sez:'legni',totId:'org_ob2'},
+  {id:'ci',label:'Corno Inglese',sez:'legni',totId:'org_ci'},
+  {id:'cl1',label:'Clarinetto I',sez:'legni',totId:'org_cl1'},
+  {id:'cl2',label:'Clarinetto II',sez:'legni',totId:'org_cl2'},
+  {id:'cl3',label:'Clarinetto III',sez:'legni',totId:'org_cl3'},
+  {id:'clb',label:'Clarinetto Basso',sez:'legni',totId:'org_clb'},
+  {id:'fg1',label:'Fagotto I',sez:'legni',totId:'org_fg1'},
+  {id:'fg2',label:'Fagotto II',sez:'legni',totId:'org_fg2'},
+  {id:'cfg',label:'Controfagotto',sez:'legni',totId:'org_cfg'},
+  {id:'sxs',label:'Sax Soprano',sez:'legni',totId:'org_sxs'},
+  {id:'sxa',label:'Sax Contralto',sez:'legni',totId:'org_sxa'},
+  {id:'sxt',label:'Sax Tenore',sez:'legni',totId:'org_sxt'},
+  {id:'sxb',label:'Sax Baritono',sez:'legni',totId:'org_sxb'},
+  {id:'cr1',label:'Corno I',sez:'ottoni',totId:'org_cr1'},
+  {id:'cr2',label:'Corno II',sez:'ottoni',totId:'org_cr2'},
+  {id:'cr3',label:'Corno III',sez:'ottoni',totId:'org_cr3'},
+  {id:'cr4',label:'Corno IV',sez:'ottoni',totId:'org_cr4'},
+  {id:'tr1',label:'Tromba I',sez:'ottoni',totId:'org_tr1'},
+  {id:'tr2',label:'Tromba II',sez:'ottoni',totId:'org_tr2'},
+  {id:'tr3',label:'Tromba III',sez:'ottoni',totId:'org_tr3'},
+  {id:'tb1',label:'Trombone I',sez:'ottoni',totId:'org_tb1'},
+  {id:'tb2',label:'Trombone II',sez:'ottoni',totId:'org_tb2'},
+  {id:'tbb',label:'Trombone Basso',sez:'ottoni',totId:'org_tbb'},
+  {id:'tuba',label:'Tuba',sez:'ottoni',totId:'org_tuba'},
+  {id:'flics',label:'Flicorno Soprano',sez:'ottoni',totId:'org_flics'},
+  {id:'frica',label:'Flicorno Contralto',sez:'ottoni',totId:'org_frica'},
+  {id:'fricb',label:'Flicorno Baritono',sez:'ottoni',totId:'org_fricb'},
+  {id:'fricbs',label:'Flicorno Basso',sez:'ottoni',totId:'org_fricbs'},
+  {id:'vi1',label:'Violini I',sez:'archi',totId:'org_vi1'},
+  {id:'vi2',label:'Violini II',sez:'archi',totId:'org_vi2'},
+  {id:'vla',label:'Viole',sez:'archi',totId:'org_vla'},
+  {id:'vc',label:'Violoncelli',sez:'archi',totId:'org_vc'},
+  {id:'cb',label:'Contrabbassi',sez:'archi',totId:'org_cb'},
+  {id:'arpa',label:'Arpa',sez:'perc',totId:'org_arpa'},
+  {id:'cel',label:'Celesta / Pianoforte',sez:'perc',totId:'org_cel'},
+  {id:'timp',label:'Timpani',sez:'perc',totId:'org_timp'},
+  {id:'perc',label:'Percussioni varie',sez:'perc',totId:'org_perc'},
 ];
+var sezLabels = {legni:'🎵 Fiati Legni',ottoni:'🎺 Fiati Ottoni',archi:'🎻 Archi',perc:'🥁 Percussioni'};
+
+function getNum(name) {
+  var el = document.querySelector('[name="' + name + '"]');
+  return el ? (parseInt(el.value) || 0) : 0;
+}
 
 function costruisciTabellaDistrib() {
   var tbody = document.getElementById('distrib-tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  sezioniOrganico.forEach(function(sez, idx) {
-    var totRef = parseInt(document.getElementById(sez.totId) ? document.getElementById(sez.totId).textContent : '0') || 0;
-    var bg = idx % 2 === 1 ? 'background:#F4F7FC' : '';
+  var sezCorrente = '', rowIdx = 0;
+  strumentiOrganico.forEach(function(s) {
+    if (s.sez !== sezCorrente) {
+      sezCorrente = s.sez;
+      var trH = document.createElement('tr');
+      trH.innerHTML = '<td colspan="6" style="padding:6px 12px;background:#2A5C9B;color:white;font-size:11px;font-weight:700;letter-spacing:.4px">' + sezLabels[s.sez] + '</td>';
+      tbody.appendChild(trH);
+    }
+    var bg = rowIdx % 2 === 0 ? 'white' : '#F4F7FC';
+    var ref = getNum(s.totId);
     var tr = document.createElement('tr');
-    tr.style.cssText = bg + ';border-bottom:1px solid #D0D7E3';
+    tr.setAttribute('data-strum', s.id);
+    tr.style.cssText = 'background:' + bg + ';border-bottom:1px solid #E8ECF3';
     tr.innerHTML =
-      '<td style="padding:7px 12px;font-weight:600;color:var(--blu)">' + sez.label + '</td>' +
-      '<td style="text-align:center;padding:7px;font-weight:700;color:var(--blu)">' + totRef + '</td>' +
-      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_doc_' + sez.id + '" value="0" oninput="aggiornaDistrib()" style="width:60px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
-      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_stu_' + sez.id + '" value="0" oninput="aggiornaDistrib()" style="width:60px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
-      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_est_' + sez.id + '" value="0" oninput="aggiornaDistrib()" style="width:60px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
-      '<td style="text-align:center;padding:7px;font-size:16px" id="verifica_' + sez.id + '">—</td>';
+      '<td style="padding:6px 12px;font-size:12px;color:#1A3C6B;font-weight:600">' + s.label + '</td>' +
+      '<td style="text-align:center;padding:6px;font-weight:700;color:#1A3C6B;font-size:13px" id="dref_' + s.id + '">' + (ref || '—') + '</td>' +
+      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_doc_' + s.id + '" value="0" oninput="aggiornaDistrib()" style="width:52px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 5px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_stu_' + s.id + '" value="0" oninput="aggiornaDistrib()" style="width:52px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 5px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+      '<td style="padding:3px 4px"><input type="number" min="0" name="dist_est_' + s.id + '" value="0" oninput="aggiornaDistrib()" style="width:52px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 5px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+      '<td style="text-align:center;padding:6px;font-size:14px" id="verifica_' + s.id + '">—</td>';
     tbody.appendChild(tr);
+    rowIdx++;
   });
+  // Coro aggregato
+  var trCH = document.createElement('tr');
+  trCH.innerHTML = '<td colspan="6" style="padding:6px 12px;background:#2A5C9B;color:white;font-size:11px;font-weight:700;letter-spacing:.4px">🎤 Coro (totale aggregato)</td>';
+  tbody.appendChild(trCH);
+  var refCoro = parseInt(document.getElementById('sint_coro_p') ? document.getElementById('sint_coro_p').textContent : '0') || 0;
+  var trC = document.createElement('tr');
+  trC.style.cssText = 'background:white;border-bottom:1px solid #E8ECF3';
+  trC.innerHTML =
+    '<td style="padding:6px 12px;font-size:12px;color:#1A3C6B;font-weight:600">Totale Coro</td>' +
+    '<td style="text-align:center;padding:6px;font-weight:700;color:#1A3C6B;font-size:13px" id="dref_coro">' + (refCoro || '—') + '</td>' +
+    '<td style="padding:3px 4px"><input type="number" min="0" name="dist_doc_coro" value="0" oninput="aggiornaDistrib()" style="width:52px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 5px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+    '<td style="padding:3px 4px"><input type="number" min="0" name="dist_stu_coro" value="0" oninput="aggiornaDistrib()" style="width:52px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 5px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+    '<td style="padding:3px 4px"><input type="number" min="0" name="dist_est_coro" value="0" oninput="aggiornaDistrib()" style="width:52px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 5px;font-family:inherit;font-size:12px;text-align:center;outline:none"></td>' +
+    '<td style="text-align:center;padding:6px;font-size:14px" id="verifica_coro">—</td>';
+  tbody.appendChild(trC);
   aggiornaDistrib();
 }
 
 function aggiornaDistrib() {
-  var totRef = 0, totDoc = 0, totStu = 0, totEst = 0;
-  sezioniOrganico.forEach(function(sez) {
-    var ref = parseInt(document.getElementById(sez.totId) ? document.getElementById(sez.totId).textContent : '0') || 0;
-    var doc = parseInt((document.querySelector('[name="dist_doc_' + sez.id + '"]') || {}).value) || 0;
-    var stu = parseInt((document.querySelector('[name="dist_stu_' + sez.id + '"]') || {}).value) || 0;
-    var est = parseInt((document.querySelector('[name="dist_est_' + sez.id + '"]') || {}).value) || 0;
-    var somma = doc + stu + est;
-    var elV = document.getElementById('verifica_' + sez.id);
-    if (elV) {
-      if (ref === 0 && somma === 0) { elV.textContent = '—'; elV.style.color = '#6B7280'; }
-      else if (somma === ref) { elV.textContent = '✓'; elV.style.color = '#2E7D32'; }
-      else { elV.textContent = '✗ ' + somma + '/' + ref; elV.style.color = '#C62828'; }
+  var set = function(id,val){var el=document.getElementById(id);if(el)el.textContent=val;};
+  var totRef=0,totDoc=0,totStu=0,totEst=0;
+  // Strumenti
+  strumentiOrganico.forEach(function(s) {
+    var ref=getNum(s.totId);
+    var doc=parseInt((document.querySelector('[name="dist_doc_'+s.id+'"]') || {}).value)||0;
+    var stu=parseInt((document.querySelector('[name="dist_stu_'+s.id+'"]') || {}).value)||0;
+    var est=parseInt((document.querySelector('[name="dist_est_'+s.id+'"]') || {}).value)||0;
+    var som=doc+stu+est;
+    var elR=document.getElementById('dref_'+s.id);
+    var elV=document.getElementById('verifica_'+s.id);
+    if(elR) elR.textContent=ref||'—';
+    if(elV){
+      if(ref===0&&som===0){elV.textContent='—';elV.style.color='#6B7280';}
+      else if(som===ref){elV.textContent='✓';elV.style.color='#2E7D32';}
+      else{elV.textContent='✗';elV.style.color='#C62828';elV.title=som+'/'+ref;}
     }
-    totRef += ref; totDoc += doc; totStu += stu; totEst += est;
+    totRef+=ref;totDoc+=doc;totStu+=stu;totEst+=est;
   });
-  var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
-  set('distrib-tot-ref', totRef);
-  set('distrib-tot-doc', totDoc);
-  set('distrib-tot-stu', totStu);
-  set('distrib-tot-est', totEst);
-
-  // Specchia interni/esterni nella scheda sintesi
-  var mapSez = {legni:'legni', ottoni:'ottoni', archi:'archi', perc:'perc', coro:'coro'};
-  var totInt = 0, totEst2 = 0;
-  sezioniOrganico.forEach(function(sez) {
-    var doc = parseInt((document.querySelector('[name="dist_doc_' + sez.id + '"]') || {}).value) || 0;
-    var stu = parseInt((document.querySelector('[name="dist_stu_' + sez.id + '"]') || {}).value) || 0;
-    var est = parseInt((document.querySelector('[name="dist_est_' + sez.id + '"]') || {}).value) || 0;
-    var interni = doc + stu;
-    set('sint_' + mapSez[sez.id] + '_i', interni);
-    set('sint_' + mapSez[sez.id] + '_e', est);
-    totInt += interni;
-    totEst2 += est;
-  });
-  set('sint_org_int', totInt);
-  set('sint_org_est', totEst2);
-
-  // Verifica totale
-  var elVT = document.getElementById('distrib-tot-verifica');
-  if (elVT) {
-    var sommaTot = totDoc + totStu + totEst;
-    if (totRef === 0) { elVT.textContent = '—'; elVT.style.color = '#6B7280'; }
-    else if (sommaTot === totRef) { elVT.textContent = '✓'; elVT.style.color = '#2E7D32'; elVT.style.fontWeight = '700'; elVT.style.fontSize = '16px'; }
-    else { elVT.textContent = '✗ ' + sommaTot + '/' + totRef; elVT.style.color = '#C62828'; elVT.style.fontWeight = '700'; }
+  // Coro
+  var refC=parseInt(document.getElementById('sint_coro_p')?document.getElementById('sint_coro_p').textContent:'0')||0;
+  var docC=parseInt((document.querySelector('[name="dist_doc_coro"]') || {}).value)||0;
+  var stuC=parseInt((document.querySelector('[name="dist_stu_coro"]') || {}).value)||0;
+  var estC=parseInt((document.querySelector('[name="dist_est_coro"]') || {}).value)||0;
+  var somC=docC+stuC+estC;
+  var elVC=document.getElementById('verifica_coro');
+  var elRC=document.getElementById('dref_coro');
+  if(elRC) elRC.textContent=refC||'—';
+  if(elVC){
+    if(refC===0&&somC===0){elVC.textContent='—';elVC.style.color='#6B7280';}
+    else if(somC===refC){elVC.textContent='✓';elVC.style.color='#2E7D32';}
+    else{elVC.textContent='✗';elVC.style.color='#C62828';elVC.title=somC+'/'+refC;}
   }
-
-  // Aggiorna contratti — conta solo righe con nome compilato E qualifica "Collaboratore esterno"
-  var righePersonale = document.querySelectorAll('#personale-tbody tr');
-  var nEst = 0;
-  righePersonale.forEach(function(tr) {
-    var nome = tr.querySelector('input[name^="pers_nome_"]');
-    var qual = tr.querySelector('select[name^="pers_qual_"]');
-    if (nome && nome.value.trim() && qual && qual.value === 'Collaboratore esterno') nEst++;
+  totRef+=refC;totDoc+=docC;totStu+=stuC;totEst+=estC;
+  // Totali tabella
+  set('distrib-tot-ref',totRef);set('distrib-tot-doc',totDoc);set('distrib-tot-stu',totStu);set('distrib-tot-est',totEst);
+  // Verifica totale
+  var elVT=document.getElementById('distrib-tot-verifica');
+  if(elVT){var st=totDoc+totStu+totEst;if(totRef===0){elVT.textContent='—';elVT.style.color='#6B7280';}else if(st===totRef){elVT.textContent='✓';elVT.style.color='#2E7D32';}else{elVT.textContent='✗ '+st+'/'+totRef;elVT.style.color='#C62828';}}
+  // Specchia in sintesi per sezione
+  var sezInt={legni:0,ottoni:0,archi:0,perc:0};
+  var sezEst={legni:0,ottoni:0,archi:0,perc:0};
+  strumentiOrganico.forEach(function(s){
+    var doc=parseInt((document.querySelector('[name="dist_doc_'+s.id+'"]') || {}).value)||0;
+    var stu=parseInt((document.querySelector('[name="dist_stu_'+s.id+'"]') || {}).value)||0;
+    var est=parseInt((document.querySelector('[name="dist_est_'+s.id+'"]') || {}).value)||0;
+    sezInt[s.sez]+=doc+stu; sezEst[s.sez]+=est;
   });
-  set('contratti-sol', nEst);
-  set('contratti-tot', totEst + nEst);
+  ['legni','ottoni','archi','perc'].forEach(function(s){set('sint_'+s+'_i',sezInt[s]);set('sint_'+s+'_e',sezEst[s]);});
+  set('sint_coro_i',docC+stuC); set('sint_coro_e',estC);
+  set('sint_org_int',totDoc+totStu); set('sint_org_est',totEst);
+  // Contratti
+  var righe=document.querySelectorAll('#personale-tbody tr'),nExt=0;
+  righe.forEach(function(tr){var n=tr.querySelector('input[name^="pers_nome_"]');var q=tr.querySelector('select[name^="pers_qual_"]');if(n&&n.value.trim()&&q&&q.value==='Collaboratore esterno')nExt++;});
+  set('contratti-orch',totEst); set('contratti-sol',nExt); set('contratti-tot',totEst+nExt);
 }
+
 
 // ── Schede personale ──
 var personaleCount = 0;
@@ -1826,8 +1891,10 @@ function addPersona() {
     '<td style="padding:3px 4px"><input type="text" name="pers_ruolo_' + personaleCount + '" placeholder="es. Violino I" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
     '<td style="padding:3px 4px"><select name="pers_qual_' + personaleCount + '" onchange="aggiornaDistrib()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 4px;font-family:inherit;font-size:11px;outline:none">' +
     '<option value="">— qualifica —</option>' +
-    '<option value="Docente interno">Docente interno</option>' +
-    '<option value="Studente interno">Studente interno</option>' +
+    '<option value="Docente">Docente</option>' +
+    '<option value="Studente piano di studi">Studente piano di studi</option>' +
+    '<option value="Studente tirocinio">Studente tirocinio</option>' +
+    '<option value="Studente 200 ore">Studente 200 ore</option>' +
     '<option value="Collaboratore esterno">Collaboratore esterno</option>' +
     '</select></td>' +
     '<td style="padding:3px 4px"><input type="email" name="pers_email_' + personaleCount + '" placeholder="email" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
