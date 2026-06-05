@@ -1963,19 +1963,33 @@ function caricaDaFirestore(id) {
     // Popola dati referente se presenti
     if (d.dati_referente) {
       var dr = d.dati_referente;
+      // Prima popola i campi già presenti nel DOM
       Object.keys(dr).forEach(function(k) {
         var el = document.querySelector('[name="' + k + '"]');
         if (el && dr[k] !== undefined) {
           el.value = dr[k];
-          if (el.tagName === 'TEXTAREA') { el.style.height = 'auto'; el.style.height = (el.scrollHeight + 2) + 'px'; }
+          if (el.tagName === 'TEXTAREA') {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight + 2) + 'px';
+          }
         }
       });
+      // Poi aggiorna tutti i calcoli e visualizzazioni
       calcolaTotali();
       aggiornaChecklist();
       aggiornaSintesiEvento();
-      setTimeout(costruisciTabellaDistrib, 300);
+      setTimeout(function() {
+        costruisciTabellaDistrib();
+        // Riprova a popolare campi dinamici (brani, prove, solisti)
+        Object.keys(dr).forEach(function(k) {
+          var el = document.querySelector('[name="' + k + '"]');
+          if (el && dr[k] !== undefined) el.value = dr[k];
+        });
+        calcolaTotali();
+        aggiornaChecklist();
+      }, 500);
     }
-    mostraNotificaSalvataggio('Dati caricati da Firestore');
+    mostraNotificaSalvataggio('✓ Dati caricati');
   }).catch(function(e) { console.warn('Errore caricamento Firestore:', e); });
 }
 
@@ -2016,6 +2030,19 @@ window.addEventListener('firebaseReady', function() {
   var id = params.get('id');
   if (id && metadati.id) caricaDaFirestore(id);
 });
+
+// Fallback: se firebaseReady è già scattato prima del listener, riprova ogni 200ms
+function tentaCaricamento() {
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (!id) return;
+  if (window.firebaseReady && window.db && metadati.id) {
+    caricaDaFirestore(id);
+  } else {
+    setTimeout(tentaCaricamento, 200);
+  }
+}
+tentaCaricamento();
 document.addEventListener('input', function() {
   aggiornaChecklist();
   aggiornaSintesiEvento();
