@@ -491,7 +491,7 @@
 </header>
 
 <!-- ══ SCHERMATA DI AVVIO — solo Responsabile ══ -->
-<div id="schermata-avvio" style="display:none;position:fixed;inset:0;background:rgba(10,20,50,.85);z-index:500;overflow-y:auto;padding:20px">
+<div id="schermata-avvio" style="display:block;position:fixed;inset:0;background:rgba(10,20,50,.85);z-index:500;overflow-y:auto;padding:20px">
   <div style="background:white;border-radius:12px;max-width:640px;margin:40px auto;padding:28px;box-shadow:0 8px 40px rgba(0,0,0,.3)">
     <h2 style="font-family:Georgia,serif;font-size:20px;color:#1A3C6B;margin-bottom:4px">Configura progetto</h2>
     <p style="font-size:12px;color:#6B7280;margin-bottom:20px">Inserisci i dati del progetto. Una volta confermati verrà generato il link da inviare al Referente.</p>
@@ -1545,7 +1545,7 @@ function addBrano() {
     '<td><textarea name="brano_autore_' + braniCount + '" rows="1" placeholder="Autore"></textarea></td>' +
     '<td><input type="text" name="brano_nato_' + braniCount + '" placeholder="aaaa"></td>' +
     '<td><input type="text" name="brano_morto_' + braniCount + '" placeholder="aaaa"></td>' +
-    '<td><input type="text" name="brano_durata_' + braniCount + '" placeholder="mm\'ss"></td>' +
+    '<td><input type="text" name="brano_durata_' + braniCount + '" placeholder="mm-ss"></td>' +
     '<td><textarea name="brano_note_' + braniCount + '" rows="1" placeholder="es. prima esecuzione"></textarea></td>';
   document.getElementById('brani-body').appendChild(tr);
 }
@@ -2095,8 +2095,10 @@ function salvaResponsabileSuFirestore() {
     }).catch(function(e) {
       window.fsSetDoc(docRef, { dati_responsabile: dati }, { merge: true });
     });
-  }, 2000);
 }
+
+var _salvaTimer = null;
+function salvaReferenteSuFirestore() {
   if (!window.firebaseReady || !window.db || !metadati.id) return;
   clearTimeout(_salvaTimer);
   _salvaTimer = setTimeout(function() {
