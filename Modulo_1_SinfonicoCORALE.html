@@ -1486,7 +1486,7 @@ function apriModulo() {
 }
 
 // ── Inizializzazione ──
-window.addEventListener('DOMContentLoaded', function() {
+function inizializza() {
   var haDati = leggiParams();
   if (haDati) {
     document.getElementById('schermata-avvio').style.display = 'none';
@@ -1497,7 +1497,14 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   aggiornaChecklist();
   setTimeout(costruisciTabellaDistrib, 200);
-});
+}
+
+// Avvia subito — non aspettare DOMContentLoaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inizializza);
+} else {
+  inizializza();
+}
 
 // ── Toggle sezioni ──
 function toggleSection(header) {
