@@ -453,12 +453,11 @@
 </head>
 <body>
 
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
-
-  const firebaseConfig = {
+<!-- Firebase SDK compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  var firebaseConfig = {
     apiKey: "AIzaSyCnB-Ck9sE4Tt2m_P5rhG8lruWLfEfpXx8",
     authDomain: "briccialdi-produzioni.firebaseapp.com",
     projectId: "briccialdi-produzioni",
@@ -466,16 +465,15 @@
     messagingSenderId: "447173206446",
     appId: "1:447173206446:web:6bb69d152d286ce957e83f"
   };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
 
   window.db = db;
-  window.fsDoc = doc;
-  window.fsSetDoc = setDoc;
-  window.fsGetDoc = getDoc;
-  window.fsUpdateDoc = updateDoc;
-  window.fsTimestamp = serverTimestamp;
+  window.fsDoc = function(db, col, id) { return db.collection(col).doc(id); };
+  window.fsSetDoc = function(ref, data, opts) { return opts && opts.merge ? ref.set(data, {merge:true}) : ref.set(data); };
+  window.fsGetDoc = function(ref) { return ref.get(); };
+  window.fsUpdateDoc = function(ref, data) { return ref.update(data); };
+  window.fsTimestamp = function() { return firebase.firestore.FieldValue.serverTimestamp(); };
   window.firebaseReady = true;
   window.dispatchEvent(new Event('firebaseReady'));
 </script>
@@ -489,7 +487,7 @@
     <span class="icon">🎼</span>
     Produzione Sinfonico-Corale &nbsp;|&nbsp; <span id="header-id">ID —</span>
   </div>
-  <span id="notifica-salvataggio" style="font-size:11px;color:rgba(255,255,255,.7);transition:opacity 1s;opacity:0;margin-left:12px"></span>
+  <span id="notifica-salvataggio" style="font-size:12px;color:#90EE90;font-weight:600;transition:opacity 1s;opacity:0;margin-left:12px;white-space:nowrap"></span>
 </header>
 
 <!-- ══ SCHERMATA DI AVVIO — solo Responsabile ══ -->
@@ -544,14 +542,26 @@
     </div>
 
     <!-- Box link generato -->
-    <div id="av-link-box" style="display:none;margin-top:16px;background:#EEF3FA;border:1px solid #C5D5EA;border-radius:8px;padding:14px">
-      <div style="font-size:11px;font-weight:700;color:#1A3C6B;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Link da inviare al Referente:</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" id="av-link-testo" readonly style="flex:1;border:1px solid #C5D5EA;border-radius:5px;padding:7px 10px;font-family:monospace;font-size:11px;background:white;outline:none;color:#1A3C6B">
-        <button onclick="copiaLink()" style="background:#1A3C6B;color:white;border:none;border-radius:5px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Copia</button>
+    <div id="av-link-box" style="display:none;margin-top:16px">
+      <!-- Link Referente -->
+      <div style="background:#EEF3FA;border:1px solid #C5D5EA;border-radius:8px;padding:14px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:#1A3C6B;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">📧 Link da inviare al Referente:</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="av-link-testo" readonly style="flex:1;border:1px solid #C5D5EA;border-radius:5px;padding:7px 10px;font-family:monospace;font-size:11px;background:white;outline:none;color:#1A3C6B">
+          <button onclick="copiaLink('av-link-testo','link-copiato')" style="background:#1A3C6B;color:white;border:none;border-radius:5px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Copia</button>
+        </div>
+        <p id="link-copiato" style="display:none;color:#2E7D32;font-size:11px;margin-top:6px">✓ Link copiato!</p>
       </div>
-      <p id="link-copiato" style="display:none;color:#2E7D32;font-size:11px;margin-top:6px">✓ Link copiato!</p>
-      <button onclick="apriModulo()" style="width:100%;margin-top:10px;background:#2E7D32;color:white;border:none;border-radius:7px;padding:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Apri modulo compilato →</button>
+      <!-- Link Responsabile -->
+      <div style="background:#E8F5E9;border:1px solid #A5D6A7;border-radius:8px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:#2E7D32;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">🔒 Link Responsabile Produzione (solo uso interno):</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="av-link-resp" readonly style="flex:1;border:1px solid #A5D6A7;border-radius:5px;padding:7px 10px;font-family:monospace;font-size:11px;background:white;outline:none;color:#2E7D32">
+          <button onclick="copiaLink('av-link-resp','link-resp-copiato')" style="background:#2E7D32;color:white;border:none;border-radius:5px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Copia</button>
+        </div>
+        <p id="link-resp-copiato" style="display:none;color:#2E7D32;font-size:11px;margin-top:6px">✓ Link copiato!</p>
+        <button onclick="apriModulo()" style="width:100%;margin-top:10px;background:#2E7D32;color:white;border:none;border-radius:7px;padding:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Apri come Responsabile →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -569,7 +579,7 @@
   <!-- Scadenza -->
   <div class="scadenza-bar">
     <span>⚠</span>
-    <strong>Restituire entro: <span id="meta-scadenza">—</span></strong>
+    <strong>Compilare entro: <span id="meta-scadenza">—</span></strong>
     <span style="color:var(--muted);font-size:12px">Inviare a: <strong>produzione@briccialditerni.it</strong></span>
   </div>
 
@@ -1354,8 +1364,31 @@ function leggiParams() {
     budget:        params.get('budget') || '',
     sede:          params.get('sede') || '',
     scadenza:      params.get('scadenza') || '',
+    ruolo:         params.get('ruolo') || 'referente',
   };
   return metadati.titolo !== '';
+}
+
+function applicaRuolo() {
+  var isResp = metadati.ruolo === 'responsabile';
+
+  // Sezioni 8-10: visibili solo al Responsabile
+  document.querySelectorAll('.section').forEach(function(sez) {
+    var h2 = sez.querySelector('h2');
+    if (!h2) return;
+    var testo = h2.textContent.trim();
+    if (testo.indexOf('8.') === 0 || testo.indexOf('9.') === 0 || testo.indexOf('10.') === 0) {
+      sez.style.display = isResp ? 'block' : 'none';
+    }
+  });
+
+  if (isResp) {
+    // Badge verde nell'header per distinguere la vista
+    var badge = document.querySelector('.badge-tipologia');
+    if (badge) badge.style.background = 'rgba(46,125,50,.35)';
+    var sub = document.querySelector('.site-header p');
+    if (sub) sub.textContent = 'Vista Responsabile Produzione';
+  }
 }
 
 function popolaMetadati() {
@@ -1431,34 +1464,35 @@ function confermaAvvio() {
     });
   }
 
-  // Genera link con params URL (fallback sempre disponibile)
+  // Genera link Referente e Responsabile
   var base = window.location.origin + window.location.pathname;
   var p = new URLSearchParams(dati);
-  var link = base + '?' + p.toString();
-  document.getElementById('av-link-testo').value = link;
+  var linkRef = base + '?' + p.toString();
+  var linkResp = base + '?' + p.toString() + '&ruolo=responsabile';
+  document.getElementById('av-link-testo').value = linkRef;
+  document.getElementById('av-link-resp').value = linkResp;
   document.getElementById('av-link-box').style.display = 'block';
 }
 
-function copiaLink() {
-  var el = document.getElementById('av-link-testo');
-  el.select();
-  try { document.execCommand('copy'); document.getElementById('link-copiato').style.display = 'block'; } catch(e) {}
+function copiaLink(inputId, confirmId) {
+  var el = document.getElementById(inputId || 'av-link-testo');
+  var conf = document.getElementById(confirmId || 'link-copiato');
+  if (el) { el.select(); try { document.execCommand('copy'); if (conf) conf.style.display = 'block'; } catch(e) {} }
 }
 
 function apriModulo() {
-  var link = document.getElementById('av-link-testo').value;
-  if (link) window.location.href = link;
+  var link = document.getElementById('av-link-resp') ? document.getElementById('av-link-resp').value : document.getElementById('av-link-testo').value;
+  if (link) window.open(link, '_blank');
 }
 
 // ── Inizializzazione ──
 window.addEventListener('DOMContentLoaded', function() {
   var haDati = leggiParams();
   if (haDati) {
-    // Aperto dal Referente con link parametrizzato
     document.getElementById('schermata-avvio').style.display = 'none';
     popolaMetadati();
+    applicaRuolo();
   } else {
-    // Aperto senza parametri — mostra schermata avvio Responsabile
     document.getElementById('schermata-avvio').style.display = 'block';
   }
   aggiornaChecklist();
@@ -1989,12 +2023,73 @@ function caricaDaFirestore(id) {
         aggiornaChecklist();
       }, 500);
     }
+    // Carica dati responsabile
+    if (d.dati_responsabile) {
+      var dr2 = d.dati_responsabile;
+      setTimeout(function() {
+        Object.keys(dr2).forEach(function(k) {
+          var el = document.querySelector('[name="' + k + '"]');
+          if (el && dr2[k] !== undefined) el.value = dr2[k];
+        });
+        aggiornaDistrib();
+      }, 700);
+    }
     mostraNotificaSalvataggio('✓ Dati caricati');
   }).catch(function(e) { console.warn('Errore caricamento Firestore:', e); });
 }
 
 var _salvaTimer = null;
 function salvaReferenteSuFirestore() {
+  if (!window.firebaseReady || !window.db || !metadati.id) return;
+  clearTimeout(_salvaTimer);
+  _salvaTimer = setTimeout(function() {
+    var dati = {};
+    document.querySelectorAll('input[name], textarea[name], select[name]').forEach(function(el) {
+      var n = el.name;
+      if (!n || n.startsWith('dist_') || n.startsWith('pers_') || n === 'note_responsabile') return;
+      if (el.value && el.value.trim()) dati[n] = el.value.trim();
+    });
+    var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
+    window.fsUpdateDoc(docRef, {
+      dati_referente: dati,
+      'stato.ultimo_aggiornamento': window.fsTimestamp()
+    }).then(function() {
+      mostraNotificaSalvataggio('Salvato ✓');
+    }).catch(function(e) {
+      window.fsSetDoc(docRef, { dati_referente: dati }, { merge: true });
+    });
+  }, 2000);
+}
+
+var _salvaRespTimer = null;
+function salvaResponsabileSuFirestore() {
+  if (!window.firebaseReady || !window.db || !metadati.id) return;
+  clearTimeout(_salvaRespTimer);
+  _salvaRespTimer = setTimeout(function() {
+    var dati = {};
+    // Distribuzione organico
+    document.querySelectorAll('input[name^="dist_"]').forEach(function(el) {
+      if (el.value && el.value !== '0') dati[el.name] = el.value;
+    });
+    // Personale
+    document.querySelectorAll('input[name^="pers_"], select[name^="pers_"]').forEach(function(el) {
+      if (el.value && el.value.trim()) dati[el.name] = el.value.trim();
+    });
+    // Note responsabile
+    var note = document.querySelector('[name="note_responsabile"]');
+    if (note && note.value.trim()) dati['note_responsabile'] = note.value.trim();
+
+    var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
+    window.fsUpdateDoc(docRef, {
+      dati_responsabile: dati,
+      'stato.ultimo_aggiornamento': window.fsTimestamp()
+    }).then(function() {
+      mostraNotificaSalvataggio('Salvato ✓');
+    }).catch(function(e) {
+      window.fsSetDoc(docRef, { dati_responsabile: dati }, { merge: true });
+    });
+  }, 2000);
+}
   if (!window.firebaseReady || !window.db || !metadati.id) return;
   clearTimeout(_salvaTimer);
   _salvaTimer = setTimeout(function() {
@@ -2048,12 +2143,21 @@ document.addEventListener('input', function() {
   aggiornaSintesiEvento();
   var n = event.target ? event.target.name : '';
   if (n && n.indexOf('org_') === 0) setTimeout(aggiornaDistrib, 50);
-  salvaReferenteSuFirestore();
+  if (n && (n.indexOf('dist_') === 0 || n.indexOf('pers_') === 0 || n === 'note_responsabile')) {
+    salvaResponsabileSuFirestore();
+  } else {
+    salvaReferenteSuFirestore();
+  }
 });
 document.addEventListener('change', function() {
   aggiornaChecklist();
   aggiornaSintesiEvento();
-  salvaReferenteSuFirestore();
+  var n = event.target ? event.target.name : '';
+  if (n && (n.indexOf('dist_') === 0 || n.indexOf('pers_') === 0)) {
+    salvaResponsabileSuFirestore();
+  } else {
+    salvaReferenteSuFirestore();
+  }
 });
 
 // ── Piano prove ──
