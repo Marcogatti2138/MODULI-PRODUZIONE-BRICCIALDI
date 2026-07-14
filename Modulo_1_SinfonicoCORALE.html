@@ -266,6 +266,32 @@
     margin-bottom: 8px;
   }
   .org-section { }
+  .org-header {
+    background: var(--blu-mid);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px 6px 12px;
+    border-radius: 5px 5px 0 0;
+    letter-spacing: .3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .org-header .org-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(255,255,255,.22);
+    padding: 2px 9px;
+    border-radius: 10px;
+    margin-left: 8px;
+  }
+  .org-header .org-arrow { font-size: 11px; transition: transform .2s; margin-left: 6px; flex-shrink: 0; }
+  .org-header.collapsed .org-arrow { transform: rotate(-90deg); }
+  .org-header.collapsed { border-radius: 5px; }
+  .org-body.hidden { display: none; }
   .org-section-title {
     background: var(--blu-mid);
     color: white;
@@ -439,6 +465,8 @@
   @media print {
     .actions, .site-header { display: none !important; }
     .section-body.hidden { display: block !important; }
+    .org-body.hidden { display: block !important; }
+    .org-header .org-arrow { display: none; }
     body { background: white; }
     .wrapper { padding: 0; }
   }
@@ -499,39 +527,35 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div style="grid-column:1/-1">
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Titolo produzione *</label>
-        <input type="text" id="av_titolo" placeholder="es. Produzione Verdi" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="text" id="av_titolo" tabindex="1" enterkeyhint="next" placeholder="es. Produzione Verdi" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">ID Progetto *</label>
-        <input type="text" id="av_id" placeholder="es. 001" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="text" id="av_id" tabindex="2" enterkeyhint="next" placeholder="es. 001" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Sede istituzionale *</label>
-        <input type="text" id="av_sede" placeholder="es. Conservatorio Briccialdi" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="text" id="av_sede" tabindex="3" enterkeyhint="next" placeholder="es. Conservatorio Briccialdi" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Docente Referente *</label>
-        <input type="text" id="av_referente" placeholder="es. Gualtieri Massimo" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="text" id="av_referente" tabindex="4" enterkeyhint="next" placeholder="es. Gualtieri Massimo" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div style="grid-column:1/-1">
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Email Referente *</label>
-        <input type="email" id="av_email" placeholder="es. gualtieri@briccialditerni.it" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="email" id="av_email" tabindex="5" enterkeyhint="next" placeholder="es. gualtieri@briccialditerni.it" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">N° Delibera C.A. *</label>
-        <input type="text" id="av_delibera" placeholder="es. 12" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="text" id="av_delibera" tabindex="6" enterkeyhint="next" placeholder="es. 12" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Data Delibera *</label>
-        <input type="text" id="av_data_delibera" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Budget autorizzato (€) *</label>
-        <input type="text" id="av_budget" placeholder="es. 5000" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="text" id="av_data_delibera" tabindex="7" enterkeyhint="next" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Scadenza risposta *</label>
-        <input type="text" id="av_scadenza" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <input type="text" id="av_scadenza" tabindex="8" enterkeyhint="done" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
     </div>
 
@@ -573,7 +597,6 @@
     <div class="info-item"><label>Progetto</label><span id="meta-titolo">—</span></div>
     <div class="info-item"><label>Docente Referente</label><span id="meta-referente">—</span></div>
     <div class="info-item"><label>Delibera C.A.</label><span id="meta-delibera">—</span></div>
-    <div class="info-item"><label>Budget autorizzato</label><span id="meta-budget">—</span></div>
   </div>
 
   <!-- Scadenza -->
@@ -681,7 +704,11 @@
 
         <!-- FIATI LEGNI -->
         <div class="org-section">
-          <div class="org-section-title">🎵 Fiati Legni</div>
+          <div class="org-header collapsed" onclick="toggleOrgSection(this)">
+            <span>🎵 Fiati Legni</span>
+            <span style="display:flex;align-items:center"><span class="org-badge" id="badge_legni">0</span><span class="org-arrow">▾</span></span>
+          </div>
+          <div class="org-body hidden">
           <table class="org-table">
             <thead><tr><th>Strumento</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
@@ -711,11 +738,16 @@
             </tfoot>
           </table>
           <div class="org-totale">Lasciare 0 (o vuoto) per gli strumenti non richiesti</div>
+          </div>
         </div>
 
         <!-- FIATI OTTONI -->
         <div class="org-section">
-          <div class="org-section-title">🎺 Fiati Ottoni</div>
+          <div class="org-header collapsed" onclick="toggleOrgSection(this)">
+            <span>🎺 Fiati Ottoni</span>
+            <span style="display:flex;align-items:center"><span class="org-badge" id="badge_ottoni">0</span><span class="org-arrow">▾</span></span>
+          </div>
+          <div class="org-body hidden">
           <table class="org-table">
             <thead><tr><th>Strumento</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
@@ -743,11 +775,16 @@
             </tfoot>
           </table>
           <div class="org-totale">Lasciare 0 (o vuoto) per gli strumenti non richiesti</div>
+          </div>
         </div>
 
         <!-- ARCHI -->
         <div class="org-section">
-          <div class="org-section-title">🎻 Archi</div>
+          <div class="org-header collapsed" onclick="toggleOrgSection(this)">
+            <span>🎻 Archi</span>
+            <span style="display:flex;align-items:center"><span class="org-badge" id="badge_archi">0</span><span class="org-arrow">▾</span></span>
+          </div>
+          <div class="org-body hidden">
           <table class="org-table">
             <thead><tr><th>Sezione</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
@@ -765,11 +802,16 @@
             </tfoot>
           </table>
           <div class="org-totale">Indicare il numero totale di esecutori per sezione</div>
+          </div>
         </div>
 
         <!-- ALTRI + CORO -->
         <div class="org-section">
-          <div class="org-section-title">🥁 Percussioni e Altri</div>
+          <div class="org-header collapsed" onclick="toggleOrgSection(this)">
+            <span>🥁 Percussioni e Altri</span>
+            <span style="display:flex;align-items:center"><span class="org-badge" id="badge_perc">0</span><span class="org-arrow">▾</span></span>
+          </div>
+          <div class="org-body hidden">
           <table class="org-table">
             <thead><tr><th>Strumento</th><th>N° esecutori fisici</th></tr></thead>
             <tbody>
@@ -786,8 +828,13 @@
             </tfoot>
           </table>
           <div class="org-totale" style="margin-bottom:12px">Indicare il numero di <strong>strumentisti</strong>, non di strumenti fisici. Es.: 1 timpanista anche se usa 3 timpani.</div>
+          </div>
 
-          <div class="org-section-title" style="margin-top:10px">🎤 Coro</div>
+          <div class="org-header collapsed" style="margin-top:10px" onclick="toggleOrgSection(this)">
+            <span>🎤 Coro</span>
+            <span style="display:flex;align-items:center"><span class="org-badge" id="badge_coro">0</span><span class="org-arrow">▾</span></span>
+          </div>
+          <div class="org-body hidden">
           <table class="org-table">
             <thead><tr><th>Sezione</th><th>N° voci<br><small style="font-weight:400;opacity:.7">(esecutori)</small></th></tr></thead>
             <tbody>
@@ -808,6 +855,7 @@
             <label style="font-size:11px;font-weight:600;color:#1A3C6B;white-space:nowrap">Totale coro indiviso:</label>
             <input type="text" name="coro_indiviso" placeholder="es. 80 elementi totali" style="border:1px solid #D0D7E3;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:12px;outline:none;min-width:180px;width:220px">
             <span style="font-size:10px;color:#6B7280">Compilare in alternativa alle voci separate sopra</span>
+          </div>
           </div>
         </div>
 
@@ -865,7 +913,7 @@
     </div>
   </div>
 
-  <!-- ══ SEZ 6 — LOGISTICA ══ -->
+  <!-- ══ SEZ 5 — LOGISTICA ══ -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
       <div><h2>5. Esigenze Logistiche</h2><p>Trasporti, dotazione tecnica, vitto e alloggio</p></div>
@@ -954,7 +1002,7 @@
     </div>
   </div>
 
-  <!-- ══ SEZ 7 — CONTATTI ══ -->
+  <!-- ══ SEZ 6 — CONTATTI ══ -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
       <div><h2>6. Referenti e Contatti</h2><p>Email istituzionale e cellulare — obbligatori</p></div>
@@ -990,7 +1038,7 @@
     </div>
   </div>
 
-  <!-- ══ SEZ 8 — MATERIALE GRAFICO ══ -->
+  <!-- ══ SEZ 7 — MATERIALE GRAFICO ══ -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
       <div><h2>7. Materiale Grafico e Testo</h2><p>Necessario per Ufficio Comunicazione</p></div>
@@ -1020,7 +1068,7 @@
     </div>
   </div>
 
-  <!-- ══ SEZ 9 — CHECKLIST RESPONSABILE ══ -->
+  <!-- ══ SEZ 8 — CHECKLIST RESPONSABILE ══ -->
   <div class="section" id="sezione-checklist">
     <div class="section-header" onclick="toggleSection(this)" style="background:#1A3C6B">
       <div><h2>8. Checklist di Verifica — Responsabile Produzione</h2><p>Si aggiorna in tempo reale durante la compilazione</p></div>
@@ -1072,7 +1120,7 @@
     </div>
   </div>
 
-  <!-- ══ SEZ 10 — SCHEDA DI SINTESI ══ -->
+  <!-- ══ SCHEDA DI SINTESI (generata automaticamente) ══ -->
   <div class="section" id="sezione-sintesi">
     <div class="section-header" onclick="toggleSection(this)" style="background:#1A3C6B">
       <div><h2>Scheda di Sintesi — generata automaticamente</h2><p>Riepilogo per il fascicolo e gli uffici</p></div>
@@ -1087,7 +1135,6 @@
           <div><span style="color:var(--muted);font-size:11px">Titolo</span><br><strong id="sint_titolo">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Docente Referente</span><br><strong id="sint_referente">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Delibera C.A.</span><br><strong id="sint_delibera">—</strong></div>
-          <div><span style="color:var(--muted);font-size:11px">Budget autorizzato</span><br><strong id="sint_budget">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Data</span><br><strong id="sint_data">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Ora</span><br><strong id="sint_ora">—</strong></div>
           <div><span style="color:var(--muted);font-size:11px">Luogo</span><br><strong id="sint_luogo">—</strong></div>
@@ -1322,6 +1369,7 @@
 
 <script>
 // ── Progetto monografico SIAE ──
+// ═══ PROGRAMMA SIAE — gestione brano unico/monografico e propagazione autore ═══
 function toggleMonografico(cb) {
   var fields = document.getElementById('autore-unico-fields');
   if (cb.checked) {
@@ -1352,6 +1400,7 @@ function propagaAutoreUnico() {
 // ── Gestione URL params e schermata avvio ──
 var metadati = {};
 
+// ═══ AVVIO E CONFIGURAZIONE PROGETTO — parametri URL, ruolo, popolamento metadati ═══
 function leggiParams() {
   var params = new URLSearchParams(window.location.search);
   metadati = {
@@ -1361,7 +1410,6 @@ function leggiParams() {
     email:         params.get('email') || '',
     delibera:      params.get('delibera') || '',
     data_delibera: params.get('data_delibera') || '',
-    budget:        params.get('budget') || '',
     sede:          params.get('sede') || '',
     scadenza:      params.get('scadenza') || '',
     ruolo:         params.get('ruolo') || 'referente',
@@ -1402,7 +1450,6 @@ function popolaMetadati() {
   set('meta-titolo',    metadati.titolo);
   set('meta-referente', metadati.referente);
   set('meta-delibera',  metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
-  set('meta-budget',    metadati.budget ? '€ ' + metadati.budget : '—');
   set('meta-scadenza',  metadati.scadenza);
 
   // Campi precompilati sezione 1
@@ -1414,7 +1461,6 @@ function popolaMetadati() {
   set('sint_titolo',    metadati.titolo);
   set('sint_referente', metadati.referente);
   set('sint_delibera',  metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
-  set('sint_budget',    metadati.budget ? '€ ' + metadati.budget : '—');
 
   // Modal PDF
   set('pdf-id',     metadati.id);
@@ -1427,8 +1473,21 @@ function popolaMetadati() {
   if (metadati.titolo) document.title = 'Modulo — ' + metadati.titolo + ' | ID ' + metadati.id;
 }
 
+// ═══ SCHERMATA AVVIO — navigazione tra campi con Invio (utile anche da mobile, senza tasto Tab fisico) ═══
+var campiAvvioOrdine = ['av_titolo','av_id','av_sede','av_referente','av_email','av_delibera','av_data_delibera','av_scadenza'];
+campiAvvioOrdine.forEach(function(cid, idx) {
+  var el = document.getElementById(cid);
+  if (!el) return;
+  el.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    var next = document.getElementById(campiAvvioOrdine[idx + 1]);
+    if (next) { next.focus(); } else { confermaAvvio(); }
+  });
+});
+
 function confermaAvvio() {
-  var campi = ['av_titolo','av_id','av_sede','av_referente','av_email','av_delibera','av_data_delibera','av_budget','av_scadenza'];
+  var campi = ['av_titolo','av_id','av_sede','av_referente','av_email','av_delibera','av_data_delibera','av_scadenza'];
   var ok = true;
   campi.forEach(function(id) {
     var el = document.getElementById(id);
@@ -1446,7 +1505,6 @@ function confermaAvvio() {
     email:         document.getElementById('av_email').value.trim(),
     delibera:      document.getElementById('av_delibera').value.trim(),
     data_delibera: document.getElementById('av_data_delibera').value.trim(),
-    budget:        document.getElementById('av_budget').value.trim(),
     sede:          document.getElementById('av_sede').value.trim(),
     scadenza:      document.getElementById('av_scadenza').value.trim(),
   };
@@ -1482,7 +1540,7 @@ function copiaLink(inputId, confirmId) {
 
 function apriModulo() {
   var link = document.getElementById('av-link-resp') ? document.getElementById('av-link-resp').value : document.getElementById('av-link-testo').value;
-  if (link) window.open(link, '_blank');
+  if (link) window.location.href = link;
 }
 
 // ── Inizializzazione ──
@@ -1507,6 +1565,7 @@ if (document.readyState === 'loading') {
 }
 
 // ── Toggle sezioni ──
+// ═══ INTERFACCIA — apertura/chiusura sezioni, modali PDF, reset modulo ═══
 function toggleSection(header) {
   var body = header.nextElementSibling;
   body.classList.toggle('hidden');
@@ -1537,6 +1596,7 @@ function resetForm() {
 
 // ── Brani SIAE ──
 var braniCount = 0;
+// ═══ PROGRAMMA SIAE — riga brano dinamica ═══
 function addBrano() {
   braniCount++;
   var tr = document.createElement('tr');
@@ -1553,6 +1613,7 @@ for (var i = 0; i < 6; i++) addBrano();
 
 // ── Repliche ──
 var replicheCount = 0;
+// ═══ REPLICHE — riga data replica dinamica ═══
 function addReplica() {
   replicheCount++;
   var div = document.createElement('div');
@@ -1580,6 +1641,14 @@ var orgGroups = {
   coro:   ['org_sopr','org_cont','org_ten','org_bas']
 };
 
+// ═══ ORGANICO — fisarmoniche per famiglia (apri/chiudi + badge totale) ═══
+function toggleOrgSection(header) {
+  var body = header.nextElementSibling;
+  var hidden = body.classList.toggle('hidden');
+  header.classList.toggle('collapsed', hidden);
+}
+
+// ═══ ORGANICO — calcolo totali per sezione strumentale ═══
 function getNum(name) {
   var el = document.querySelector('[name="' + name + '"]');
   return el ? (parseInt(el.value) || 0) : 0;
@@ -1590,8 +1659,19 @@ function calcolaTotali() {
   for (var grp in orgGroups) {
     var tot = 0;
     orgGroups[grp].forEach(function(n) { tot += getNum(n); });
+    if (grp === 'coro' && tot === 0) {
+      // Se le sezioni voce (soprani/contralti/tenori/bassi) non sono compilate,
+      // usa il numero indicato nel campo "Totale coro indiviso" (es. "80 elementi totali")
+      var indivEl = document.querySelector('[name="coro_indiviso"]');
+      if (indivEl && indivEl.value.trim()) {
+        var match = indivEl.value.trim().match(/\d+/);
+        if (match) tot = parseInt(match[0], 10) || 0;
+      }
+    }
     var elTot = document.getElementById('tot_' + grp + '_p');
     if (elTot) elTot.textContent = tot;
+    var badgeEl = document.getElementById('badge_' + grp);
+    if (badgeEl) badgeEl.textContent = tot;
     var sEl = document.getElementById('sint_' + grp + '_p');
     if (sEl) sEl.textContent = tot;
     grandTot += tot;
@@ -1600,13 +1680,17 @@ function calcolaTotali() {
   if (elGrand) elGrand.textContent = grandTot;
 }
 
-// Attacca listener a tutti gli input organico
-document.querySelectorAll('input[name^="org_"]').forEach(function(el) {
-  el.addEventListener('input', calcolaTotali);
+// Attacca listener a tutti gli input organico (comprese le sezioni org_ e il coro indiviso)
+document.querySelectorAll('input[name^="org_"], input[name="coro_indiviso"]').forEach(function(el) {
+  el.addEventListener('input', function() {
+    calcolaTotali();
+    aggiornaDistrib(); // tiene sincronizzati i riferimenti in Sezione 10 — Distribuzione Organico
+  });
 });
 
 // ── Solisti ──
 var solistiCount = 0;
+// ═══ SOLISTI — riga dinamica e sintesi ═══
 function addSolista() {
   solistiCount++;
   var tr = document.createElement('tr');
@@ -1651,6 +1735,7 @@ function aggiornaSintesiSolisti() {
 }
 
 // ── Sintesi evento ──
+// ═══ SINTESI EVENTO — riepilogo dati per la Sezione 9 ═══
 function aggiornaSintesiEvento() {
   var map = {
     'data_evento': 'sint_data',
@@ -1717,6 +1802,7 @@ var tagColors = {
   '':             'transparent'
 };
 
+// ═══ SEZIONE 8 — CHECKLIST stato avanzamento fascicolo ═══
 function aggiornaChecklist() {
   var ul = document.getElementById('checklist-voci');
   if (!ul) return;
@@ -1767,6 +1853,7 @@ function aggiornaChecklist() {
 }
 
 // ── Sollecito ──
+// ═══ SOLLECITO — generazione email di richiesta dati mancanti ═══
 function generaSollecito() {
   var referente = getField('doc_nome_1') || '{Docente Referente}';
   var titolo = document.getElementById('sint_titolo') ? document.getElementById('sint_titolo').textContent : '{Titolo Progetto}';
@@ -1854,12 +1941,9 @@ var strumentiOrganico = [
   {id:'perc',label:'Percussioni varie',sez:'perc',totId:'org_perc'},
 ];
 var sezLabels = {legni:'🎵 Fiati Legni',ottoni:'🎺 Fiati Ottoni',archi:'🎻 Archi',perc:'🥁 Percussioni'};
+// Nota: getNum() è già definita sopra (usata anche da calcolaTotali) — riutilizzata qui, non ridefinita.
 
-function getNum(name) {
-  var el = document.querySelector('[name="' + name + '"]');
-  return el ? (parseInt(el.value) || 0) : 0;
-}
-
+// ═══ SEZIONE 10 — DISTRIBUZIONE ORGANICO: tabella per strumento e ruolo ═══
 function costruisciTabellaDistrib() {
   var tbody = document.getElementById('distrib-tbody');
   if (!tbody) return;
@@ -1990,6 +2074,7 @@ function addPersona() {
 for (var pp = 0; pp < 5; pp++) addPersona();
 
 // ── Firestore: carica e salva dati ──
+// ═══ FIRESTORE — caricamento dati progetto esistente ═══
 function caricaDaFirestore(id) {
   if (!window.firebaseReady || !window.db) return;
   var docRef = window.fsDoc(window.db, 'progetti', id);
@@ -2045,6 +2130,7 @@ function caricaDaFirestore(id) {
   }).catch(function(e) { console.warn('Errore caricamento Firestore:', e); });
 }
 
+// ═══ FIRESTORE — autosave referente/responsabile (debounce 2s) e notifiche ═══
 var _salvaTimer = null;
 function salvaReferenteSuFirestore() {
   if (!window.firebaseReady || !window.db || !metadati.id) return;
@@ -2095,31 +2181,10 @@ function salvaResponsabileSuFirestore() {
     }).catch(function(e) {
       window.fsSetDoc(docRef, { dati_responsabile: dati }, { merge: true });
     });
-}
-
-var _salvaTimer = null;
-function salvaReferenteSuFirestore() {
-  if (!window.firebaseReady || !window.db || !metadati.id) return;
-  clearTimeout(_salvaTimer);
-  _salvaTimer = setTimeout(function() {
-    var dati = {};
-    document.querySelectorAll('input[name], textarea[name], select[name]').forEach(function(el) {
-      if (el.value && el.value.trim() && !el.name.startsWith('dist_') && !el.name.startsWith('pers_') && el.name !== 'note_responsabile') {
-        dati[el.name] = el.value.trim();
-      }
-    });
-    var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
-    window.fsUpdateDoc(docRef, {
-      dati_referente: dati,
-      'stato.ultimo_aggiornamento': window.fsTimestamp()
-    }).then(function() {
-      mostraNotificaSalvataggio('Salvato ✓');
-    }).catch(function(e) {
-      // Se il documento non esiste ancora, crealo
-      window.fsSetDoc(docRef, { dati_referente: dati }, { merge: true });
-    });
   }, 2000); // salva 2 secondi dopo l'ultima modifica
 }
+
+// Nota: salvaReferenteSuFirestore() è già definita sopra — riutilizzata anche qui, non ridefinita.
 
 function mostraNotificaSalvataggio(msg) {
   var el = document.getElementById('notifica-salvataggio');
@@ -2171,6 +2236,7 @@ document.addEventListener('change', function() {
 
 // ── Piano prove ──
 var proveCount = 0;
+// ═══ PIANO PROVE E DOCENTI — righe dinamiche ═══
 function addProva() {
   proveCount++;
   var tr = document.createElement('tr');
@@ -2200,6 +2266,7 @@ function addDocente() {
 for (var d = 0; d < 3; d++) addDocente();
 
 // ── Stampa sintesi ──
+// ═══ STAMPA / EXPORT ═══
 function stampaSintesi() {
   var win = window.open('', '_blank');
   if (!win) { alert('Consenti i popup per questa pagina per stampare la sintesi.'); return; }
