@@ -49,7 +49,7 @@
   .scadenza-item:last-child { margin-bottom: 0; }
   .scadenza-info { flex:1; min-width:0; }
   .scadenza-info strong { display:block; font-size:13px; color:var(--blu); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .scadenza-tipo { font-size:11px; color:var(--muted); }
+  .scadenza-tipo { font-size:11px; color:var(--muted); display:block; margin-top:2px; }
   .scadenza-badge { font-size:11px; font-weight:700; white-space:nowrap; }
   .btn-mini { font-size:11px; font-weight:600; color:white; background:var(--blu-mid); padding:5px 12px; border-radius:5px; text-decoration:none; white-space:nowrap; }
   .btn-mini:hover { background: var(--blu); }
@@ -220,29 +220,36 @@
   }
 
   function renderScadenze(progetti) {
-    var items = [];
+    var raggruppati = [];
     progetti.forEach(function(p) {
+      var titolo = p.meta.titolo || p.id;
+      var voci = [];
       var dataEvento = parseDataIT(p.dr.data_evento);
       var scadenza = parseDataIT(p.meta.scadenza);
-      var titolo = p.meta.titolo || p.id;
-      if (dataEvento) items.push({ tipo: 'Data evento', label: titolo, data: dataEvento, id: p.id });
-      if (scadenza && !(p.stato && p.stato.completato_referente)) items.push({ tipo: 'Scadenza risposta Referente', label: titolo, data: scadenza, id: p.id });
+      if (dataEvento) voci.push({ tipo: 'Data evento', data: dataEvento });
+      if (scadenza && !(p.stato && p.stato.completato_referente)) voci.push({ tipo: 'Scadenza risposta Referente', data: scadenza });
+      voci = voci.filter(function(v) { return giorniMancanti(v.data) >= -1; }); // nasconde scadenze passate da tempo
+      if (voci.length === 0) return;
+      voci.sort(function(a, b) { return a.data - b.data; });
+      raggruppati.push({ id: p.id, titolo: titolo, voci: voci, primaData: voci[0].data });
     });
-    items = items.filter(function(it) { return giorniMancanti(it.data) >= -1; }); // nasconde scadenze passate da tempo
-    items.sort(function(a, b) { return a.data - b.data; });
+    raggruppati.sort(function(a, b) { return a.primaData - b.primaData; });
 
     var el = document.getElementById('scadenze-body');
-    if (items.length === 0) { el.innerHTML = '<div class="empty-msg">Nessuna scadenza imminente.</div>'; return; }
+    if (raggruppati.length === 0) { el.innerHTML = '<div class="empty-msg">Nessuna scadenza imminente.</div>'; return; }
 
     var html = '';
-    items.forEach(function(it) {
-      var gg = giorniMancanti(it.data);
+    raggruppati.forEach(function(r) {
+      var gg = giorniMancanti(r.primaData);
       var colore = gg <= 3 ? 'var(--rosso)' : gg <= 7 ? 'var(--arancio)' : 'var(--verde)';
-      var testoGg = gg < 0 ? 'ieri' : gg === 0 ? 'oggi' : gg === 1 ? 'domani' : 'tra ' + gg + ' giorni';
+      var righeInfo = r.voci.map(function(v) {
+        var ggV = giorniMancanti(v.data);
+        var testoGgV = ggV < 0 ? 'ieri' : ggV === 0 ? 'oggi' : ggV === 1 ? 'domani' : 'tra ' + ggV + ' giorni';
+        return '<span class="scadenza-tipo">' + v.tipo + ' — ' + formatDataIT(v.data) + ' (' + testoGgV + ')</span>';
+      }).join('');
       html += '<div class="scadenza-item" style="border-left-color:' + colore + '">' +
-        '<div class="scadenza-info"><strong>' + escapeHtml(it.label) + '</strong><span class="scadenza-tipo">' + it.tipo + ' — ' + formatDataIT(it.data) + '</span></div>' +
-        '<span class="scadenza-badge" style="color:' + colore + '">' + testoGg + '</span>' +
-        '<a href="' + linkModulo(it.id) + '" class="btn-mini">Apri →</a>' +
+        '<div class="scadenza-info"><strong>' + escapeHtml(r.titolo) + '</strong>' + righeInfo + '</div>' +
+        '<a href="' + linkModulo(r.id) + '" class="btn-mini">Apri →</a>' +
         '</div>';
     });
     el.innerHTML = html;
