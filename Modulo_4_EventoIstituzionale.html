@@ -1,0 +1,2705 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modulo Raccolta Dati — Evento Istituzionale | ID {XX}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --blu:       #1A3C6B;
+    --blu-mid:   #2A5C9B;
+    --blu-light: #EEF3FA;
+    --blu-pale:  #F4F7FC;
+    --giallo:    #FFF8E1;
+    --arancio:   #B85C00;
+    --verde:     #2E7D32;
+    --verde-l:   #E8F5E9;
+    --rosso:     #C62828;
+    --grigio:    #F5F5F5;
+    --bordo:     #D0D7E3;
+    --testo:     #1a1a2e;
+    --muted:     #6B7280;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #ECF0F8;
+    color: var(--testo);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--blu);
+    color: white;
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 14px rgba(26,60,107,.35);
+  }
+  .site-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: .3px;
+  }
+  .site-header p { font-size: 11px; opacity: .7; margin-top: 2px; }
+  .badge-tipologia {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge-tipologia .icon { font-size: 16px; }
+
+  /* ── Layout ── */
+  .wrapper {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 24px 100px;
+  }
+
+  /* ── Info banner ── */
+  .info-banner {
+    background: white;
+    border: 1px solid var(--bordo);
+    border-left: 4px solid var(--blu-mid);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px 24px;
+  }
+  .info-item label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .info-item span { font-weight: 600; color: var(--blu); font-size: 13px; }
+
+  /* ── Scadenza bar ── */
+  .scadenza-bar {
+    background: var(--giallo);
+    border: 1px solid #F5C542;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .scadenza-bar strong { color: var(--arancio); }
+
+  /* ── Sezioni ── */
+  .section {
+    background: white;
+    border: 1px solid var(--bordo);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 1px 5px rgba(0,0,0,.05);
+  }
+  .section-header {
+    background: var(--blu);
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .section-header p { font-size: 11px; opacity: .7; margin-top: 1px; }
+  .section-header .toggle { font-size: 17px; transition: transform .25s; }
+  .section-header.collapsed .toggle { transform: rotate(-90deg); }
+  .section-body { padding: 20px; }
+  .section-body.hidden { display: none; }
+
+  /* ── Sub-header ── */
+  .sub-header {
+    background: var(--blu-mid);
+    color: white;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 18px 0 10px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+  .sub-header:first-child { margin-top: 0; }
+
+  /* ── Campi ── */
+  .field-row {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    border-bottom: 1px solid var(--bordo);
+    align-items: stretch;
+    min-height: 40px;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-row:nth-child(even) { background: var(--blu-pale); }
+  .field-label {
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blu);
+    border-right: 1px solid var(--bordo);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .req { color: var(--arancio); }
+  .field-input { padding: 4px 8px; display: flex; align-items: flex-start; }
+
+  input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="time"],
+  textarea, select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--testo);
+    padding: 6px 4px;
+    resize: none;
+    outline: none;
+    transition: background .15s;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+  input:focus, textarea:focus, select:focus { background: #E8EEFA; }
+  textarea { min-height: 34px; overflow: hidden; }
+
+  .prefilled {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 12px;
+    padding: 8px 4px;
+    display: flex;
+    align-items: center;
+  }
+  .warn-inline {
+    color: var(--arancio);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+  }
+
+  /* ── Tabelle dati ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table thead th {
+    background: var(--blu);
+    color: white;
+    padding: 8px 10px;
+    font-weight: 600;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: .3px;
+  }
+  .data-table tbody tr:nth-child(even) { background: var(--grigio); }
+  .data-table tbody tr:nth-child(odd)  { background: white; }
+  .data-table tbody td {
+    border: 1px solid var(--bordo);
+    padding: 2px 4px;
+    vertical-align: top;
+  }
+  .data-table tbody td.pre {
+    background: var(--blu-light);
+    font-weight: 600;
+    color: var(--blu);
+    font-size: 11px;
+    padding: 7px 10px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .data-table tbody td input,
+  .data-table tbody td textarea,
+  .data-table tbody td select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 6px;
+    resize: none;
+    outline: none;
+    overflow: hidden;
+    min-height: 30px;
+  }
+  .data-table tbody td input:focus,
+  .data-table tbody td textarea:focus,
+  .data-table tbody td select:focus { background: #E8EEFA; border-radius: 3px; }
+
+  /* ── Tabella organico ── */
+  .org-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .org-section { }
+  .org-header {
+    background: var(--blu-mid);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px 6px 12px;
+    border-radius: 5px 5px 0 0;
+    letter-spacing: .3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .org-header .org-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(255,255,255,.22);
+    padding: 2px 9px;
+    border-radius: 10px;
+    margin-left: 8px;
+  }
+  .org-header .org-arrow { font-size: 11px; transition: transform .2s; margin-left: 6px; flex-shrink: 0; }
+  .org-header.collapsed .org-arrow { transform: rotate(-90deg); }
+  .org-header.collapsed { border-radius: 5px; }
+  .org-body.hidden { display: none; }
+  .org-section-title {
+    background: var(--blu-mid);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 5px 5px 0 0;
+    letter-spacing: .3px;
+  }
+  .org-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .org-table thead th {
+    background: var(--blu-light);
+    color: var(--blu);
+    padding: 5px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    border: 1px solid var(--bordo);
+    letter-spacing: .3px;
+  }
+  .org-table thead th:first-child { text-align: left; }
+  .org-table tbody tr:nth-child(even) { background: var(--grigio); }
+  .org-table tbody tr:nth-child(odd)  { background: white; }
+  .org-table td {
+    border: 1px solid var(--bordo);
+    padding: 2px 3px;
+    vertical-align: middle;
+  }
+  .org-table td.nome {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blu);
+    padding: 6px 9px;
+    background: var(--blu-light) !important;
+    white-space: nowrap;
+  }
+  .org-table td input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 4px 6px;
+    text-align: center;
+    outline: none;
+  }
+  .org-table td input:focus { background: #E8EEFA; border-radius: 3px; }
+  .org-totale {
+    background: var(--blu-pale);
+    border: 1px solid var(--bordo);
+    border-top: none;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    border-radius: 0 0 5px 5px;
+  }
+  .org-full { grid-column: 1 / -1; }
+
+  /* ── Checklist Responsabile ── */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--bordo);
+    font-size: 13px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li.todo { background: var(--giallo); }
+  .check-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .checklist li.todo .check-icon { color: var(--arancio); }
+  .checklist li .obblig {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--rosso);
+    background: #FFEBEE;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* ── Nota SIAE ── */
+  .nota-siae {
+    background: var(--verde-l);
+    border: 1px solid #A5D6A7;
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--verde);
+    margin-bottom: 14px;
+  }
+
+  /* ── Add button ── */
+  .btn-add {
+    margin-top: 10px;
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px dashed var(--bordo);
+    background: var(--grigio);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-add:hover { background: var(--blu-light); color: var(--blu); border-color: var(--blu-mid); }
+
+  /* ── Barra azioni ── */
+  .actions {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--bordo);
+    padding: 12px 40px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    z-index: 200;
+    box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+  }
+  .btn {
+    padding: 10px 26px;
+    border-radius: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+  }
+  .btn-primary { background: var(--blu); color: white; }
+  .btn-primary:hover { background: var(--blu-mid); transform: translateY(-1px); }
+  .btn-secondary { background: var(--grigio); color: var(--testo); border: 1px solid var(--bordo); }
+  .btn-secondary:hover { background: var(--bordo); }
+
+  /* ── Modal PDF ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 999;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .modal-box {
+    background: white;
+    border-radius: 12px;
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 26px;
+  }
+  .modal-box h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--blu);
+    margin-bottom: 14px;
+  }
+  .modal-box ol { padding-left: 20px; line-height: 2.1; font-size: 14px; }
+  .modal-nota {
+    background: var(--blu-light);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--blu);
+  }
+
+  @media print {
+    .actions, .site-header, #avviso-locale { display: none !important; }
+    .section-body.hidden { display: block !important; }
+    .org-body.hidden { display: block !important; }
+    .org-header .org-arrow { display: none; }
+    body { background: white; }
+    .wrapper { padding: 0; }
+  }
+  @media (max-width: 640px) {
+    .field-row { grid-template-columns: 1fr; }
+    .field-label { border-right: none; border-bottom: 1px solid var(--bordo); }
+    .org-grid { grid-template-columns: 1fr; }
+    .site-header { padding: 14px 16px; }
+    .wrapper { padding: 16px 12px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="avviso-locale" style="display:none;position:sticky;top:0;z-index:600;background:#C62828;color:white;padding:10px 16px;text-align:center;font-size:13px;font-weight:600">
+  ⚠️ Stai visualizzando una copia LOCALE del modulo (file sul computer, non il link pubblicato). Autosave e link generati (Referente, Responsabile, Sollecito) non funzioneranno per nessun altro — apri la versione pubblicata su GitHub Pages prima di generare link da inviare.
+</div>
+<script>
+  if (window.location.protocol === 'file:') {
+    document.getElementById('avviso-locale').style.display = 'block';
+  }
+</script>
+
+<!-- Firebase SDK compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyCnB-Ck9sE4Tt2m_P5rhG8lruWLfEfpXx8",
+    authDomain: "briccialdi-produzioni.firebaseapp.com",
+    projectId: "briccialdi-produzioni",
+    storageBucket: "briccialdi-produzioni.firebasestorage.app",
+    messagingSenderId: "447173206446",
+    appId: "1:447173206446:web:6bb69d152d286ce957e83f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  window.db = db;
+  window.fsDoc = function(db, col, id) { return db.collection(col).doc(id); };
+  window.fsSetDoc = function(ref, data, opts) { return opts && opts.merge ? ref.set(data, {merge:true}) : ref.set(data); };
+  window.fsGetDoc = function(ref) { return ref.get(); };
+  window.fsUpdateDoc = function(ref, data) { return ref.update(data); };
+  window.fsTimestamp = function() { return firebase.firestore.FieldValue.serverTimestamp(); };
+  window.firebaseReady = true;
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<header class="site-header">
+  <div>
+    <h1>Conservatorio «G. Briccialdi» — Terni</h1>
+    <p>Modulo Raccolta Dati — Referente di Progetto</p>
+    <a id="link-dashboard" href="Dashboard_Briccialdi.html" style="display:inline-block;font-size:11px;color:rgba(255,255,255,.85);text-decoration:underline;margin-top:2px">← Torna alla Dashboard</a>
+  </div>
+  <div class="badge-tipologia">
+    <span class="icon">🏛</span>
+    Evento Istituzionale &nbsp;|&nbsp; <span id="header-id">ID —</span>
+  </div>
+  <span id="notifica-salvataggio" style="font-size:12px;color:#90EE90;font-weight:600;transition:opacity 1s;opacity:0;margin-left:12px;white-space:nowrap"></span>
+</header>
+
+<!-- ══ SCHERMATA DI AVVIO — solo Responsabile ══ -->
+<div id="schermata-avvio" style="display:block;position:fixed;inset:0;background:rgba(10,20,50,.85);z-index:500;overflow-y:auto;padding:20px">
+  <div style="background:white;border-radius:12px;max-width:640px;margin:40px auto;padding:28px;box-shadow:0 8px 40px rgba(0,0,0,.3)">
+    <h2 style="font-family:Georgia,serif;font-size:20px;color:#1A3C6B;margin-bottom:4px">Configura progetto</h2>
+    <p style="font-size:12px;color:#6B7280;margin-bottom:20px">Inserisci i dati del progetto. Una volta confermati verrà generato il link da inviare al Referente.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="grid-column:1/-1">
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Titolo produzione *</label>
+        <input type="text" id="av_titolo" tabindex="1" enterkeyhint="next" placeholder="es. Produzione Verdi" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">ID Progetto *</label>
+        <input type="text" id="av_id" tabindex="2" enterkeyhint="next" placeholder="es. 001" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div style="grid-column:1/-1">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#6B7280;cursor:pointer;background:#F4F7FC;border-radius:6px;padding:8px 12px">
+          <input type="checkbox" id="av-no-referente" onchange="toggleNoReferente(this)" style="width:auto">
+          Nessun referente — compilo tutto io come Responsabile (non genera il link da inviare)
+        </label>
+      </div>
+      <div id="riga-av-referente">
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Docente Referente *</label>
+        <input type="text" id="av_referente" tabindex="3" enterkeyhint="next" placeholder="es. Gualtieri Massimo" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div id="riga-av-email" style="grid-column:1/-1">
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Email Referente *</label>
+        <input type="email" id="av_email" tabindex="4" enterkeyhint="next" placeholder="es. gualtieri@briccialditerni.it" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">N° Delibera C.A. *</label>
+        <input type="text" id="av_delibera" tabindex="5" enterkeyhint="next" placeholder="es. 12" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Data Delibera *</label>
+        <input type="text" id="av_data_delibera" tabindex="6" enterkeyhint="next" onblur="formattaDataItaliana(this)" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Data evento prevista <span style="font-weight:400;text-transform:none;color:#6B7280">(facoltativo)</span></label>
+        <input type="text" id="av_data_evento" tabindex="7" enterkeyhint="next" onblur="formattaDataItaliana(this); calcolaScadenzaDaEvento();" placeholder="GG/MM/AAAA — se già nota" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Scadenza risposta *</label>
+        <input type="text" id="av_scadenza" tabindex="8" enterkeyhint="done" onblur="formattaDataItaliana(this)" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
+        <p id="av-scadenza-nota" style="display:none;font-size:10px;color:#6B7280;margin-top:3px;font-style:italic">Calcolata automaticamente: 1 mese prima della data evento — modificabile</p>
+      </div>
+    </div>
+
+    <p id="av-errore" style="display:none;color:#C62828;font-size:12px;margin-top:10px">⚠ Compila tutti i campi obbligatori prima di procedere.</p>
+
+    <div style="margin-top:20px;display:flex;gap:10px">
+      <button onclick="confermaAvvio()" style="flex:1;background:#1A3C6B;color:white;border:none;border-radius:7px;padding:11px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">Genera link e apri modulo</button>
+    </div>
+
+    <!-- Box link generato -->
+    <div id="av-link-box" style="display:none;margin-top:16px">
+      <!-- Link Referente -->
+      <div id="av-link-box-referente" style="background:#EEF3FA;border:1px solid #C5D5EA;border-radius:8px;padding:14px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:#1A3C6B;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">📧 Link da inviare al Referente:</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="av-link-testo" readonly style="flex:1;border:1px solid #C5D5EA;border-radius:5px;padding:7px 10px;font-family:monospace;font-size:11px;background:white;outline:none;color:#1A3C6B">
+          <button onclick="copiaLink('av-link-testo','link-copiato')" style="background:#1A3C6B;color:white;border:none;border-radius:5px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Copia</button>
+        </div>
+        <p id="link-copiato" style="display:none;color:#2E7D32;font-size:11px;margin-top:6px">✓ Link copiato!</p>
+      </div>
+      <!-- Link Responsabile -->
+      <div style="background:#E8F5E9;border:1px solid #A5D6A7;border-radius:8px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:#2E7D32;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">🔒 Link Responsabile Produzione (solo uso interno):</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="av-link-resp" readonly style="flex:1;border:1px solid #A5D6A7;border-radius:5px;padding:7px 10px;font-family:monospace;font-size:11px;background:white;outline:none;color:#2E7D32">
+          <button onclick="copiaLink('av-link-resp','link-resp-copiato')" style="background:#2E7D32;color:white;border:none;border-radius:5px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Copia</button>
+        </div>
+        <p id="link-resp-copiato" style="display:none;color:#2E7D32;font-size:11px;margin-top:6px">✓ Link copiato!</p>
+        <button onclick="apriModulo()" style="width:100%;margin-top:10px;background:#2E7D32;color:white;border:none;border-radius:7px;padding:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Apri come Responsabile →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- Info Banner -->
+  <div class="info-banner">
+    <div class="info-item"><label>Progetto</label><span id="meta-titolo">—</span></div>
+    <div class="info-item"><label>Docente Referente</label><span id="meta-referente">—</span></div>
+    <div class="info-item"><label>Delibera C.A.</label><span id="meta-delibera">—</span></div>
+  </div>
+
+  <!-- Scadenza -->
+  <div class="scadenza-bar">
+    <span>⚠</span>
+    <strong>Compilare entro: <span id="meta-scadenza">—</span></strong>
+    <span style="color:var(--muted);font-size:12px">Inviare a: <strong>produzione@briccialditerni.it</strong></span>
+  </div>
+
+  <!-- Gestione scadenza — solo Responsabile -->
+  <div id="pannello-scadenza-resp" style="display:none;background:white;border:1px solid var(--bordo);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:none;align-items:center;gap:14px;flex-wrap:wrap">
+    <div>
+      <label style="font-size:10px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px">Data evento prevista</label><br>
+      <input type="text" id="resp_data_evento" placeholder="GG/MM/AAAA" onblur="formattaDataItaliana(this)" style="border:1px solid #D0D7E3;border-radius:6px;padding:6px 9px;font-family:inherit;font-size:13px;margin-top:3px;outline:none;width:130px">
+    </div>
+    <button class="btn-add" onclick="ricalcolaScadenzaResp()" style="margin-top:16px">Ricalcola scadenza (−1 mese)</button>
+    <span id="resp-scadenza-nota" style="display:none;font-size:11px;color:var(--muted);font-style:italic;margin-top:16px">Scadenza aggiornata — ricordati di salvare/inviare.</span>
+  </div>
+
+  <!-- ══ GUIDA ALLA COMPILAZIONE ══ -->
+  <details style="margin-bottom:20px;border:1px solid var(--bordo);border-radius:10px;background:white;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+    <summary style="padding:14px 20px;font-size:14px;font-weight:600;color:var(--blu);cursor:pointer;font-family:Georgia,serif">📖 Guida alla Compilazione — leggi prima di iniziare</summary>
+    <div style="padding:0 20px 18px;font-size:13px;line-height:1.6;color:var(--testo)">
+      <p style="margin-bottom:10px">Questo modulo è pensato per eventi in cui il Conservatorio partecipa fuori sede o riceve un invito da un altro ente — celebrazioni civili, convegni, fiere, open day. È volutamente più leggero degli altri: niente Programma/SIAE, niente Piano Prove, niente Dotazione Sala articolata.</p>
+      <ul style="margin:0 0 10px 20px;padding:0">
+        <li style="margin-bottom:6px"><strong>1. Dati Evento</strong> — tipo di evento, data, ora, luogo <em>ed ente ospitante</em> (chi organizza, se non è il Conservatorio).</li>
+        <li style="margin-bottom:6px"><strong>2. Partecipanti</strong> — chi rappresenta il Conservatorio: uno studente, un duo/trio/quartetto, un docente con un allievo. Elenco semplice, nessuna distinzione complessa di ruoli.</li>
+        <li style="margin-bottom:6px"><strong>3. Dotazione/Materiale e Trasporto</strong> — cosa serve preparare o portare (es. leggii, sedie, uno strumento) e se serve una trasferta. La richiesta di materiale va all'Ufficio Produzione, non ad Acquisti.</li>
+        <li style="margin-bottom:6px"><strong>4. Contatti</strong> — il referente Briccialdi e, se c'è, un referente presso l'ente ospitante.</li>
+        <li style="margin-bottom:0"><strong>5. Materiale Grafico</strong> — solo se serve comunicazione (spesso non necessario per questi eventi).</li>
+      </ul>
+      <p style="margin:0;font-size:12px;color:var(--muted);font-style:italic">Hai dubbi mentre compili? Guarda se c'è una nota sotto il campo — spesso la spiegazione è già lì.</p>
+    </div>
+  </details>
+
+  <!-- ══ SEZ 1 — DATI EVENTO ══ -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div><h2>1. Dati dell'Evento</h2><p>Verificare e confermare tutti i campi</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="field-row">
+        <div class="field-label">Titolo evento</div>
+        <div class="field-input"><span class="prefilled" id="pre-titolo">{Titolo Progetto}</span></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Docente Referente</div>
+        <div class="field-input"><span class="prefilled" id="pre-referente">{Docente Referente}</span></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Data evento <span class="req">*</span></div>
+        <div class="field-input"><span class="warn-inline" id="avviso-data-evento">⚠</span><input type="text" name="data_evento" onblur="formattaDataItaliana(this)" oninput="document.getElementById('avviso-data-evento').style.display = this.value.trim() ? 'none' : 'flex'" placeholder="GG/MM/AAAA"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Ora inizio <span class="req">*</span></div>
+        <div class="field-input"><input type="text" name="ora_evento" onblur="formattaOraItaliana(this)" placeholder="__:__"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Durata stimata <span class="req">*</span></div>
+        <div class="field-input"><input type="text" name="durata" placeholder="es. 90 minuti, con intervallo"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Luogo concerto <span class="req">*</span></div>
+        <div class="field-input"><input type="text" name="luogo_concerto" placeholder="Es. Auditorium Caos — Terni, oppure sede esterna"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Note evento</div>
+        <div class="field-input"><textarea name="note_evento" placeholder="Informazioni aggiuntive sull'evento..."></textarea></div>
+      </div>
+      <div class="field-row" style="background:var(--blu-pale)">
+        <div class="field-label" style="grid-column:1/-1;border-right:none;background:var(--blu-light);color:var(--blu);font-size:11px;letter-spacing:.3px;text-transform:uppercase">Repliche (se previste)</div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);padding:6px 8px 0;font-style:italic">Usa una Replica anche per ogni tappa di un giro/tournée in città diverse (es. dopo Terni: Ravenna, La Spezia...) — ognuna con il proprio trasporto, vitto e alloggio.</p>
+      <div id="repliche-body"></div>
+      <div style="padding:6px 8px">
+        <button class="btn-add" onclick="addReplica()">+ Aggiungi replica</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SEZ 2 — PARTECIPANTI ══ -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div><h2>2. Partecipanti</h2><p>Chi rappresenta il Conservatorio all'evento — studenti e/o docenti</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body">
+
+      <details style="margin-bottom:14px;border:1px solid var(--bordo);border-radius:6px;background:#F8FAFC">
+        <summary style="padding:9px 12px;font-size:12px;font-weight:600;color:var(--blu);cursor:pointer">📋 Incolla da Excel</summary>
+        <div style="padding:0 12px 12px">
+          <p style="font-size:11px;color:var(--muted);margin:8px 0">Copia dal tuo foglio le colonne <strong>Nome — Strumento/Ruolo — Qualifica — Email — Telefono</strong> (in questo ordine) e incollale qui, una riga per persona.</p>
+          <textarea id="incolla-esecutori" rows="4" placeholder="Rossi Mario&#9;Violino&#9;Studente&#9;rossi@briccialditerni.it&#9;+39 333 1234567" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;resize:vertical"></textarea>
+          <button class="btn-add" onclick="importaEsecutoriIncollati()" style="margin-top:8px">Importa righe</button>
+          <span id="incolla-esecutori-esito" style="font-size:11px;color:var(--verde);margin-left:10px;display:none"></span>
+        </div>
+      </details>
+
+      <div style="overflow-x:auto">
+      <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:var(--blu)">
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:20%">Cognome e Nome</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:15%">Ruolo / Strumento</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:17%">Qualifica</th>
+            <th class="col-modalita" style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:15%">Modalità<br><small style="font-weight:400;opacity:.8">(solo esterni)</small></th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:16%">Email</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:13%">Telefono<br><small style="font-weight:400;opacity:.8">(facoltativo)</small></th>
+            <th style="padding:7px 10px;text-align:center;color:white;font-size:11px;width:4%"></th>
+          </tr>
+        </thead>
+        <tbody id="esecutori-tbody"></tbody>
+      </table>
+      </div>
+      <button class="btn-add" onclick="addEsecutore()" style="margin-top:10px">+ Aggiungi partecipante</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px" id="esecutori-contatore">0 partecipanti inseriti</p>
+
+      <!-- NOTE ESECUTORI -->
+      <div class="field-row" style="margin-top:10px">
+        <div class="field-label">Note sui partecipanti</div>
+        <div class="field-input"><textarea name="note_esecutori" placeholder="Indicare eventuali necessità particolari..."></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SEZ 3 — DOTAZIONE/MATERIALE E TRASPORTO ══ -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div><h2>3. Dotazione/Materiale e Trasporto</h2><p>Cosa serve preparare o portare, e se serve una trasferta</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body">
+
+      <div class="field-row">
+        <div class="field-label">Dotazione/Materiale necessario</div>
+        <div class="field-input">
+          <div id="colli-body"></div>
+          <button type="button" class="btn-add" onclick="addCollo()" style="margin-top:6px;font-size:11px;padding:5px 12px">+ Aggiungi materiale</button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin:-4px 0 12px">Es. leggii, sedie pieghevoli, uno strumento da trasportare, materiale informativo... — verrà inviato all'Ufficio Produzione per la preparazione.</p>
+
+      <div class="field-row">
+        <div class="field-label">Trasporto richiesto <span class="req">*</span></div>
+        <div class="field-input">
+          <select name="trasferta" onchange="toggleTrasferta(this)">
+            <option value="">— selezionare —</option>
+            <option>No — evento in sede</option>
+            <option>Sì — destinazione locale (Terni / provincia)</option>
+            <option>Sì — destinazione regionale</option>
+            <option>Sì — destinazione nazionale</option>
+            <option>Sì — destinazione internazionale</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row" id="riga-dest-trasferta" style="display:none">
+        <div class="field-label">Destinazione trasferta</div>
+        <div class="field-input"><input type="text" name="dest_trasferta" placeholder="Città / luogo — indicare anche l'ente ospitante se diverso da quanto già scritto in Sezione 1"></div>
+      </div>
+      <div id="blocco-vitto-concerto" style="display:none">
+        <div class="field-row">
+          <div class="field-label">Note esigenze particolari</div>
+          <div class="field-input"><textarea name="note_vitto" placeholder="Es. vitto/alloggio se serve, orari di viaggio, o altre esigenze della trasferta..."></textarea></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SEZ 6 — CONTATTI ══ -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div><h2>4. Referenti e Contatti</h2><p>Email istituzionale e cellulare — obbligatori</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body">
+
+      <div class="sub-header">4A — Docenti Briccialdi coinvolti</div>
+      <table class="data-table">
+        <thead><tr><th style="width:26%">Cognome e Nome</th><th style="width:20%">Ruolo / Cattedra</th><th style="width:28%">Email istituzionale</th><th style="width:16%">Cellulare</th><th style="width:4%"></th></tr></thead>
+        <tbody id="docenti-body"></tbody>
+      </table>
+      <button class="btn-add" onclick="addDocente()">+ Aggiungi docente</button>
+
+      <p style="font-size:11px;color:var(--muted);margin:16px 0 0;font-style:italic">Il referente locale per eventi fuori sede si indica dentro ciascuna Replica (Sezione 1) — può essere diverso per ogni tappa.</p>
+
+    </div>
+  </div>
+
+  <!-- ══ SEZ 7 — MATERIALE GRAFICO ══ -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div><h2>5. Materiale Grafico e Testo</h2><p>Necessario per Ufficio Comunicazione</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="field-row">
+        <div class="field-label">Foto ensemble / orchestra <span class="req">*</span><br><small style="font-weight:400;color:var(--muted)">min. 300 dpi</small></div>
+        <div class="field-input"><textarea name="foto_ensemble" placeholder="Link WeTransfer / Drive oppure indicare modalità di invio..." rows="2"></textarea></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Foto solisti / direttore <span class="req">*</span><br><small style="font-weight:400;color:var(--muted)">min. 300 dpi</small></div>
+        <div class="field-input"><textarea name="foto_solisti" placeholder="Link WeTransfer / Drive — una foto per ogni solista..." rows="2"></textarea></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Contenuti / testo locandina</div>
+        <div class="field-input"><textarea name="locandina" placeholder="Titolo, sottotitolo, artisti, date, luogo — testo da inserire nella locandina..." rows="2"></textarea></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Testo descrittivo <span class="req">*</span><br><small style="font-weight:400;color:var(--muted)">per social e stampa</small></div>
+        <div class="field-input"><textarea name="testo_descr" placeholder="Testo di presentazione del progetto, del programma e degli artisti (300–500 parole)..." rows="6"></textarea></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Biografie solisti / direttore</div>
+        <div class="field-input"><textarea name="bio_artisti" placeholder="Brevi biografie degli artisti ospiti (o link a pagina web)..." rows="4"></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SEZ 8 — CHECKLIST RESPONSABILE ══ -->
+  <div class="section" id="sezione-checklist">
+    <div class="section-header" onclick="toggleSection(this)" style="background:#1A3C6B">
+      <div><h2>6. Checklist di Verifica — Responsabile Produzione</h2><p>Si aggiorna in tempo reale durante la compilazione</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body" style="padding:0">
+
+      <!-- Barra stato globale -->
+      <div id="checklist-stato-bar" style="padding:12px 20px;background:#F5F5F5;border-bottom:1px solid #D0D7E3;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;flex-wrap:wrap">
+          <span id="cl-count-ok" style="color:#2E7D32">✓ 0 compilati</span>
+          <span style="color:#D0D7E3">|</span>
+          <span id="cl-count-err" style="color:#C62828">✗ 0 mancanti</span>
+        </div>
+        <div id="checklist-stato-label" style="margin-left:auto;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#FFEBEE;color:#C62828">
+          Modulo incompleto
+        </div>
+      </div>
+
+      <!-- Lista voci -->
+      <ul class="checklist" id="checklist-voci"></ul>
+
+      <!-- Pulsante sollecito -->
+      <div id="blocco-sollecito" style="padding:14px 20px;border-top:1px solid #D0D7E3;display:none">
+        <div style="font-size:12px;color:#C62828;margin-bottom:10px;font-weight:600">⚠ Campi obbligatori mancanti — genera un sollecito al Referente:</div>
+        <button class="btn btn-primary" onclick="generaSollecito()" style="font-size:13px;padding:8px 20px">✉ Genera sollecito</button>
+      </div>
+
+      <!-- Modal sollecito -->
+      <div id="modal-sollecito" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+        <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Sollecito — dati mancanti</h2>
+            <button onclick="chiudiSollecito()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
+          </div>
+          <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo al Referente, oppure apri direttamente in Mail.</p>
+          <textarea id="testo-sollecito" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <button onclick="copiaSollecito()" class="btn btn-primary" style="flex:1">Copia testo</button>
+            <button onclick="apriMailSollecito()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
+            <button onclick="chiudiSollecito()" class="btn btn-secondary" style="flex:1">Chiudi</button>
+          </div>
+          <p id="copia-confirm-sol" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SEZ 7 — RICHIESTE (RESPONSABILE) ══ -->
+  <div class="section" id="sezione-spazi">
+    <div class="section-header" onclick="toggleSection(this)" style="background:#2A5C9B">
+      <div><h2>7. Richieste — Responsabile Produzione</h2><p>Genera le richieste da inviare per il materiale e l'eventuale trasferta</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body" style="padding:16px 20px">
+
+      <div style="margin-top:0;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--blu-mid)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blu-mid);margin-bottom:8px;font-weight:700">👥 Trasporto Persone</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Se è stata segnalata una trasferta (Sezione 3), qui puoi decidere la modalità.</p>
+        <button class="btn-add" onclick="aggiornaListaColli(); costruisciTabellaTrasportoPersone();" style="margin-bottom:10px">🔄 Aggiorna vista</button>
+        <div style="overflow-x:auto">
+        <table style="width:100%;min-width:680px;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--blu)">
+              <th style="padding:6px 10px;text-align:left;color:white;font-size:11px">Tappa</th>
+              <th style="padding:6px 10px;text-align:left;color:white;font-size:11px">Luogo</th>
+              <th style="padding:6px 10px;text-align:center;color:white;font-size:11px">N° Persone</th>
+              <th style="padding:6px 10px;text-align:left;color:white;font-size:11px">Vitto</th>
+              <th style="padding:6px 10px;text-align:left;color:white;font-size:11px">Alloggio</th>
+              <th style="padding:6px 10px;text-align:left;color:white;font-size:11px;width:22%">Modalità Trasporto</th>
+            </tr>
+          </thead>
+          <tbody id="trasporto-persone-tbody">
+            <tr><td colspan="6" style="padding:10px;text-align:center;color:var(--muted);font-style:italic">Nessuna trasferta segnalata dal Referente</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--verde)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--verde);margin-bottom:8px;font-weight:700">📦 Dotazione/Materiale</div>
+        <div id="lista-colli-riepilogo" style="font-size:12px"></div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;font-style:italic">Materiale indicato dal Referente in Sezione 3 — la richiesta va all'Ufficio Produzione.</p>
+        <button class="btn btn-primary" onclick="generaRichiestaDotazioneMateriale()" style="margin-top:10px">📤 Genera richiesta Dotazione/Materiale</button>
+      </div>
+
+      <button class="btn btn-primary" onclick="generaRichiestaTrasporti()" style="margin-top:14px">🚚 Genera richiesta Trasporti (Acquisti)</button>
+
+    </div>
+
+    <!-- Modal richiesta dotazione/materiale -->
+    <div id="modal-spazi" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+      <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Richiesta Dotazione/Materiale — Ufficio Produzione</h2>
+          <button onclick="chiudiModalSpazi()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
+        </div>
+        <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
+        <textarea id="testo-spazi" style="width:100%;height:220px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <button onclick="copiaTestoSpazi()" class="btn btn-primary" style="flex:1">Copia testo</button>
+          <button onclick="apriMailSpazi()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
+          <button onclick="chiudiModalSpazi()" class="btn btn-secondary" style="flex:1">Chiudi</button>
+        </div>
+        <p id="copia-confirm-spazi" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
+      </div>
+    </div>
+
+    <!-- Modal richiesta trasporti -->
+    <div id="modal-trasporti" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+      <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Richiesta trasporti — Ufficio Acquisti</h2>
+          <button onclick="chiudiModalTrasporti()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
+        </div>
+        <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
+        <textarea id="testo-trasporti" style="width:100%;height:220px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <button onclick="copiaTestoTrasporti()" class="btn btn-primary" style="flex:1">Copia testo</button>
+          <button onclick="apriMailTrasporti()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
+          <button onclick="chiudiModalTrasporti()" class="btn btn-secondary" style="flex:1">Chiudi</button>
+        </div>
+        <p id="copia-confirm-trasporti" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCHEDA DI SINTESI (generata automaticamente) ══ -->
+  <div class="section" id="sezione-sintesi">
+    <div class="section-header" onclick="toggleSection(this)" style="background:#1A3C6B">
+      <div><h2>Scheda di Sintesi — generata automaticamente</h2><p>Riepilogo per il fascicolo e gli uffici</p></div>
+      <span class="toggle">▾</span>
+    </div>
+    <div class="section-body" style="padding:0">
+
+      <!-- Dati evento -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo);background:var(--blu-pale)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Dati Evento</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px 20px;font-size:13px">
+          <div><span style="color:var(--muted);font-size:11px">Titolo</span><br><strong id="sint_titolo">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Docente Referente</span><br><strong id="sint_referente">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Delibera C.A.</span><br><strong id="sint_delibera">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Data</span><br><strong id="sint_data">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Ora</span><br><strong id="sint_ora">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Luogo</span><br><strong id="sint_luogo">—</strong></div>
+          <div><span style="color:var(--muted);font-size:11px">Repliche</span><br><strong id="sint_repliche">nessuna</strong></div>
+        </div>
+      </div>
+
+      <!-- Programma Artistico -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Programma Artistico</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--blu-light)">
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Titolo</th>
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Autore</th>
+              <th style="padding:6px 10px;text-align:center;color:var(--blu);font-size:11px">Durata</th>
+            </tr>
+          </thead>
+          <tbody id="sint_brani_rows">
+            <tr><td colspan="3" style="padding:8px 10px;color:var(--muted);font-style:italic;font-size:12px">Nessun brano inserito</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Docente Esterno -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Docente Esterno</div>
+        <div id="sint_docente_esterno" style="font-size:12px;color:var(--muted);font-style:italic">Non ancora indicato</div>
+      </div>
+
+      <!-- Studenti Partecipanti -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Studenti Partecipanti</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--blu-light)">
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Nome</th>
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Ruolo / Strumento</th>
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Qualifica</th>
+            </tr>
+          </thead>
+          <tbody id="sint_esecutori_rows">
+            <tr><td colspan="3" style="padding:8px 10px;color:var(--muted);font-style:italic;font-size:12px">Nessuno studente inserito</td></tr>
+          </tbody>
+          <tfoot>
+            <tr style="background:var(--blu-light);font-weight:700">
+              <td colspan="2" style="padding:8px 10px;color:var(--blu)">TOTALE STUDENTI</td>
+              <td style="text-align:center;color:var(--blu)" id="sint_esec_tot">0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Persone esterne — modalità -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo);background:#FFF8E1">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--arancio);margin-bottom:10px">Persone Esterne da Reclutare</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--rosso)" id="sint_pers_singolo">0</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px">Contratto<br>singolo</div>
+          </div>
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--rosso)" id="sint_pers_coop">0</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px">Cooperativa/<br>Preventivo</div>
+          </div>
+          <div style="background:var(--rosso);border-radius:7px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:white" id="sint_pers_tot">0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.85);margin-top:2px">TOTALE</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--arancio);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">📋 Dettaglio — Contratto singolo</div>
+            <div id="dettaglio-singolo" style="font-size:11px;color:var(--testo)">—</div>
+          </div>
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--arancio);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">📋 Dettaglio — Cooperativa/Preventivo</div>
+            <div id="dettaglio-coop" style="font-size:11px;color:var(--testo)">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Piano Prove -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Piano Prove</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--blu-light)">
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Data</th>
+              <th style="padding:6px 10px;text-align:center;color:var(--blu);font-size:11px">Orario</th>
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Luogo</th>
+            </tr>
+          </thead>
+          <tbody id="sint_prove_rows">
+            <tr><td colspan="3" style="padding:8px 10px;color:var(--muted);font-style:italic;font-size:12px">Nessuna sessione inserita</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Contatti -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Contatti</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px">
+          <thead>
+            <tr style="background:var(--blu-light)">
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Docente</th>
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Ruolo</th>
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Email</th>
+              <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Cellulare</th>
+            </tr>
+          </thead>
+          <tbody id="sint_docenti_rows">
+            <tr><td colspan="4" style="padding:8px 10px;color:var(--muted);font-style:italic;font-size:12px">Nessun docente inserito</td></tr>
+          </tbody>
+        </table>
+        <div id="sint_ref_ext" style="font-size:12px;color:var(--muted);font-style:italic">Nessun referente locale indicato</div>
+      </div>
+
+      <!-- Dotazione Tecnica -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Dotazione Tecnica Richiesta</div>
+        <div id="sint_dotazione" style="font-size:12px;color:var(--muted);font-style:italic">Nessuna dotazione indicata</div>
+      </div>
+
+      <!-- Materiale da Trasportare -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Materiale da Trasportare</div>
+        <div id="sint_colli" style="font-size:12px;color:var(--muted);font-style:italic">Nessun materiale indicato</div>
+      </div>
+
+      <!-- Materiale Musicale -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Materiale Musicale da Noleggiare</div>
+        <div id="sint_spartiti" style="font-size:12px;color:var(--muted);font-style:italic">Nessun materiale musicale indicato</div>
+      </div>
+
+      <!-- Pulsante stampa sintesi -->
+      <div style="padding:12px 20px;border-top:1px solid var(--bordo);text-align:right">
+        <button class="btn btn-primary" onclick="stampaSintesi()" style="font-size:13px;padding:8px 20px">🖨 Stampa solo sintesi</button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<!-- Modal PDF -->
+<div id="modal-pdf" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Salva come PDF</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Dopo aver compilato tutti i campi, salva il modulo come PDF e invialo a <strong>produzione@briccialditerni.it</strong></p>
+    <div style="background:#F5F5F5;border-radius:8px;padding:14px;margin-bottom:12px">
+      <p style="font-size:12px;font-weight:600;color:var(--blu);margin-bottom:8px">💻 Windows / Linux</p>
+      <p style="font-size:13px;">Premi <strong>Ctrl + P</strong> → Stampante: <strong>Salva come PDF</strong> → Salva</p>
+    </div>
+    <div style="background:#F5F5F5;border-radius:8px;padding:14px;margin-bottom:12px">
+      <p style="font-size:12px;font-weight:600;color:var(--blu);margin-bottom:8px">🍎 Mac</p>
+      <p style="font-size:13px;">Premi <strong>Cmd + P</strong> → in basso a sinistra <strong>PDF</strong> → <strong>Salva come PDF</strong></p>
+    </div>
+    <div style="background:#F5F5F5;border-radius:8px;padding:14px;margin-bottom:16px">
+      <p style="font-size:12px;font-weight:600;color:var(--blu);margin-bottom:8px">📱 iPhone / iPad</p>
+      <ol style="padding-left:18px;font-size:13px;line-height:2">
+        <li>Tocca <strong>Condividi</strong> (quadrato con freccia)</li>
+        <li>Tocca <strong>Opzioni</strong> → seleziona <strong>PDF</strong></li>
+        <li>Tocca <strong>Salva in File</strong></li>
+      </ol>
+    </div>
+    <div class="modal-nota">📧 Nominare il file: <strong>ID<span id="pdf-id">XX</span>_<span id="pdf-titolo">TitoloProduzione</span>_Modulo.pdf</strong><br>Inviare a: <strong>produzione@briccialditerni.it</strong></div>
+    <button onclick="chiudiPDF()" class="btn btn-primary" style="width:100%;margin-top:16px">Chiudi</button>
+  </div>
+</div>
+
+<!-- Barra azioni -->
+<div class="actions">
+  <button class="btn btn-secondary" onclick="resetForm()">Ricomincia</button>
+  <button class="btn btn-primary" onclick="apriPDF()">Salva come PDF &amp; Invia</button>
+</div>
+
+<script>
+// ── Progetto monografico SIAE ──
+// ═══ PROGRAMMA SIAE — gestione brano unico/monografico e propagazione autore ═══
+function toggleMonografico(cb) {
+  var fields = document.getElementById('autore-unico-fields');
+  if (cb.checked) {
+    fields.style.display = 'grid';
+    // Aggiorna tutti i brani con i valori dell'autore unico
+    document.getElementById('autore_unico').addEventListener('input', propagaAutoreUnico);
+    document.getElementById('nato_unico').addEventListener('input', propagaAutoreUnico);
+    document.getElementById('morto_unico').addEventListener('input', propagaAutoreUnico);
+  } else {
+    fields.style.display = 'none';
+  }
+}
+
+function propagaAutoreUnico() {
+  var autore = document.getElementById('autore_unico').value;
+  var nato = document.getElementById('nato_unico').value;
+  var morto = document.getElementById('morto_unico').value;
+  for (var i = 1; i <= braniCount; i++) {
+    var a = document.querySelector('[name="brano_autore_' + i + '"]');
+    var n = document.querySelector('[name="brano_nato_' + i + '"]');
+    var m = document.querySelector('[name="brano_morto_' + i + '"]');
+    if (a) a.value = autore;
+    if (n) n.value = nato;
+    if (m) m.value = morto;
+  }
+}
+
+// ── Gestione URL params e schermata avvio ──
+var metadati = {};
+
+// ═══ AVVIO E CONFIGURAZIONE PROGETTO — parametri URL, ruolo, popolamento metadati ═══
+// ═══ UTILITY — normalizza le date inserite a mano nel formato GG/MM/AAAA ═══
+// ═══ UTILITY — calcola la Scadenza risposta (1 mese prima della data evento, Masterclass) ═══
+function parseDataGGMMAAAA(str) {
+  if (!str) return null;
+  var p = str.trim().split('/');
+  if (p.length !== 3) return null;
+  var gg = parseInt(p[0], 10), mm = parseInt(p[1], 10), aa = parseInt(p[2], 10);
+  if (isNaN(gg) || isNaN(mm) || isNaN(aa)) return null;
+  var d = new Date(aa, mm - 1, gg);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function calcolaScadenzaDaEvento() {
+  var elEvento = document.getElementById('av_data_evento');
+  var elScadenza = document.getElementById('av_scadenza');
+  var elNota = document.getElementById('av-scadenza-nota');
+  if (!elEvento || !elScadenza) return;
+  var dataEvento = parseDataGGMMAAAA(elEvento.value);
+  if (!dataEvento) { if (elNota) elNota.style.display = 'none'; return; }
+  var dataScadenza = new Date(dataEvento.getFullYear(), dataEvento.getMonth() - 1, dataEvento.getDate());
+  var gg = ('0' + dataScadenza.getDate()).slice(-2);
+  var mm = ('0' + (dataScadenza.getMonth() + 1)).slice(-2);
+  elScadenza.value = gg + '/' + mm + '/' + dataScadenza.getFullYear();
+  if (elNota) elNota.style.display = 'block';
+}
+
+// ═══ UTILITY — stesso calcolo, riusabile dopo la creazione del progetto (vista Responsabile) ═══
+function ricalcolaScadenzaResp() {
+  var elEvento = document.getElementById('resp_data_evento');
+  var elNota = document.getElementById('resp-scadenza-nota');
+  if (!elEvento) return;
+  var dataEvento = parseDataGGMMAAAA(elEvento.value);
+  if (!dataEvento) { alert('Inserisci una data evento valida (GG/MM/AAAA) prima di ricalcolare.'); return; }
+  var dataScadenza = new Date(dataEvento.getFullYear(), dataEvento.getMonth() - 1, dataEvento.getDate());
+  var gg = ('0' + dataScadenza.getDate()).slice(-2);
+  var mm = ('0' + (dataScadenza.getMonth() + 1)).slice(-2);
+  var nuovaScadenza = gg + '/' + mm + '/' + dataScadenza.getFullYear();
+
+  // Aggiorna subito la visualizzazione e i metadati in memoria
+  metadati.scadenza = nuovaScadenza;
+  var elMeta = document.getElementById('meta-scadenza');
+  if (elMeta) elMeta.textContent = nuovaScadenza;
+
+  // Aggancia davvero: salva su Firestore, non solo a video
+  if (window.firebaseReady && window.db && metadati.id) {
+    var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
+    window.fsUpdateDoc(docRef, {
+      'metadati.scadenza': nuovaScadenza,
+      'metadati.data_evento_prevista': elEvento.value
+    }).then(function() {
+      if (elNota) { elNota.textContent = '✓ Scadenza aggiornata e salvata: ' + nuovaScadenza; elNota.style.display = 'inline'; }
+    }).catch(function(e) {
+      if (elNota) { elNota.textContent = '⚠ Aggiornata a video ma non salvata su Firestore: ' + e.message; elNota.style.display = 'inline'; }
+    });
+  } else if (elNota) {
+    elNota.textContent = '⚠ Firestore non disponibile — scadenza aggiornata solo a video, non salvata.';
+    elNota.style.display = 'inline';
+  }
+}
+
+function formattaDataItaliana(input) {
+  var v = input.value.trim();
+  if (!v) return;
+  var parti = v.split(/[\/\-\.]/);
+  if (parti.length !== 3) return; // formato non riconosciuto: lascia invariato, non forzare
+  var gg = parseInt(parti[0], 10);
+  var mm = parseInt(parti[1], 10);
+  var aa = parseInt(parti[2], 10);
+  if (isNaN(gg) || isNaN(mm) || isNaN(aa)) return;
+  if (aa < 100) aa += 2000; // es. "25" → 2025
+  if (gg < 1 || gg > 31 || mm < 1 || mm > 12) return; // valori non plausibili: lascia invariato
+  var ggStr = (gg < 10 ? '0' : '') + gg;
+  var mmStr = (mm < 10 ? '0' : '') + mm;
+  input.value = ggStr + '/' + mmStr + '/' + aa;
+}
+
+// ═══ UTILITY — normalizza gli orari inseriti a mano nel formato hh:mm ═══
+function formattaOraItaliana(input) {
+  var v = input.value.trim();
+  if (!v) return;
+  var norm = v.replace(/[.,\s]/g, ':');
+  var parti = norm.split(':').filter(function(p) { return p !== ''; });
+  var hh, mm;
+  if (parti.length === 2) {
+    hh = parseInt(parti[0], 10);
+    mm = parseInt(parti[1], 10);
+  } else if (parti.length === 1 && /^\d{3,4}$/.test(parti[0])) {
+    var s = parti[0];
+    mm = parseInt(s.slice(-2), 10);
+    hh = parseInt(s.slice(0, -2), 10);
+  } else if (parti.length === 1 && /^\d{1,2}$/.test(parti[0])) {
+    hh = parseInt(parti[0], 10);
+    mm = 0;
+  } else {
+    return; // formato non riconosciuto: lascia invariato
+  }
+  if (isNaN(hh) || isNaN(mm) || hh < 0 || hh > 23 || mm < 0 || mm > 59) return;
+  var hhStr = (hh < 10 ? '0' : '') + hh;
+  var mmStr = (mm < 10 ? '0' : '') + mm;
+  input.value = hhStr + ':' + mmStr;
+}
+
+// ═══ UTILITY — mostra/nasconde il campo destinazione in base alla necessità di trasferta ═══
+function toggleTrasferta(sel) {
+  var mostra = sel.value && sel.value.indexOf('Sì') === 0;
+  var riga = document.getElementById('riga-dest-trasferta');
+  if (riga) riga.style.display = mostra ? 'grid' : 'none';
+  var blocco = document.getElementById('blocco-vitto-concerto');
+  if (blocco) blocco.style.display = mostra ? 'block' : 'none';
+}
+
+// ═══ UTILITY — normalizza la durata dei brani SIAE nel formato mm:ss ═══
+function formattaDurata(input) {
+  var v = input.value.trim();
+  if (!v) return;
+  var norm = v.replace(/[.\-'\s]/g, ':');
+  var parti = norm.split(':').filter(function(p) { return p !== ''; });
+  var min, sec;
+  if (parti.length === 2) {
+    min = parseInt(parti[0], 10);
+    sec = parseInt(parti[1], 10);
+  } else if (parti.length === 1 && /^\d{3,4}$/.test(parti[0])) {
+    var s = parti[0];
+    sec = parseInt(s.slice(-2), 10);
+    min = parseInt(s.slice(0, -2), 10);
+  } else {
+    return; // formato non riconosciuto: lascia invariato
+  }
+  if (isNaN(min) || isNaN(sec) || sec < 0 || sec > 59 || min < 0) return;
+  var secStr = (sec < 10 ? '0' : '') + sec;
+  input.value = min + ':' + secStr;
+}
+
+function leggiParams() {
+  var params = new URLSearchParams(window.location.search);
+  metadati = {
+    id:            params.get('id') || '',
+    titolo:        params.get('titolo') || '',
+    referente:     params.get('referente') || '',
+    email:         params.get('email') || '',
+    delibera:      params.get('delibera') || '',
+    data_delibera: params.get('data_delibera') || '',
+    scadenza:      params.get('scadenza') || '',
+    ruolo:         params.get('ruolo') || 'referente',
+  };
+  return metadati.id !== '';
+}
+
+function applicaRuolo() {
+  var isResp = metadati.ruolo === 'responsabile';
+  // Il link Dashboard è visibile di default (utile anche in schermata di avvio);
+  // lo nascondiamo solo quando sappiamo per certo di essere in vista Referente
+  if (!isResp) {
+    var linkDashRef = document.getElementById('link-dashboard');
+    if (linkDashRef) linkDashRef.style.display = 'none';
+  }
+
+  // Sezioni riservate al Responsabile: Checklist, Assegnazione Spazi, Scheda di Sintesi
+  var sezioniRiservate = ['sezione-checklist', 'sezione-spazi', 'sezione-sintesi'];
+  sezioniRiservate.forEach(function(id) {
+    var sez = document.getElementById(id);
+    if (sez) sez.style.display = isResp ? 'block' : 'none';
+  });
+
+  // Colonna "Modalità" (Esecutori): è una decisione del Responsabile, non va chiesta al Referente
+  document.querySelectorAll('.col-modalita').forEach(function(el) {
+    el.style.display = isResp ? '' : 'none';
+  });
+
+  if (isResp) {
+    // Badge verde nell'header per distinguere la vista
+    var badge = document.querySelector('.badge-tipologia');
+    if (badge) badge.style.background = 'rgba(46,125,50,.35)';
+    var sub = document.querySelector('.site-header p');
+    if (sub) sub.textContent = 'Vista Responsabile Produzione';
+    // Pannello gestione scadenza, solo Responsabile
+    var pannScad = document.getElementById('pannello-scadenza-resp');
+    if (pannScad) pannScad.style.display = 'flex';
+    // Link per tornare alla Dashboard, solo Responsabile
+    var linkDash = document.getElementById('link-dashboard');
+    if (linkDash) linkDash.style.display = 'inline-block';
+  }
+}
+
+function popolaMetadati() {
+  var el = function(id) { return document.getElementById(id); };
+  var set = function(id, val) { if (el(id)) el(id).textContent = val || '—'; };
+
+  // Header
+  set('header-id', 'ID ' + (metadati.id || '—'));
+
+  // Info banner
+  set('meta-titolo',    metadati.titolo);
+  set('meta-referente', metadati.referente);
+  set('meta-delibera',  metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
+  set('meta-scadenza',  metadati.scadenza);
+  var elRespData = document.getElementById('resp_data_evento');
+  if (elRespData && metadati.data_evento_prevista) elRespData.value = metadati.data_evento_prevista;
+
+  // Campi precompilati sezione 1
+  set('pre-titolo',    metadati.titolo);
+  set('pre-referente', metadati.referente);
+
+  // Scheda sintesi
+  set('sint_titolo',    metadati.titolo);
+  set('sint_referente', metadati.referente);
+  set('sint_delibera',  metadati.delibera ? 'N° ' + metadati.delibera + ' del ' + metadati.data_delibera : '—');
+
+  // Modal PDF
+  set('pdf-id',     metadati.id);
+  set('pdf-titolo', metadati.titolo ? metadati.titolo.replace(/\s+/g,'') : 'TitoloProduzione');
+
+  // Email referente per sollecito
+  window._emailReferente = metadati.email || '';
+
+  // Titolo pagina
+  if (metadati.titolo) document.title = 'Modulo — ' + metadati.titolo + ' | ID ' + metadati.id;
+}
+
+// ═══ SCHERMATA AVVIO — navigazione tra campi con Invio (utile anche da mobile, senza tasto Tab fisico) ═══
+var campiAvvioOrdine = ['av_titolo','av_id','av_referente','av_email','av_delibera','av_data_delibera','av_data_evento','av_scadenza'];
+campiAvvioOrdine.forEach(function(cid, idx) {
+  var el = document.getElementById(cid);
+  if (!el) return;
+  el.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    var next = document.getElementById(campiAvvioOrdine[idx + 1]);
+    if (next) { next.focus(); } else { confermaAvvio(); }
+  });
+});
+
+function toggleNoReferente(cb) {
+  var rigaRef = document.getElementById('riga-av-referente');
+  var rigaEmail = document.getElementById('riga-av-email');
+  if (cb.checked) {
+    rigaRef.style.display = 'none';
+    rigaEmail.style.display = 'none';
+  } else {
+    rigaRef.style.display = 'block';
+    rigaEmail.style.display = 'block';
+  }
+}
+
+function confermaAvvio() {
+  var noRef = document.getElementById('av-no-referente').checked;
+  var campi = noRef
+    ? ['av_titolo','av_id','av_delibera','av_data_delibera','av_scadenza']
+    : ['av_titolo','av_id','av_referente','av_email','av_delibera','av_data_delibera','av_scadenza'];
+  var ok = true;
+  campi.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el || !el.value.trim()) { ok = false; el && (el.style.borderColor = '#C62828'); }
+    else el && (el.style.borderColor = '#D0D7E3');
+  });
+  if (!ok) { document.getElementById('av-errore').style.display = 'block'; return; }
+  document.getElementById('av-errore').style.display = 'none';
+
+  var id = document.getElementById('av_id').value.trim();
+  var dati = {
+    id:            id,
+    tipologia:     'evento-istituzionale',
+    titolo:        document.getElementById('av_titolo').value.trim(),
+    referente:     noRef ? 'Responsabile Produzione' : document.getElementById('av_referente').value.trim(),
+    email:         noRef ? '' : document.getElementById('av_email').value.trim(),
+    delibera:      document.getElementById('av_delibera').value.trim(),
+    data_delibera: document.getElementById('av_data_delibera').value.trim(),
+    scadenza:      document.getElementById('av_scadenza').value.trim(),
+  };
+
+  // Salva su Firestore — riprova finché Firebase non è pronto, invece di saltare silenziosamente
+  (function salvaMetadatiConRetry(tentativi) {
+    if (window.firebaseReady && window.db) {
+      var docRef = window.fsDoc(window.db, 'progetti', id);
+      window.fsSetDoc(docRef, {
+        metadati: dati,
+        stato: { creato_il: window.fsTimestamp(), completato_referente: false, completato_responsabile: false }
+      }, { merge: true }).then(function() {
+        console.log('Progetto salvato su Firestore:', id);
+      }).catch(function(e) {
+        console.warn('Errore salvataggio metadati su Firestore:', e);
+      });
+    } else if (tentativi > 0) {
+      setTimeout(function() { salvaMetadatiConRetry(tentativi - 1); }, 300);
+    } else {
+      console.warn('Firestore non disponibile dopo vari tentativi, uso solo URL params');
+    }
+  })(20); // fino a 6 secondi di tentativi
+
+  // Genera link Referente e Responsabile
+  var base = window.location.origin + window.location.pathname;
+  var p = new URLSearchParams(dati);
+  var linkResp = base + '?' + p.toString() + '&ruolo=responsabile';
+  document.getElementById('av-link-resp').value = linkResp;
+  document.getElementById('av-link-box').style.display = 'block';
+  var boxRef = document.getElementById('av-link-box-referente');
+  if (noRef) {
+    if (boxRef) boxRef.style.display = 'none';
+  } else {
+    var linkRef = base + '?' + p.toString();
+    document.getElementById('av-link-testo').value = linkRef;
+    if (boxRef) boxRef.style.display = 'block';
+  }
+}
+
+function copiaLink(inputId, confirmId) {
+  var el = document.getElementById(inputId || 'av-link-testo');
+  var conf = document.getElementById(confirmId || 'link-copiato');
+  if (el) { el.select(); try { document.execCommand('copy'); if (conf) conf.style.display = 'block'; } catch(e) {} }
+}
+
+function apriModulo() {
+  var link = document.getElementById('av-link-resp') ? document.getElementById('av-link-resp').value : document.getElementById('av-link-testo').value;
+  if (link) window.location.href = link;
+}
+
+// ── Inizializzazione ──
+function inizializza() {
+  collassaSezioniIniziali();
+  var haDati = leggiParams();
+  if (haDati) {
+    document.getElementById('schermata-avvio').style.display = 'none';
+    popolaMetadati();
+    applicaRuolo();
+  } else {
+    document.getElementById('schermata-avvio').style.display = 'block';
+  }
+  aggiornaChecklist();
+  aggiornaSintesiEsecutori();
+}
+
+// Avvia subito — non aspettare DOMContentLoaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inizializza);
+} else {
+  inizializza();
+}
+
+// ── Toggle sezioni ──
+// ═══ INTERFACCIA — apertura/chiusura sezioni, modali PDF, reset modulo ═══
+function toggleSection(header) {
+  var body = header.nextElementSibling;
+  body.classList.toggle('hidden');
+  header.classList.toggle('collapsed');
+}
+
+// ═══ UTILITY — chiude tutte le sezioni principali all'apertura, per una visualizzazione più leggera ═══
+function collassaSezioniIniziali() {
+  document.querySelectorAll('.section-header').forEach(function(header) {
+    var body = header.nextElementSibling;
+    if (body && body.classList.contains('section-body')) {
+      body.classList.add('hidden');
+      header.classList.add('collapsed');
+    }
+  });
+}
+
+// ── Auto-resize textarea ──
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.tagName === 'TEXTAREA') {
+    e.target.style.height = 'auto';
+    e.target.style.height = (e.target.scrollHeight + 2) + 'px';
+  }
+});
+
+// ── PDF ──
+function apriPDF() { document.getElementById('modal-pdf').style.display = 'block'; }
+function chiudiPDF() { document.getElementById('modal-pdf').style.display = 'none'; }
+
+// ── Reset ──
+function resetForm() {
+  if (!confirm('Cancellare tutti i dati inseriti?')) return;
+  document.querySelectorAll('input:not([readonly]), textarea:not([readonly]), select').forEach(function(el) {
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+    if (el.tagName === 'TEXTAREA') el.style.height = 'auto';
+  });
+}
+
+// ── Brani SIAE ──
+var braniCount = 0;
+// ═══ PROGRAMMA SIAE — riga brano dinamica ═══
+function addBrano() {
+  var body = document.getElementById('brani-body');
+  if (!body) return;
+  braniCount++;
+  var tr = document.createElement('tr');
+  tr.setAttribute('data-riga', 'brano');
+  tr.innerHTML =
+    '<td><textarea data-f="titolo" name="brano_titolo_' + braniCount + '" rows="1" placeholder="Titolo"></textarea></td>' +
+    '<td><textarea data-f="autore" name="brano_autore_' + braniCount + '" rows="1" placeholder="Autore"></textarea></td>' +
+    '<td><input type="text" data-f="nato" name="brano_nato_' + braniCount + '" placeholder="aaaa"></td>' +
+    '<td><input type="text" data-f="morto" name="brano_morto_' + braniCount + '" placeholder="aaaa"></td>' +
+    '<td><input type="text" data-f="durata" name="brano_durata_' + braniCount + '" onblur="formattaDurata(this)" placeholder="mm:ss"></td>' +
+    '<td><textarea data-f="note" name="brano_note_' + braniCount + '" rows="1" placeholder="es. prima esecuzione"></textarea></td>' +
+    '<td style="text-align:center"><button type="button" onclick="eliminaRiga(this,\'brani-body\',\'brano\',[\'titolo\',\'autore\',\'nato\',\'morto\',\'durata\',\'note\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
+  body.appendChild(tr);
+}
+for (var i = 0; i < 6; i++) addBrano();
+
+// ── Repliche ──
+var replicheCount = 0;
+var replicaUidCounter = 0;
+// ═══ REPLICHE — riga data replica dinamica ═══
+function addReplica() {
+  replicheCount++;
+  replicaUidCounter++;
+  var uid = replicaUidCounter;
+  var div = document.createElement('div');
+  div.setAttribute('data-riga', 'replica');
+  div.setAttribute('data-uid', uid);
+  div.setAttribute('data-pos', replicheCount);
+  div.style.cssText = 'border-bottom:8px solid #F0F4FA;padding:12px;background:white;';
+  div.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+    '<div data-label style="font-size:13px;font-weight:700;color:#1A3C6B">Replica ' + replicheCount + '</div>' +
+    '<button type="button" onclick="eliminaRiga(this,\'repliche-body\',\'replica\',[\'data\',\'ora\',\'luogo\',\'confermata\',\'trasporto\',\'trasporto_note\',\'vitto\',\'alloggio\'],\'Replica\')" title="Elimina questa replica" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;">✕</button>' +
+    '</div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+    '<div><label style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Data</label>' +
+    '<input type="text" data-f="data" name="replica_data_' + replicheCount + '" placeholder="GG/MM/AAAA" onblur="formattaDataItaliana(this)" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:14px;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;"></div>' +
+    '<div><label style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Ora</label>' +
+    '<input type="text" data-f="ora" name="replica_ora_' + replicheCount + '" placeholder="__:__" onblur="formattaOraItaliana(this)" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:14px;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;"></div>' +
+    '</div>' +
+
+    '<div style="margin-bottom:8px">' +
+    '<label style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Luogo (se diverso dalla sede principale)</label>' +
+    '<input type="text" data-f="luogo" name="replica_luogo_' + replicheCount + '" placeholder="Città / sede di questa tappa" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:14px;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;"></div>' +
+
+    '<label style="font-size:12px;color:#6B7280;display:flex;align-items:center;gap:6px;padding:4px 0;cursor:pointer;margin-bottom:8px">' +
+    '<input type="checkbox" data-f="confermata" name="replica_confermata_' + replicheCount + '" style="width:auto;"> Data confermata' +
+    '</label>' +
+
+    '<div style="background:#E3F2FD;border-radius:6px;padding:8px 10px;margin-bottom:8px">' +
+    '<label style="font-size:11px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.3px;display:block">👥 N° persone da trasportare (questa tappa)</label>' +
+    '<input type="number" min="0" data-f="trasporto" name="replica_trasporto_' + replicheCount + '" placeholder="0 = nessun trasporto necessario" style="border:1px solid #BBDEFB;background:white;border-radius:5px;font-family:inherit;font-size:15px;font-weight:600;color:#1565C0;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;margin-top:4px;">' +
+    '<input type="text" data-f="trasporto_note" name="replica_trasporto_note_' + replicheCount + '" placeholder="Note (es. andata 10, ritorno solo 3 — il mezzo resta lo stesso)" style="border:1px solid #BBDEFB;background:white;border-radius:5px;font-family:inherit;font-size:11px;color:#444;padding:5px 8px;outline:none;width:100%;box-sizing:border-box;margin-top:5px;"></div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+    '<div><label style="font-size:10px;color:#8A94A6;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Vitto necessario?</label>' +
+    '<input type="text" data-f="vitto" name="replica_vitto_' + replicheCount + '" placeholder="Es. sì, per tutti / no" style="border:1px solid #E8ECF3;border-radius:5px;font-family:inherit;font-size:13px;color:#444;padding:6px 8px;outline:none;width:100%;box-sizing:border-box;"></div>' +
+    '<div><label style="font-size:10px;color:#8A94A6;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Alloggio necessario?</label>' +
+    '<input type="text" data-f="alloggio" name="replica_alloggio_' + replicheCount + '" placeholder="Es. sì, 1 notte / no" style="border:1px solid #E8ECF3;border-radius:5px;font-family:inherit;font-size:13px;color:#444;padding:6px 8px;outline:none;width:100%;box-sizing:border-box;"></div>' +
+    '</div>' +
+
+    '<details id="ref-locale-details-' + uid + '" style="background:#F3E5F5;border-radius:6px;padding:4px 10px 10px;margin-top:4px">' +
+    '<summary style="font-size:11px;font-weight:700;color:#6A1B9A;text-transform:uppercase;letter-spacing:.3px;padding:6px 0;cursor:pointer">📍 Referente/i locale/i (se fuori sede)</summary>' +
+    '<div id="ref-locale-body-' + uid + '"></div>' +
+    '<button type="button" class="btn-add" onclick="addRefLocale(' + uid + ')" style="margin-top:4px;font-size:11px;padding:5px 12px">+ Aggiungi referente</button>' +
+    '</details>';
+  document.getElementById('repliche-body').appendChild(div);
+  addRefLocale(uid); // una riga iniziale
+  // aggiorna sintesi
+  var el = document.getElementById('sint_repliche');
+  if (el) el.textContent = replicheCount + ' replica/e prevista/e';
+}
+
+// ═══ REFERENTE/I LOCALE/I — lista dentro ogni replica; uid = trova il contenitore, posizione = nome campo ═══
+var refLocaleCount = {}; // { uid: contatore } — indice locale stabile, indipendente dalla numerazione visibile
+function addRefLocale(uid) {
+  if (!refLocaleCount[uid]) refLocaleCount[uid] = 0;
+  refLocaleCount[uid]++;
+  var n = refLocaleCount[uid];
+  var replicaEl = document.querySelector('[data-uid="' + uid + '"]');
+  var pos = replicaEl ? replicaEl.getAttribute('data-pos') : uid;
+  var row = document.createElement('div');
+  row.setAttribute('data-riga-ref', '1');
+  row.setAttribute('data-ref-idx', n);
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:5px;align-items:start;';
+  row.innerHTML =
+    '<input type="text" data-f="nome" name="replica_ref_nome_' + pos + '_' + n + '" placeholder="Cognome Nome" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:12px;padding:6px 7px;outline:none;width:100%;box-sizing:border-box;grid-column:1/3;">' +
+    '<input type="text" data-f="ente" name="replica_ref_ente_' + pos + '_' + n + '" placeholder="Ente / organizzazione locale" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:12px;padding:6px 7px;outline:none;width:100%;box-sizing:border-box;grid-column:1/3;margin-top:5px;">' +
+    '<input type="email" data-f="email" name="replica_ref_email_' + pos + '_' + n + '" placeholder="email" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:12px;padding:6px 7px;outline:none;width:100%;box-sizing:border-box;grid-column:1/3;margin-top:5px;">' +
+    '<input type="tel" data-f="tel" name="replica_ref_tel_' + pos + '_' + n + '" placeholder="+39 ..." style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:12px;padding:6px 7px;outline:none;width:100%;box-sizing:border-box;grid-column:1/2;margin-top:5px;">' +
+    '<button type="button" onclick="eliminaRefLocale(this,' + uid + ')" title="Elimina questo referente" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;grid-column:2/3;margin-top:5px;justify-self:end;">✕</button>';
+  document.getElementById('ref-locale-body-' + uid).appendChild(row);
+}
+
+function eliminaRefLocale(btn, uid) {
+  if (!confirm('Eliminare questo referente locale?')) return;
+  var row = btn.closest('[data-riga-ref]');
+  if (row) row.remove();
+  var replicaEl = document.querySelector('[data-uid="' + uid + '"]');
+  var pos = replicaEl ? replicaEl.getAttribute('data-pos') : uid;
+  var righe = document.querySelectorAll('#ref-locale-body-' + uid + ' [data-riga-ref]');
+  righe.forEach(function(r, idx) {
+    var nuovoNum = idx + 1;
+    r.setAttribute('data-ref-idx', nuovoNum);
+    ['nome', 'ente', 'email', 'tel'].forEach(function(f) {
+      var el = r.querySelector('[data-f="' + f + '"]');
+      if (el) el.name = 'replica_ref_' + f + '_' + pos + '_' + nuovoNum;
+    });
+  });
+  refLocaleCount[uid] = righe.length;
+  aggiornaSintesiEvento();
+  salvaReferenteSuFirestore();
+}
+
+// ═══ GESTIONE RIGHE DINAMICHE — cancellazione con rinumerazione automatica ═══
+function eliminaRiga(btn, containerId, prefix, campi, labelPrefix) {
+  if (!confirm('Eliminare questa riga? I dati inseriti andranno persi.')) return;
+  var row = btn.closest('[data-riga]');
+  if (row) row.remove();
+  var righe = document.querySelectorAll('#' + containerId + ' [data-riga="' + prefix + '"]');
+  righe.forEach(function(r, idx) {
+    var nuovoNum = idx + 1;
+    campi.forEach(function(f) {
+      var el = r.querySelector('[data-f="' + f + '"]');
+      if (el) el.name = f === '' ? (prefix + '_' + nuovoNum) : (prefix + '_' + f + '_' + nuovoNum);
+    });
+    if (labelPrefix) {
+      var lbl = r.querySelector('[data-label]');
+      if (lbl) lbl.textContent = labelPrefix + ' ' + nuovoNum;
+    }
+    // Repliche: i referenti locali annidati sono agganciati alla POSIZIONE, non all'uid — vanno rinominati a cascata
+    if (prefix === 'replica') {
+      r.setAttribute('data-pos', nuovoNum);
+      r.querySelectorAll('[data-riga-ref]').forEach(function(refRow) {
+        var refIdx = refRow.getAttribute('data-ref-idx');
+        ['nome', 'ente', 'email', 'tel'].forEach(function(f) {
+          var el = refRow.querySelector('[data-f="' + f + '"]');
+          if (el) el.name = 'replica_ref_' + f + '_' + nuovoNum + '_' + refIdx;
+        });
+      });
+    }
+  });
+  if (prefix === 'replica') { replicheCount = righe.length; var elS = document.getElementById('sint_repliche'); if (elS) elS.textContent = replicheCount + ' replica/e prevista/e'; }
+  if (prefix === 'prova') proveCount = righe.length;
+  if (prefix === 'esec') esecutoriCount = righe.length;
+  if (prefix === 'collo') colliCount = righe.length;
+  if (prefix === 'spartito') spartitiCount = righe.length;
+  if (prefix === 'brano') braniCount = righe.length;
+  if (prefix === 'doc') docentiCount = righe.length;
+  aggiornaChecklist();
+  aggiornaSintesiEvento();
+  if (typeof aggiornaSintesiEsecutori === 'function') aggiornaSintesiEsecutori();
+  if (typeof aggiornaListaColli === 'function') aggiornaListaColli();
+  if (typeof aggiornaListaSpartiti === 'function') aggiornaListaSpartiti();
+  salvaReferenteSuFirestore();
+}
+
+// ── Colli / materiale da trasportare ──
+var colliCount = 0;
+function addCollo() {
+  colliCount++;
+  var div = document.createElement('div');
+  div.setAttribute('data-riga', 'collo');
+  div.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:5px;';
+  div.innerHTML =
+    '<input type="text" data-f="" name="collo_' + colliCount + '" placeholder="Es. Cassa violoncello, 2 leggii, casse audio..." style="flex:1;border:1px solid #D0D7E3;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none;">' +
+    '<button type="button" onclick="eliminaRiga(this,\'colli-body\',\'collo\',[\'\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;">✕</button>';
+  document.getElementById('colli-body').appendChild(div);
+}
+addCollo(); // una riga iniziale
+
+// ── Materiale musicale da noleggiare (Biblioteca) ──
+var spartitiCount = 0;
+function addSpartito() {
+  var body = document.getElementById('spartiti-body');
+  if (!body) return;
+  spartitiCount++;
+  var div = document.createElement('div');
+  div.setAttribute('data-riga', 'spartito');
+  div.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:5px;';
+  div.innerHTML =
+    '<input type="text" data-f="" name="spartito_' + spartitiCount + '" placeholder="Es. Parti orchestrali Requiem Verdi, ed. Ricordi" style="flex:1;border:1px solid #D0D7E3;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none;">' +
+    '<button type="button" onclick="eliminaRiga(this,\'spartiti-body\',\'spartito\',[\'\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;">✕</button>';
+  body.appendChild(div);
+}
+addSpartito(); // una riga iniziale
+
+function toggleMaterialeMusicale(cb) {
+  var blocco = document.getElementById('blocco-spartiti');
+  if (!blocco) return;
+  blocco.style.display = cb.checked ? 'none' : 'block';
+  if (cb.checked) {
+    // svuota eventuali righe già compilate, per non lasciare dati fantasma
+    document.querySelectorAll('[name^="spartito_"]').forEach(function(el) { el.value = ''; });
+    if (typeof aggiornaListaSpartiti === 'function') aggiornaListaSpartiti();
+  }
+  salvaReferenteSuFirestore();
+}
+
+// ═══ UTILITY — mostra/nasconde il blocco Programma/SIAE, rilevante solo se c'è un concerto finale pubblico ═══
+function toggleConcertoFinale(cb) {
+  var blocco = document.getElementById('blocco-siae-masterclass');
+  if (!blocco) return;
+  blocco.style.display = cb.checked ? 'block' : 'none';
+  salvaReferenteSuFirestore();
+  aggiornaChecklist();
+}
+
+// ── Sintesi evento ──
+// ═══ SINTESI EVENTO — riepilogo dati per la Sezione 9 ═══
+function aggiornaSintesiEvento() {
+  var map = {
+    'data_evento': 'sint_data',
+    'ora_evento':  'sint_ora',
+    'luogo_concerto': 'sint_luogo'
+  };
+  for (var nm in map) {
+    var el = document.querySelector('[name="' + nm + '"]');
+    var tgt = document.getElementById(map[nm]);
+    if (el && tgt) tgt.textContent = el.value || '—';
+  }
+  aggiornaSintesiCompleta();
+}
+
+// ═══ SCHEDA DI SINTESI — blocchi aggiuntivi (Programma, Prove, Contatti, Dotazione, Materiali, Persone Esterne) ═══
+function aggiornaSintesiCompleta() {
+  // Programma Artistico
+  var braniRows = [];
+  var b = 1;
+  while (document.querySelector('[name="brano_titolo_' + b + '"]')) {
+    var bt = getField('brano_titolo_' + b), ba = getField('brano_autore_' + b), bd = getField('brano_durata_' + b);
+    if (bt) braniRows.push('<tr><td style="padding:5px 10px">' + bt + '</td><td style="padding:5px 10px;color:#6B7280">' + (ba || '—') + '</td><td style="padding:5px 10px;text-align:center;color:#6B7280">' + (bd || '—') + '</td></tr>');
+    b++;
+  }
+  var elBrani = document.getElementById('sint_brani_rows');
+  if (elBrani) elBrani.innerHTML = braniRows.length ? braniRows.join('') : '<tr><td colspan="3" style="padding:8px 10px;color:#6B7280;font-style:italic;font-size:12px">Nessun brano inserito</td></tr>';
+
+  // Piano Prove
+  var proveRows = [];
+  var p = 1;
+  while (document.querySelector('[name="prova_data_' + p + '"]')) {
+    var pd = getField('prova_data_' + p), pi = getField('prova_inizio_' + p), pf = getField('prova_fine_' + p), pl = getField('prova_luogo_' + p);
+    if (pd || pl) proveRows.push('<tr><td style="padding:5px 10px">' + (pd || '—') + '</td><td style="padding:5px 10px;text-align:center;color:#6B7280">' + (pi || '—') + (pf ? ' – ' + pf : '') + '</td><td style="padding:5px 10px;color:#6B7280">' + (pl || '—') + '</td></tr>');
+    p++;
+  }
+  var elProve = document.getElementById('sint_prove_rows');
+  if (elProve) elProve.innerHTML = proveRows.length ? proveRows.join('') : '<tr><td colspan="3" style="padding:8px 10px;color:#6B7280;font-style:italic;font-size:12px">Nessuna sessione inserita</td></tr>';
+
+  // Contatti — Docenti
+  var docRows = [];
+  var dc = 1;
+  while (document.querySelector('[name="doc_nome_' + dc + '"]')) {
+    var dn = getField('doc_nome_' + dc), dro = getField('doc_ruolo_' + dc), de = getField('doc_email_' + dc), dt = getField('doc_tel_' + dc);
+    if (dn) docRows.push('<tr><td style="padding:5px 10px">' + dn + '</td><td style="padding:5px 10px;color:#6B7280">' + (dro || '—') + '</td><td style="padding:5px 10px;color:#6B7280">' + (de || '—') + '</td><td style="padding:5px 10px;color:#6B7280">' + (dt || '—') + '</td></tr>');
+    dc++;
+  }
+  var elDoc = document.getElementById('sint_docenti_rows');
+  if (elDoc) elDoc.innerHTML = docRows.length ? docRows.join('') : '<tr><td colspan="4" style="padding:8px 10px;color:#6B7280;font-style:italic;font-size:12px">Nessun docente inserito</td></tr>';
+
+  var elRefExt = document.getElementById('sint_ref_ext');
+  if (elRefExt) {
+    var righeRef = [];
+    document.querySelectorAll('#repliche-body [data-riga="replica"]').forEach(function(rigaReplica) {
+      var uid = rigaReplica.getAttribute('data-uid');
+      var labelReplica = rigaReplica.querySelector('[data-label]');
+      var nomeReplica = labelReplica ? labelReplica.textContent : 'Replica';
+      var refBits = [];
+      document.querySelectorAll('#ref-locale-body-' + uid + ' [data-riga-ref]').forEach(function(r) {
+        var nome = r.querySelector('[data-f="nome"]');
+        if (nome && nome.value.trim()) {
+          var ente = r.querySelector('[data-f="ente"]');
+          var email = r.querySelector('[data-f="email"]');
+          var tel = r.querySelector('[data-f="tel"]');
+          var bits = [nome.value.trim()];
+          if (ente && ente.value.trim()) bits.push(ente.value.trim());
+          if (email && email.value.trim()) bits.push(email.value.trim());
+          if (tel && tel.value.trim()) bits.push(tel.value.trim());
+          refBits.push(bits.join(' — '));
+        }
+      });
+      if (refBits.length) righeRef.push('<strong style="color:#1A3C6B">' + nomeReplica + ':</strong> ' + refBits.join('; '));
+    });
+    if (righeRef.length) {
+      elRefExt.innerHTML = righeRef.join('<br>');
+      elRefExt.style.fontStyle = 'normal'; elRefExt.style.color = '#1a1a2e';
+    } else {
+      elRefExt.textContent = 'Nessun referente locale indicato';
+      elRefExt.style.fontStyle = 'italic'; elRefExt.style.color = '#6B7280';
+    }
+  }
+
+  // Dotazione tecnica
+  var dotLabels = { dot_sedie: 'Sedie orchestrali', dot_leggii: 'Leggii', dot_leggii_lum: 'Leggii illuminati', dot_podio: 'Podio direttore', dot_piano: 'Pianoforte/Grancoda', dot_audio: 'Impianto audio/PA', dot_luci: 'Impianto luci', dot_service: 'Service esterno', dot_altro: 'Altro materiale' };
+  var dotVoci = [];
+  Object.keys(dotLabels).forEach(function(key) {
+    var v = getField(key);
+    if (v) dotVoci.push('<strong>' + dotLabels[key] + ':</strong> ' + v);
+  });
+  var elDot = document.getElementById('sint_dotazione');
+  if (elDot) {
+    if (dotVoci.length) { elDot.innerHTML = dotVoci.join('<br>'); elDot.style.fontStyle = 'normal'; elDot.style.color = '#1a1a2e'; }
+    else { elDot.textContent = 'Nessuna dotazione indicata'; elDot.style.fontStyle = 'italic'; elDot.style.color = '#6B7280'; }
+  }
+
+  // Materiale da trasportare (colli)
+  var colliList = [];
+  var c = 1;
+  while (document.querySelector('[name="collo_' + c + '"]')) {
+    var cv = getField('collo_' + c);
+    if (cv) colliList.push(cv);
+    c++;
+  }
+  var elColli = document.getElementById('sint_colli');
+  if (elColli) {
+    if (colliList.length) { elColli.innerHTML = '<ul style="margin:0 0 0 18px;padding:0">' + colliList.map(function(v) { return '<li>' + v + '</li>'; }).join('') + '</ul>'; elColli.style.fontStyle = 'normal'; }
+    else { elColli.textContent = 'Nessun materiale indicato'; elColli.style.fontStyle = 'italic'; elColli.style.color = '#6B7280'; }
+  }
+
+  // Materiale musicale
+  var spartitiList = [];
+  var s = 1;
+  while (document.querySelector('[name="spartito_' + s + '"]')) {
+    var sv = getField('spartito_' + s);
+    if (sv) spartitiList.push(sv);
+    s++;
+  }
+  var elSpart = document.getElementById('sint_spartiti');
+  if (elSpart) {
+    if (spartitiList.length) { elSpart.innerHTML = '<ul style="margin:0 0 0 18px;padding:0">' + spartitiList.map(function(v) { return '<li>' + v + '</li>'; }).join('') + '</ul>'; elSpart.style.fontStyle = 'normal'; }
+    else { elSpart.textContent = 'Nessun materiale musicale indicato'; elSpart.style.fontStyle = 'italic'; elSpart.style.color = '#6B7280'; }
+  }
+
+  // Persone esterne — modalità (calcolate direttamente dalla tabella Esecutori)
+  var nSingolo = 0, nCoop = 0, nSenzaModalita = 0;
+  var vociSingolo = [], vociCoop = [];
+  document.querySelectorAll('#esecutori-tbody tr').forEach(function(tr) {
+    var n = tr.querySelector('[name^="esec_nome_"]');
+    var q = tr.querySelector('[name^="esec_qual_"]');
+    var m = tr.querySelector('[name^="esec_modalita_"]');
+    var ruoloEl = tr.querySelector('[name^="esec_ruolo_"]');
+    var emailEl = tr.querySelector('[name^="esec_email_"]');
+    var telEl = tr.querySelector('[name^="esec_tel_"]');
+    if (n && n.value.trim() && q && q.value === 'Collaboratore esterno') {
+      var base = n.value.trim() + (ruoloEl && ruoloEl.value.trim() ? ' (' + ruoloEl.value.trim() + ')' : '');
+      if (m && m.value === 'Contratto singolo') {
+        nSingolo++;
+        var contatti = [];
+        if (emailEl && emailEl.value.trim()) contatti.push(emailEl.value.trim());
+        if (telEl && telEl.value.trim()) contatti.push(telEl.value.trim());
+        vociSingolo.push(base + (contatti.length ? ' — ' + contatti.join(' / ') : ' — <span style="color:#C62828">contatti mancanti</span>'));
+      }
+      else if (m && m.value === 'Cooperativa / Preventivo') { nCoop++; vociCoop.push(base); }
+      else nSenzaModalita++;
+    }
+  });
+  var setS = function(id, val) { var e = document.getElementById(id); if (e) e.textContent = val; };
+  setS('sint_pers_singolo', nSingolo);
+  setS('sint_pers_coop', nCoop);
+  setS('sint_pers_tot', nSingolo + nCoop + nSenzaModalita);
+  var elDetSingolo = document.getElementById('dettaglio-singolo');
+  if (elDetSingolo) elDetSingolo.innerHTML = vociSingolo.length ? vociSingolo.map(function(v){return '• '+v;}).join('<br>') : '<span style="color:#6B7280;font-style:italic">Nessuno</span>';
+  var elDetCoop = document.getElementById('dettaglio-coop');
+  if (elDetCoop) elDetCoop.innerHTML = vociCoop.length ? vociCoop.map(function(v){return '• '+v;}).join('<br>') : '<span style="color:#6B7280;font-style:italic">Nessuno</span>';
+}
+
+// ── Checklist reattiva ──
+var checklistVoci = [
+  { id: 'cl_data',      label: 'Data evento',                          tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('data_evento'); } },
+  { id: 'cl_ora',       label: 'Ora inizio evento',                    tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('ora_evento'); } },
+  { id: 'cl_luogo',     label: 'Luogo / ente ospitante',                tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('luogo_concerto'); } },
+  { id: 'cl_esecutori', label: 'Partecipanti — almeno 1 nominativo',    tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('esec_nome_1'); } },
+  { id: 'cl_trasferta', label: 'Trasporto — tipo selezionato',         tag: 'OBBLIGATORIO', obblig: true,  check: function() {
+    var sel = document.querySelector('[name="trasferta"]');
+    return sel && sel.value && sel.value !== '';
+  }},
+  { id: 'cl_contatti',  label: 'Contatti docenti — almeno 1',          tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('doc_email_1'); } },
+  { id: 'cl_foto',      label: 'Materiale grafico (se necessario)',    tag: 'STAMPA',       obblig: false, check: function() { return !!getField('foto_ensemble') || !!getField('testo_descr'); } },
+];
+
+function getField(name) {
+  var el = document.querySelector('[name="' + name + '"]');
+  return el ? el.value.trim() : '';
+}
+
+var tagColors = {
+  'OBBLIGATORIO': '#C62828',
+  'SIAE':         '#1565C0',
+  'PERSONALE':    '#6A1B9A',
+  'CONTRATTI':    '#E65100',
+  'STAMPA':       '#2E7D32',
+  '':             'transparent'
+};
+
+// ═══ SEZIONE 8 — CHECKLIST stato avanzamento fascicolo ═══
+function aggiornaChecklist() {
+  var avvisoData = document.getElementById('avviso-data-evento');
+  if (avvisoData) avvisoData.style.display = getField('data_evento') ? 'none' : 'flex';
+  var ul = document.getElementById('checklist-voci');
+  if (!ul) return;
+  ul.innerHTML = '';
+  var nOk = 0, nErr = 0;
+  var mancanti = [];
+
+  checklistVoci.forEach(function(voce) {
+    var ok = voce.check();
+    if (ok) nOk++;
+    else { nErr++; mancanti.push(voce.label); }
+
+    var li = document.createElement('li');
+    var bgColor = ok ? '#F1FBF2' : '#FFEBEE';
+    var iconColor = ok ? '#2E7D32' : '#C62828';
+    var icon = ok ? '✓' : '✗';
+    li.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #D0D7E3;font-size:13px;background:' + bgColor;
+
+    var tagHtml = voce.tag ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:white;background:' + (tagColors[voce.tag] || '#999') + ';padding:2px 6px;border-radius:3px">' + voce.tag + '</span>' : '';
+
+    li.innerHTML = '<span style="font-size:16px;width:20px;text-align:center;flex-shrink:0;color:' + iconColor + '">' + icon + '</span>' +
+      '<span>' + voce.label + '</span>' + tagHtml;
+    ul.appendChild(li);
+  });
+
+  // Aggiorna contatori
+  var elOk = document.getElementById('cl-count-ok');
+  var elErr = document.getElementById('cl-count-err');
+  var elLabel = document.getElementById('checklist-stato-label');
+  var elSollecito = document.getElementById('blocco-sollecito');
+
+  if (elOk) elOk.textContent = '✓ ' + nOk + ' compilati';
+  if (elErr) elErr.textContent = '✗ ' + nErr + ' mancanti';
+
+  if (nErr === 0) {
+    if (elLabel) { elLabel.style.background = '#E8F5E9'; elLabel.style.color = '#2E7D32'; elLabel.textContent = '✓ Modulo completo'; }
+    if (elSollecito) elSollecito.style.display = 'none';
+  } else {
+    if (elLabel) { elLabel.style.background = '#FFEBEE'; elLabel.style.color = '#C62828'; elLabel.textContent = 'Modulo incompleto'; }
+    if (elSollecito) elSollecito.style.display = 'block';
+  }
+
+  // Aggiorna mancanti per sollecito
+  window._mancanti = mancanti;
+}
+
+// ── Sollecito ──
+// ═══ SOLLECITO — generazione email di richiesta dati mancanti ═══
+function generaSollecito() {
+  var referente = getField('doc_nome_1') || '{Docente Referente}';
+  var titolo = document.getElementById('sint_titolo') ? document.getElementById('sint_titolo').textContent : '{Titolo Progetto}';
+  var mancanti = window._mancanti || [];
+  var lines = [];
+  lines.push('Gentile ' + referente + ',');
+  lines.push('');
+  lines.push('in riferimento al progetto "' + titolo + '", ti chiedo cortesemente di integrare il modulo con i seguenti dati mancanti:');
+  lines.push('');
+  mancanti.forEach(function(m, i) { lines.push((i+1) + '. ' + m); });
+  lines.push('');
+  lines.push('Ti chiedo di compilare il modulo al seguente link (i dati già inseriti restano salvati) e inviare il PDF aggiornato entro il prima possibile:');
+  var baseLink = window.location.origin + window.location.pathname;
+  var pSol = new URLSearchParams();
+  if (metadati.id)            pSol.set('id', metadati.id);
+  if (metadati.titolo)        pSol.set('titolo', metadati.titolo);
+  if (metadati.referente)     pSol.set('referente', metadati.referente);
+  if (metadati.email)         pSol.set('email', metadati.email);
+  if (metadati.delibera)      pSol.set('delibera', metadati.delibera);
+  if (metadati.data_delibera) pSol.set('data_delibera', metadati.data_delibera);
+  if (metadati.scadenza)      pSol.set('scadenza', metadati.scadenza);
+  lines.push(baseLink + '?' + pSol.toString());
+  lines.push('');
+  lines.push('Grazie per la collaborazione.');
+  lines.push('');
+  lines.push('Marco Gatti');
+  lines.push('Responsabile Produzione — Conservatorio G. Briccialdi, Terni');
+  lines.push('produzione@briccialditerni.it');
+
+  var ta = document.getElementById('testo-sollecito');
+  if (ta) ta.value = lines.join('\n');
+  document.getElementById('modal-sollecito').style.display = 'block';
+  document.getElementById('copia-confirm-sol').style.display = 'none';
+}
+
+function chiudiSollecito() { document.getElementById('modal-sollecito').style.display = 'none'; }
+
+function copiaSollecito() {
+  var ta = document.getElementById('testo-sollecito');
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); document.getElementById('copia-confirm-sol').style.display = 'block'; } catch(e) {}
+}
+
+function apriMailSollecito() {
+  var titolo = metadati.titolo || 'Progetto';
+  var emailRef = metadati.email || '';
+  var sogg = encodeURIComponent('[Sollecito] ' + titolo + ' — dati mancanti');
+  var corpo = encodeURIComponent(document.getElementById('testo-sollecito').value);
+  window.location.href = 'mailto:' + emailRef + '?subject=' + sogg + '&body=' + corpo;
+}
+
+// ═══ SEZIONE 9 — ASSEGNAZIONE SPAZI (solo Responsabile) ═══
+var SPAZI_DISPONIBILI = ['Teatro Secci', 'Sala Orologio', 'Studio1', 'AreaLab', 'Auditorium Primavere', 'Altro'];
+
+function creaSelectSpazio(name, valoreAttuale, valoreAltro) {
+  var opts = '<option value="">— selezionare —</option>';
+  SPAZI_DISPONIBILI.forEach(function(s) {
+    opts += '<option' + (valoreAttuale === s ? ' selected' : '') + '>' + s + '</option>';
+  });
+  var mostraAltro = valoreAttuale === 'Altro';
+  return '<select name="' + name + '" onchange="gestisciSelectSpazio(this)" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 4px;font-family:inherit;font-size:11px;outline:none">' + opts + '</select>' +
+    '<input type="text" name="' + name + '_altro" value="' + (valoreAltro || '') + '" placeholder="specificare sede occasionale" style="display:' + (mostraAltro ? 'block' : 'none') + ';width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 4px;margin-top:3px;font-family:inherit;font-size:11px;outline:none">';
+}
+
+function gestisciSelectSpazio(sel) {
+  var altroInput = sel.parentElement.querySelector('input[type="text"]');
+  if (altroInput) altroInput.style.display = sel.value === 'Altro' ? 'block' : 'none';
+}
+
+function valoreSpazioSalvato(chiave) {
+  // Prima controlla se esiste già nel DOM (ricostruzione manuale), poi la cache dal caricamento Firestore
+  var el = document.querySelector('[name="' + chiave + '"]');
+  if (el) return el.value || '';
+  if (window._datiReferenteCache && window._datiReferenteCache[chiave] !== undefined) return window._datiReferenteCache[chiave];
+  return '';
+}
+
+function aggiornaListaColli() {
+  var el = document.getElementById('lista-colli-riepilogo');
+  if (!el) return;
+  var colli = [];
+  var c = 1;
+  while (document.querySelector('[name="collo_' + c + '"]')) {
+    var v = getField('collo_' + c);
+    if (v) colli.push(v);
+    c++;
+  }
+  if (colli.length === 0) {
+    el.innerHTML = '<span style="color:#6B7280;font-style:italic">Nessun materiale indicato dal Referente in Sezione 5.</span>';
+    return;
+  }
+  var html = '<strong style="color:#1A3C6B;font-size:11px">Materiale indicato dal Referente:</strong><ul style="margin:4px 0 0 18px;padding:0">';
+  colli.forEach(function(v) { html += '<li>' + v + '</li>'; });
+  html += '</ul>';
+  el.innerHTML = html;
+}
+
+// ═══ TRASPORTO PERSONE — una riga per tappa (Concerto + ogni Replica con trasferta segnalata) ═══
+function costruisciTabellaTrasportoPersone() {
+  var tbody = document.getElementById('trasporto-persone-tbody');
+  if (!tbody) return;
+  var righe = [];
+
+  var trasfMain = getField('trasferta');
+  if (trasfMain && trasfMain.indexOf('Sì') === 0) {
+    righe.push({ tappa: 'Concerto', luogo: getField('dest_trasferta') || getField('luogo_concerto') || '—', nPersone: '—', vitto: getField('note_vitto') || '—', alloggio: '—', key: 'concerto' });
+  }
+
+  var r = 1;
+  while (document.querySelector('[name="replica_data_' + r + '"]')) {
+    var nPersone = parseInt(getField('replica_trasporto_' + r), 10) || 0;
+    var luogoR = getField('replica_luogo_' + r);
+    var vittoR = getField('replica_vitto_' + r);
+    var alloggioR = getField('replica_alloggio_' + r);
+    if (nPersone > 0 || vittoR || alloggioR) {
+      righe.push({ tappa: 'Replica ' + r, luogo: luogoR || '—', nPersone: nPersone > 0 ? nPersone : '—', vitto: vittoR || '—', alloggio: alloggioR || '—', key: 'replica_' + r });
+    }
+    r++;
+  }
+
+  if (righe.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:10px;text-align:center;color:#6B7280;font-style:italic">Nessuna trasferta segnalata dal Referente</td></tr>';
+    return;
+  }
+
+  var opzioni = ['Pullman', 'Treno', 'Mezzi propri', 'Misto', 'Non necessario'];
+  var html = '';
+  righe.forEach(function(riga, idx) {
+    var bg = idx % 2 === 0 ? 'white' : '#F4F7FC';
+    var modalitaSalvata = valoreSpazioSalvato('trasp_pers_modalita_' + riga.key);
+    var noteSalvate = valoreSpazioSalvato('trasp_pers_note_' + riga.key);
+    var opts = '<option value=""' + (modalitaSalvata === '' ? ' selected' : '') + '>— selezionare —</option>';
+    opzioni.forEach(function(o) {
+      opts += '<option value="' + o + '"' + (modalitaSalvata === o ? ' selected' : '') + '>' + o + '</option>';
+    });
+    html += '<tr style="background:' + bg + ';border-bottom:1px solid #E8ECF3">' +
+      '<td style="padding:6px 10px;font-weight:600">' + riga.tappa + '</td>' +
+      '<td style="padding:6px 10px;color:#6B7280">' + riga.luogo + '</td>' +
+      '<td style="padding:6px 10px;color:#6B7280;text-align:center">' + riga.nPersone + '</td>' +
+      '<td style="padding:6px 10px;color:#6B7280;font-style:italic">' + riga.vitto + '</td>' +
+      '<td style="padding:6px 10px;color:#6B7280;font-style:italic">' + riga.alloggio + '</td>' +
+      '<td style="padding:4px 6px">' +
+      '<select name="trasp_pers_modalita_' + riga.key + '" onchange="salvaReferenteSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 3px;font-family:inherit;font-size:11px;outline:none">' + opts + '</select>' +
+      '<input type="text" name="trasp_pers_note_' + riga.key + '" value="' + (noteSalvate || '') + '" placeholder="es. 2 pullman da 50 posti" oninput="salvaReferenteSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 3px;margin-top:3px;font-family:inherit;font-size:10px;outline:none">' +
+      '</td></tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function costruisciTabellaSpazi() {
+  var tbody = document.getElementById('spazi-tbody');
+  if (!tbody) return;
+  aggiornaListaColli();
+  aggiornaListaSpartiti();
+  costruisciTabellaTrasportoPersone();
+  costruisciTabellaDotazioneDisp();
+  var righe = [];
+
+  // Concerto principale
+  var dataC = getField('data_evento'), oraC = getField('ora_evento'), luogoC = getField('luogo_concerto');
+  if (dataC || oraC || luogoC) righe.push({ tipo: 'Concerto', data: dataC, ora: oraC, luogo: luogoC, key: 'concerto' });
+
+  // Repliche
+  var r = 1;
+  while (document.querySelector('[name="replica_data_' + r + '"]')) {
+    var dR = getField('replica_data_' + r), oR = getField('replica_ora_' + r), lR = getField('replica_luogo_' + r);
+    if (dR || oR || lR) righe.push({ tipo: 'Replica ' + r, data: dR, ora: oR, luogo: lR || luogoC, key: 'replica_' + r });
+    r++;
+  }
+
+  // Prove
+  var p = 1;
+  while (document.querySelector('[name="prova_data_' + p + '"]')) {
+    var dP = getField('prova_data_' + p), oP1 = getField('prova_inizio_' + p), oP2 = getField('prova_fine_' + p), lP = getField('prova_luogo_' + p);
+    if (dP || lP) righe.push({ tipo: 'Prova ' + p, data: dP, ora: (oP1 || '—') + (oP2 ? ' – ' + oP2 : ''), luogo: lP, key: 'prova_' + p });
+    p++;
+  }
+
+  if (righe.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:12px;text-align:center;color:#6B7280;font-style:italic">Nessun dato ancora inserito dal Referente (data evento, repliche o prove)</td></tr>';
+    return;
+  }
+
+  var html = '';
+  righe.forEach(function(riga, idx) {
+    var bg = idx % 2 === 0 ? 'white' : '#F4F7FC';
+    var valoreEsistente = valoreSpazioSalvato('spazio_' + riga.key);
+    var valoreAltro = valoreSpazioSalvato('spazio_' + riga.key + '_altro');
+    html += '<tr style="background:' + bg + ';border-bottom:1px solid #E8ECF3">' +
+      '<td style="padding:6px 10px;font-weight:600">' + riga.tipo + '</td>' +
+      '<td style="padding:6px 10px">' + (riga.data || '—') + '</td>' +
+      '<td style="padding:6px 10px">' + (riga.ora || '—') + '</td>' +
+      '<td style="padding:6px 10px;color:#6B7280">' + (riga.luogo || '—') + '</td>' +
+      '<td style="padding:4px 6px">' + creaSelectSpazio('spazio_' + riga.key, valoreEsistente, valoreAltro) + '</td>' +
+      '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+// ═══ RICHIESTA DOTAZIONE/MATERIALE — Ufficio Produzione ═══
+function generaRichiestaDotazioneMateriale() {
+  var colli = [];
+  var c = 1;
+  while (document.querySelector('[name="collo_' + c + '"]')) {
+    var vColl = getField('collo_' + c);
+    if (vColl) colli.push('- ' + vColl);
+    c++;
+  }
+  if (colli.length === 0) {
+    alert('Nessun materiale indicato dal Referente in Sezione 3.');
+    return;
+  }
+  var lines = [];
+  lines.push('Gentile Ufficio Produzione,');
+  lines.push('');
+  lines.push('si segnala la seguente dotazione/materiale necessario per il progetto "' + (metadati.titolo || '') + '" (ID ' + (metadati.id || '') + '):');
+  lines.push('');
+  lines = lines.concat(colli);
+  lines.push('');
+  lines.push('Si prega di confermare e preparare quanto necessario.');
+  lines.push('');
+  lines.push('Cordiali saluti,');
+  lines.push('Ufficio Produzione');
+  document.getElementById('testo-spazi').value = lines.join('\n');
+  document.getElementById('modal-spazi').style.display = 'block';
+}
+function chiudiModalSpazi() { document.getElementById('modal-spazi').style.display = 'none'; }
+function copiaTestoSpazi() {
+  var ta = document.getElementById('testo-spazi');
+  ta.select();
+  try { document.execCommand('copy'); document.getElementById('copia-confirm-spazi').style.display = 'block'; } catch(e) {}
+}
+function apriMailSpazi() {
+  var sogg = encodeURIComponent('[Richiesta dotazione/materiale] ' + (metadati.titolo || 'Progetto'));
+  var corpo = encodeURIComponent(document.getElementById('testo-spazi').value);
+  window.location.href = 'mailto:produzione@briccialditerni.it?subject=' + sogg + '&body=' + corpo;
+}
+
+// ═══ RICHIESTA TRASPORTI — trasferta persone (Ufficio Acquisti) ═══
+function generaRichiestaTrasporti() {
+  var trasf = getField('trasferta');
+  if (!trasf || trasf.indexOf('Sì') !== 0) {
+    alert('Nessuna trasferta indicata in Sezione 3 (Trasporto richiesto = "No" o non ancora compilato).');
+    return;
+  }
+  var dest = getField('dest_trasferta');
+  var note = getField('note_vitto');
+  var lines = [];
+  lines.push('Gentile Ufficio Acquisti,');
+  lines.push('');
+  lines.push('si richiede organizzazione trasporto per il progetto "' + (metadati.titolo || '') + '" (ID ' + (metadati.id || '') + '):');
+  lines.push('');
+  lines.push('Tipo trasferta: ' + trasf);
+  if (dest) lines.push('Destinazione: ' + dest);
+  if (note) lines.push('Note: ' + note);
+  lines.push('');
+  lines.push('Si prega di confermare disponibilità e procedere con quanto necessario.');
+  lines.push('');
+  lines.push('Cordiali saluti,');
+  lines.push('Ufficio Produzione');
+  document.getElementById('testo-trasporti').value = lines.join('\n');
+  document.getElementById('modal-trasporti').style.display = 'block';
+}
+function chiudiModalTrasporti() { document.getElementById('modal-trasporti').style.display = 'none'; }
+function copiaTestoTrasporti() {
+  var ta = document.getElementById('testo-trasporti');
+  ta.select();
+  try { document.execCommand('copy'); document.getElementById('copia-confirm-trasporti').style.display = 'block'; } catch(e) {}
+}
+function apriMailTrasporti() {
+  var sogg = encodeURIComponent('[Richiesta trasporti] ' + (metadati.titolo || 'Progetto'));
+  var corpo = encodeURIComponent(document.getElementById('testo-trasporti').value);
+  window.location.href = 'mailto:acquisti@briccialditerni.it?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
+}
+
+
+// ── Esecutori (elenco nominativo unico) ──
+var esecutoriCount = 0;
+function addEsecutore() {
+  esecutoriCount++;
+  var tr = document.createElement('tr');
+  tr.setAttribute('data-riga', 'esec');
+  tr.style.borderBottom = '1px solid #D0D7E3';
+  if (esecutoriCount % 2 === 0) tr.style.background = '#F4F7FC';
+  tr.innerHTML =
+    '<td style="padding:3px 4px"><input type="text" data-f="nome" name="esec_nome_' + esecutoriCount + '" placeholder="Cognome Nome" oninput="aggiornaSintesiEsecutori()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:3px 4px"><input type="text" data-f="ruolo" name="esec_ruolo_' + esecutoriCount + '" placeholder="es. Violino, Voce recitante..." oninput="aggiornaSintesiEsecutori()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:3px 4px"><select data-f="qual" name="esec_qual_' + esecutoriCount + '" onchange="aggiornaSintesiEsecutori()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 4px;font-family:inherit;font-size:11px;outline:none">' +
+    '<option value="">— qualifica —</option>' +
+    '<option value="Docente">Docente</option>' +
+    '<option value="Studente piano di studi">Studente piano di studi</option>' +
+    '<option value="Studente tirocinio">Studente tirocinio</option>' +
+    '<option value="Studente 200 ore">Studente 200 ore</option>' +
+    '<option value="Collaboratore esterno">Collaboratore esterno</option>' +
+    '</select></td>' +
+    '<td class="col-modalita" style="padding:3px 4px"><select data-f="modalita" name="esec_modalita_' + esecutoriCount + '" onchange="aggiornaSintesiEsecutori()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 4px;font-family:inherit;font-size:11px;outline:none">' +
+    '<option value="">—</option>' +
+    '<option value="Contratto singolo">Contratto singolo</option>' +
+    '<option value="Cooperativa / Preventivo">Cooperativa / Preventivo</option>' +
+    '</select></td>' +
+    '<td style="padding:3px 4px"><input type="email" data-f="email" name="esec_email_' + esecutoriCount + '" placeholder="email" style="width:100%;min-width:130px;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:3px 4px"><input type="tel" data-f="tel" name="esec_tel_' + esecutoriCount + '" placeholder="+39 ..." style="width:100%;min-width:110px;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="eliminaRiga(this,\'esecutori-tbody\',\'esec\',[\'nome\',\'ruolo\',\'qual\',\'modalita\',\'email\',\'tel\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
+  document.getElementById('esecutori-tbody').appendChild(tr);
+  aggiornaSintesiEsecutori();
+}
+// 5 righe iniziali
+for (var pp = 0; pp < 5; pp++) addEsecutore();
+
+// ═══ SINTESI ESECUTORI — aggiorna contatore e Scheda di Sintesi ═══
+function aggiornaSintesiEsecutori() {
+  var elDocEst = document.getElementById('sint_docente_esterno');
+  if (elDocEst) {
+    var nomeDoc = getField('doc_est_nome');
+    if (nomeDoc) {
+      var bits = [nomeDoc];
+      if (getField('doc_est_ente')) bits.push(getField('doc_est_ente'));
+      if (getField('doc_est_email')) bits.push(getField('doc_est_email'));
+      if (getField('doc_est_tel')) bits.push(getField('doc_est_tel'));
+      elDocEst.innerHTML = bits.join(' — ');
+      elDocEst.style.fontStyle = 'normal'; elDocEst.style.color = '#1a1a2e';
+    } else {
+      elDocEst.textContent = 'Non ancora indicato';
+      elDocEst.style.fontStyle = 'italic'; elDocEst.style.color = '#6B7280';
+    }
+  }
+  var righe = document.querySelectorAll('#esecutori-tbody tr');
+  var tot = 0;
+  var tbodySint = document.getElementById('sint_esecutori_rows');
+  var righeSint = [];
+  righe.forEach(function(tr) {
+    var nome = tr.querySelector('[name^="esec_nome_"]');
+    var ruolo = tr.querySelector('[name^="esec_ruolo_"]');
+    var qual = tr.querySelector('[name^="esec_qual_"]');
+    if (nome && nome.value.trim()) {
+      tot++;
+      righeSint.push('<tr><td style="padding:5px 10px">' + nome.value + '</td><td style="padding:5px 10px;color:#6B7280">' + (ruolo ? ruolo.value : '') + '</td><td style="padding:5px 10px;color:#6B7280">' + (qual ? (qual.value || '—') : '—') + '</td></tr>');
+    }
+  });
+  var elContatore = document.getElementById('esecutori-contatore');
+  if (elContatore) elContatore.textContent = tot + ' studenti inseriti';
+  if (tbodySint) tbodySint.innerHTML = righeSint.length ? righeSint.join('') : '<tr><td colspan="3" style="padding:8px 10px;color:#6B7280;font-style:italic;font-size:12px">Nessun esecutore inserito</td></tr>';
+  var elTot = document.getElementById('sint_esec_tot');
+  if (elTot) elTot.textContent = tot;
+}
+
+// ═══ IMPORTAZIONE MASSIVA — incolla da Excel per l'elenco esecutori ═══
+function riconosciQualifica(testo) {
+  var t = (testo || '').toLowerCase();
+  if (t.indexOf('estern') >= 0) return 'Collaboratore esterno';
+  if (t.indexOf('tirocin') >= 0) return 'Studente tirocinio';
+  if (t.indexOf('200') >= 0) return 'Studente 200 ore';
+  if (t.indexOf('piano di studi') >= 0 || t.indexOf('ps') === 0) return 'Studente piano di studi';
+  if (t.indexOf('docente') >= 0 || t.indexOf('doc') === 0) return 'Docente';
+  return '';
+}
+
+function importaEsecutoriIncollati() {
+  var area = document.getElementById('incolla-esecutori');
+  var esito = document.getElementById('incolla-esecutori-esito');
+  if (!area || !area.value.trim()) return;
+  var righe = area.value.split('\n').filter(function(r) { return r.trim() !== ''; });
+  var importate = 0;
+  righe.forEach(function(riga) {
+    var campi = riga.split('\t');
+    if (campi.length === 1) campi = riga.split(','); // fallback se non tab-separato
+    var nome = (campi[0] || '').trim();
+    if (!nome) return;
+    var ruolo = (campi[1] || '').trim();
+    var qualificaTesto = (campi[2] || '').trim();
+    var email = (campi[3] || '').trim();
+    var tel = (campi[4] || '').trim();
+
+    addEsecutore();
+    var n = esecutoriCount;
+    var elNome = document.querySelector('[name="esec_nome_' + n + '"]');
+    var elRuolo = document.querySelector('[name="esec_ruolo_' + n + '"]');
+    var elQual = document.querySelector('[name="esec_qual_' + n + '"]');
+    var elEmail = document.querySelector('[name="esec_email_' + n + '"]');
+    var elTel = document.querySelector('[name="esec_tel_' + n + '"]');
+    if (elNome) elNome.value = nome;
+    if (elRuolo) elRuolo.value = ruolo;
+    if (elQual) elQual.value = riconosciQualifica(qualificaTesto);
+    if (elEmail) elEmail.value = email;
+    if (elTel) elTel.value = tel;
+    importate++;
+  });
+  if (esito) {
+    esito.textContent = '✓ ' + importate + ' righe importate';
+    esito.style.display = 'inline';
+  }
+  area.value = '';
+  aggiornaSintesiEsecutori();
+}
+
+// ── Firestore: carica e salva dati ──
+// ═══ FIRESTORE — caricamento dati progetto esistente ═══
+function caricaDaFirestore(id) {
+  if (!window.firebaseReady || !window.db) return;
+  var docRef = window.fsDoc(window.db, 'progetti', id);
+  window.fsGetDoc(docRef).then(function(snap) {
+    if (!snap.exists) return;
+    var d = snap.data();
+    // Popola metadati se presenti
+    if (d.metadati) {
+      metadati = d.metadati;
+      popolaMetadati();
+    }
+    // Popola dati referente se presenti
+    if (d.dati_referente) {
+      var dr = d.dati_referente;
+      window._datiReferenteCache = dr; // per costruisciTabellaSpazi, letta prima che le select esistano
+      // Ricrea le righe "Replica" mancanti
+      var maxReplica = 0;
+      Object.keys(dr).forEach(function(k) {
+        var m = k.match(/^replica_data_(\d+)$/);
+        if (m) maxReplica = Math.max(maxReplica, parseInt(m[1], 10));
+      });
+      while (replicheCount < maxReplica) { addReplica(); }
+      // Ricrea le righe "Referente locale" mancanti, per ogni replica (in base alla sua posizione)
+      var maxRefPerPos = {}; // { posizione: numero massimo di referenti salvati }
+      Object.keys(dr).forEach(function(k) {
+        var mr = k.match(/^replica_ref_nome_(\d+)_(\d+)$/);
+        if (mr) {
+          var posRif = mr[1], nRif = parseInt(mr[2], 10);
+          maxRefPerPos[posRif] = Math.max(maxRefPerPos[posRif] || 0, nRif);
+        }
+      });
+      Object.keys(maxRefPerPos).forEach(function(posRif) {
+        var replicaEl = document.querySelector('#repliche-body [data-pos="' + posRif + '"]');
+        if (!replicaEl) return;
+        var uidRif = replicaEl.getAttribute('data-uid');
+        while ((refLocaleCount[uidRif] || 0) < maxRefPerPos[posRif]) { addRefLocale(uidRif); }
+      });
+      // Ricrea le righe "Esecutore" mancanti (oltre le 5 pre-create)
+      var maxEsec = 0;
+      Object.keys(dr).forEach(function(k) {
+        var m2 = k.match(/^esec_nome_(\d+)$/);
+        if (m2) maxEsec = Math.max(maxEsec, parseInt(m2[1], 10));
+      });
+      while (esecutoriCount < maxEsec) { addEsecutore(); }
+      // Ricrea le righe "Collo" mancanti
+      var maxCollo = 0;
+      Object.keys(dr).forEach(function(k) {
+        var m3 = k.match(/^collo_(\d+)$/);
+        if (m3) maxCollo = Math.max(maxCollo, parseInt(m3[1], 10));
+      });
+      while (colliCount < maxCollo) { addCollo(); }
+      // Compatibilità: eventuali vecchi progetti con campo unico "n_colli" invece della lista
+      if (maxCollo === 0 && dr.n_colli) {
+        var elCollo1 = document.querySelector('[name="collo_1"]');
+        if (elCollo1 && !elCollo1.value) { elCollo1.value = dr.n_colli; }
+      }
+      // Ricrea le righe "Spartito" mancanti
+      var maxSpartito = 0;
+      Object.keys(dr).forEach(function(k) {
+        var m4 = k.match(/^spartito_(\d+)$/);
+        if (m4) maxSpartito = Math.max(maxSpartito, parseInt(m4[1], 10));
+      });
+      while (spartitiCount < maxSpartito) { addSpartito(); }
+      // Prima popola i campi già presenti nel DOM
+      Object.keys(dr).forEach(function(k) {
+        var el = document.querySelector('[name="' + k + '"]');
+        if (el && dr[k] !== undefined) {
+          if (el.type === 'checkbox') { el.checked = (dr[k] === true || dr[k] === 'true' || dr[k] === 'on'); return; }
+          el.value = dr[k];
+          if (el.tagName === 'TEXTAREA') {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight + 2) + 'px';
+          }
+        }
+      });
+      // Poi aggiorna tutti i calcoli e visualizzazioni
+      var cbNoMateriale = document.querySelector('[name="no_materiale_musicale"]');
+      var blkSpartiti = document.getElementById('blocco-spartiti');
+      if (cbNoMateriale && blkSpartiti) blkSpartiti.style.display = cbNoMateriale.checked ? 'none' : 'block';
+      var cbConcertoFinale = document.querySelector('[name="ha_concerto_finale"]');
+      var blkSiae = document.getElementById('blocco-siae-masterclass');
+      if (cbConcertoFinale && blkSiae) blkSiae.style.display = cbConcertoFinale.checked ? 'block' : 'none';
+      aggiornaSintesiEsecutori();
+      aggiornaChecklist();
+      aggiornaSintesiEvento();
+      var selTrasf = document.querySelector('[name="trasferta"]');
+      if (selTrasf) toggleTrasferta(selTrasf);
+      setTimeout(function() {
+        // Riprova a popolare campi dinamici (brani, prove, esecutori)
+        Object.keys(dr).forEach(function(k) {
+          var el = document.querySelector('[name="' + k + '"]');
+          if (el && dr[k] !== undefined) el.value = dr[k];
+        });
+        // Apri i pannelli "Referente locale" che hanno già almeno un nominativo compilato
+        document.querySelectorAll('[id^="ref-locale-details-"]').forEach(function(det) {
+          var haNome = Array.prototype.some.call(det.querySelectorAll('[data-f="nome"]'), function(el) { return el.value.trim(); });
+          if (haNome) det.setAttribute('open', '');
+        });
+        aggiornaSintesiEsecutori();
+        aggiornaChecklist();
+        aggiornaListaColli();
+        costruisciTabellaTrasportoPersone();
+      }, 500);
+    }
+    // Carica dati responsabile
+    if (d.dati_responsabile) {
+      var dr2 = d.dati_responsabile;
+      setTimeout(function() {
+        Object.keys(dr2).forEach(function(k) {
+          var el = document.querySelector('[name="' + k + '"]');
+          if (el && dr2[k] !== undefined) el.value = dr2[k];
+        });
+      }, 700);
+    }
+    mostraNotificaSalvataggio('✓ Dati caricati');
+  }).catch(function(e) { console.warn('Errore caricamento Firestore:', e); });
+}
+
+// ═══ FIRESTORE — autosave referente/responsabile (debounce 2s) e notifiche ═══
+var _salvaTimer = null;
+function salvaReferenteSuFirestore() {
+  if (!window.firebaseReady || !window.db || !metadati.id) return;
+  clearTimeout(_salvaTimer);
+  _salvaTimer = setTimeout(function() {
+    var dati = {};
+    document.querySelectorAll('input[name], textarea[name], select[name]').forEach(function(el) {
+      var n = el.name;
+      if (!n || n.startsWith('dist_') || n.startsWith('pers_') || n === 'note_responsabile') return;
+      if (el.type === 'checkbox') { dati[n] = el.checked; return; }
+      if (el.value && el.value.trim()) dati[n] = el.value.trim();
+    });
+    var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
+    window.fsUpdateDoc(docRef, {
+      dati_referente: dati,
+      'stato.ultimo_aggiornamento': window.fsTimestamp()
+    }).then(function() {
+      mostraNotificaSalvataggio('Salvato ✓');
+    }).catch(function(e) {
+      window.fsSetDoc(docRef, { dati_referente: dati, metadati: metadati }, { merge: true });
+    });
+  }, 2000);
+}
+
+var _salvaRespTimer = null;
+function salvaResponsabileSuFirestore() {
+  if (!window.firebaseReady || !window.db || !metadati.id) return;
+  clearTimeout(_salvaRespTimer);
+  _salvaRespTimer = setTimeout(function() {
+    var dati = {};
+    // Distribuzione organico
+    document.querySelectorAll('input[name^="dist_"]').forEach(function(el) {
+      if (el.value && el.value !== '0') dati[el.name] = el.value;
+    });
+    // Personale
+    document.querySelectorAll('input[name^="pers_"], select[name^="pers_"]').forEach(function(el) {
+      if (el.value && el.value.trim()) dati[el.name] = el.value.trim();
+    });
+    // Note responsabile
+    var note = document.querySelector('[name="note_responsabile"]');
+    if (note && note.value.trim()) dati['note_responsabile'] = note.value.trim();
+
+    var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
+    window.fsUpdateDoc(docRef, {
+      dati_responsabile: dati,
+      'stato.ultimo_aggiornamento': window.fsTimestamp()
+    }).then(function() {
+      mostraNotificaSalvataggio('Salvato ✓');
+    }).catch(function(e) {
+      window.fsSetDoc(docRef, { dati_responsabile: dati, metadati: metadati }, { merge: true });
+    });
+  }, 2000); // salva 2 secondi dopo l'ultima modifica
+}
+
+// Nota: salvaReferenteSuFirestore() è già definita sopra — riutilizzata anche qui, non ridefinita.
+
+function mostraNotificaSalvataggio(msg) {
+  var el = document.getElementById('notifica-salvataggio');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
+  setTimeout(function() { el.style.opacity = '0'; }, 3000);
+}
+
+window.addEventListener('firebaseReady', function() {
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (id && metadati.id) caricaDaFirestore(id);
+});
+
+// Fallback: se firebaseReady è già scattato prima del listener, riprova ogni 200ms
+function tentaCaricamento() {
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (!id) return;
+  if (window.firebaseReady && window.db && metadati.id) {
+    caricaDaFirestore(id);
+  } else {
+    setTimeout(tentaCaricamento, 200);
+  }
+}
+tentaCaricamento();
+document.addEventListener('input', function() {
+  aggiornaChecklist();
+  aggiornaSintesiEvento();
+  var n = event.target ? event.target.name : '';
+  if (n && n.indexOf('collo_') === 0) aggiornaListaColli();
+  if (n && n.indexOf('spartito_') === 0) aggiornaListaSpartiti();
+  if (n && (n === 'dest_trasferta' || n === 'note_vitto' || n.indexOf('replica_trasporto_') === 0 || n.indexOf('replica_luogo_') === 0 || n.indexOf('replica_vitto_') === 0 || n.indexOf('replica_alloggio_') === 0)) {
+    if (typeof costruisciTabellaTrasportoPersone === 'function') costruisciTabellaTrasportoPersone();
+  }
+  salvaReferenteSuFirestore();
+});
+document.addEventListener('change', function() {
+  aggiornaChecklist();
+  aggiornaSintesiEvento();
+  var n = event.target ? event.target.name : '';
+  if (n === 'trasferta' && typeof costruisciTabellaTrasportoPersone === 'function') costruisciTabellaTrasportoPersone();
+  salvaReferenteSuFirestore();
+});
+
+// ── Piano prove ──
+var proveCount = 0;
+// ═══ PIANO PROVE E DOCENTI — righe dinamiche ═══
+function addProva() {
+  var body = document.getElementById('prove-body');
+  if (!body) return;
+  proveCount++;
+  var tr = document.createElement('tr');
+  tr.setAttribute('data-riga', 'prova');
+  tr.innerHTML =
+    '<td><input type="text" data-f="data" name="prova_data_' + proveCount + '" placeholder="GG/MM/AAAA" onblur="formattaDataItaliana(this)"></td>' +
+    '<td><input type="text" data-f="inizio" name="prova_inizio_' + proveCount + '" placeholder="__:__" onblur="formattaOraItaliana(this)"></td>' +
+    '<td><input type="text" data-f="fine" name="prova_fine_' + proveCount + '" placeholder="__:__" onblur="formattaOraItaliana(this)"></td>' +
+    '<td><input type="text" data-f="luogo" name="prova_luogo_' + proveCount + '" placeholder="Sala / sede"></td>' +
+    '<td><textarea data-f="sez" name="prova_sez_' + proveCount + '" rows="1" placeholder="es. Archi + Fiati"></textarea></td>' +
+    '<td><textarea data-f="note" name="prova_note_' + proveCount + '" rows="1"></textarea></td>' +
+    '<td style="text-align:center"><button type="button" onclick="eliminaRiga(this,\'prove-body\',\'prova\',[\'data\',\'inizio\',\'fine\',\'luogo\',\'sez\',\'note\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
+  body.appendChild(tr);
+}
+for (var p = 0; p < 5; p++) addProva();
+
+// ── Docenti ──
+var docentiCount = 0;
+function addDocente() {
+  docentiCount++;
+  var tr = document.createElement('tr');
+  tr.setAttribute('data-riga', 'doc');
+  tr.innerHTML =
+    '<td><input type="text" data-f="nome" name="doc_nome_' + docentiCount + '" placeholder="Cognome Nome"></td>' +
+    '<td><input type="text" data-f="ruolo" name="doc_ruolo_' + docentiCount + '" placeholder="Ruolo / Cattedra"></td>' +
+    '<td><input type="email" data-f="email" name="doc_email_' + docentiCount + '" placeholder="nome.cognome@briccialditerni.it"></td>' +
+    '<td><input type="tel" data-f="tel" name="doc_tel_' + docentiCount + '" placeholder="+39 ..."></td>' +
+    '<td style="text-align:center"><button type="button" onclick="eliminaRiga(this,\'docenti-body\',\'doc\',[\'nome\',\'ruolo\',\'email\',\'tel\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
+  document.getElementById('docenti-body').appendChild(tr);
+}
+for (var d = 0; d < 3; d++) addDocente();
+
+// ── Stampa sintesi ──
+// ═══ STAMPA / EXPORT ═══
+function stampaSintesi() {
+  var win = window.open('', '_blank');
+  if (!win) { alert('Consenti i popup per questa pagina per stampare la sintesi.'); return; }
+  var titolo = document.getElementById('sint_titolo') ? document.getElementById('sint_titolo').textContent : 'Briccialdi';
+  var contenuto = document.getElementById('sezione-sintesi').cloneNode(true);
+  // rimuovi pulsanti dalla copia
+  contenuto.querySelectorAll('button').forEach(function(b){ b.remove(); });
+  contenuto.querySelectorAll('.section-header').forEach(function(h){ h.style.cursor='default'; });
+  win.document.write('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">');
+  win.document.write('<title>Sintesi — ' + titolo + '</title>');
+  win.document.write('<style>');
+  win.document.write(':root{--blu:#1A3C6B;--blu-light:#EEF3FA;--blu-pale:#F4F7FC;--verde:#2E7D32;--rosso:#C62828;--arancio:#B85C00;--muted:#6B7280;--bordo:#D0D7E3;--grigio:#F5F5F5;--testo:#1a1a2e}');
+  win.document.write('body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:24px;max-width:820px;margin:0 auto;font-size:13px;color:var(--testo)}');
+  win.document.write('h1{font-family:Georgia,serif;font-size:20px;color:var(--blu);margin-bottom:4px}');
+  win.document.write('button{display:none!important}');
+  win.document.write('@media print{button{display:none!important}}');
+  win.document.write('</style></head><body>');
+  win.document.write('<h1>Scheda di Sintesi — ' + titolo + '</h1>');
+  win.document.write('<p style="font-size:11px;color:#6B7280;margin-bottom:20px">Conservatorio G. Briccialdi — Ufficio Produzione</p>');
+  win.document.write(contenuto.querySelector('.section-body').innerHTML);
+  win.document.write('</body></html>');
+  win.document.close();
+  setTimeout(function(){ win.print(); }, 600);
+}
+</script>
+</body>
+</html>
