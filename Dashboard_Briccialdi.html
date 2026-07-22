@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portale Produzione — Conservatorio G. Briccialdi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --blu:       #1A3C6B;
+    --blu-mid:   #2A5C9B;
+    --blu-light: #EEF3FA;
+    --blu-pale:  #F4F7FC;
+    --verde:     #2E7D32;
+    --verde-l:   #E8F5E9;
+    --arancio:   #E65100;
+    --arancio-l: #FFF3E0;
+    --rosso:     #C62828;
+    --rosso-l:   #FFEBEE;
+    --grigio:    #F5F5F5;
+    --bordo:     #D0D7E3;
+    --testo:     #1a1a2e;
+    --muted:     #6B7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4FA; color: var(--testo); font-size: 14px; line-height: 1.5; }
+
+  #avviso-locale { display:none; position:sticky; top:0; z-index:600; background:var(--rosso); color:white; padding:10px 16px; text-align:center; font-size:13px; font-weight:600; }
+
+  .site-header { background: var(--blu); color: white; padding: 22px 40px; }
+  .site-header h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 600; letter-spacing: .3px; }
+  .site-header p { font-size: 12px; opacity: .75; margin-top: 3px; }
+
+  .wrapper { max-width: 1080px; margin: 0 auto; padding: 28px 24px 60px; display: grid; gap: 22px; }
+
+  .section { background: white; border: 1px solid var(--bordo); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .section-header { background: var(--blu); color: white; padding: 12px 20px; display:flex; align-items:center; justify-content:space-between; }
+  .section-header h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 600; }
+  .section-header p { font-size: 11px; opacity: .75; margin-top: 1px; }
+  .section-body { padding: 18px 20px; }
+
+  .empty-msg { color: var(--muted); font-size: 13px; font-style: italic; padding: 10px 4px; }
+  .loading-msg { color: var(--muted); font-size: 13px; padding: 10px 4px; }
+  .error-msg { color: var(--rosso); background: var(--rosso-l); border-radius: 6px; padding: 10px 14px; font-size: 12px; }
+
+  /* Scadenze */
+  .scadenza-item { display:flex; align-items:center; gap:14px; padding:10px 14px; margin-bottom:8px; border-left:4px solid var(--bordo); background:var(--blu-pale); border-radius:0 6px 6px 0; }
+  .scadenza-item:last-child { margin-bottom: 0; }
+  .scadenza-info { flex:1; min-width:0; }
+  .scadenza-info strong { display:block; font-size:13px; color:var(--blu); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .scadenza-tipo { font-size:11px; color:var(--muted); display:block; margin-top:2px; }
+  .scadenza-badge { font-size:11px; font-weight:700; white-space:nowrap; }
+  .btn-mini { font-size:11px; font-weight:600; color:white; background:var(--blu-mid); padding:5px 12px; border-radius:5px; text-decoration:none; white-space:nowrap; }
+  .btn-mini:hover { background: var(--blu); }
+
+  /* Elenco progetti */
+  .progetti-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .progetti-table th { text-align:left; padding:8px 10px; background:var(--blu-light); color:var(--blu); font-size:11px; font-weight:700; }
+  .progetti-table td { padding:8px 10px; border-bottom:1px solid var(--bordo); vertical-align:middle; }
+  .progetti-table tr:last-child td { border-bottom:none; }
+  .stato-badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:10px; white-space:nowrap; }
+
+  /* Collegamenti rapidi */
+  .quick-links-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+  .quick-link { display:flex; align-items:center; gap:10px; padding:14px; border:1px solid var(--bordo); border-radius:8px; text-decoration:none; color:var(--testo); transition:all .15s; }
+  .quick-link:hover { border-color:var(--blu-mid); background:var(--blu-pale); }
+  .quick-link .icona { font-size:20px; }
+  .quick-link .testo { font-size:12px; font-weight:600; color:var(--blu); }
+
+  /* Categorie nuovo progetto */
+  .categorie-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .cat-card { border:2px solid var(--bordo); border-radius:10px; padding:18px 14px; text-decoration:none; color:inherit; transition:all .15s; }
+  .cat-card.active { cursor:pointer; }
+  .cat-card.active:hover { border-color:var(--blu); background:var(--blu-pale); transform:translateY(-1px); }
+  .cat-card.disabled { opacity:.5; cursor:default; }
+  .cat-card .icona { font-size:22px; margin-bottom:8px; }
+  .cat-card .titolo { font-weight:600; color:var(--blu); font-size:14px; }
+  .cat-card .nota { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  @media (max-width: 640px) {
+    .site-header { padding:16px 18px; }
+    .wrapper { padding: 18px 14px 60px; }
+    .scadenza-item { flex-wrap:wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div id="avviso-locale">⚠️ Stai visualizzando una copia LOCALE del portale — apri la versione pubblicata su GitHub Pages per dati aggiornati e link funzionanti.</div>
+<script>
+  if (window.location.protocol === 'file:') { document.getElementById('avviso-locale').style.display = 'block'; }
+</script>
+
+<header class="site-header">
+  <h1>Conservatorio «G. Briccialdi» — Terni</h1>
+  <p>Portale Produzione — Vista Responsabile</p>
+</header>
+
+<div class="wrapper">
+
+  <!-- SCADENZE IMMINENTI -->
+  <div class="section">
+    <div class="section-header">
+      <div><h2>📅 Scadenze Imminenti</h2><p>Date evento e scadenze risposta, ordinate per urgenza</p></div>
+    </div>
+    <div class="section-body" id="scadenze-body"><div class="loading-msg">Caricamento da Firestore…</div></div>
+  </div>
+
+  <!-- ELENCO PROGETTI -->
+  <div class="section">
+    <div class="section-header">
+      <div><h2>📋 Progetti</h2><p>Tutti i progetti presenti su Firestore</p></div>
+    </div>
+    <div class="section-body" id="progetti-body"><div class="loading-msg">Caricamento da Firestore…</div></div>
+  </div>
+
+  <!-- AVVIA NUOVO PROGETTO -->
+  <div class="section">
+    <div class="section-header">
+      <div><h2>➕ Avvia Nuovo Progetto</h2><p>Per categoria di produzione</p></div>
+    </div>
+    <div class="section-body">
+      <div class="categorie-grid">
+        <a href="Modulo_1_SinfonicoCORALE.html" class="cat-card active">
+          <div class="icona">🎼</div>
+          <div class="titolo">Produzione Sinfonico-Corale</div>
+          <div class="nota">Modulo completo →</div>
+        </a>
+        <a href="Modulo_3_Masterclass.html" class="cat-card active">
+          <div class="icona">🎓</div>
+          <div class="titolo">Masterclass / Seminario</div>
+          <div class="nota">Modulo completo →</div>
+        </a>
+        <a href="Modulo_2_PiccoloConcerto.html" class="cat-card active">
+          <div class="icona">🎹</div>
+          <div class="titolo">Piccolo Concerto</div>
+          <div class="nota">Modulo completo →</div>
+        </a>
+        <a href="Modulo_4_EventoIstituzionale.html" class="cat-card active">
+          <div class="icona">🏛</div>
+          <div class="titolo">Evento Istituzionale</div>
+          <div class="nota">Modulo completo →</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLLEGAMENTI RAPIDI -->
+  <div class="section">
+    <div class="section-header">
+      <div><h2>🔗 Collegamenti Rapidi</h2><p>Strumenti collegati alla produzione</p></div>
+    </div>
+    <div class="section-body">
+      <div class="quick-links-grid">
+        <a class="quick-link" href="https://docs.google.com/spreadsheets/d/1SjjIz-vz8RH4Q-52wjt7Mrtsbxo86SNSdCCfc8RxSvc/edit" target="_blank"><span class="icona">📊</span><span class="testo">Planning Eventi</span></a>
+        <a class="quick-link" href="https://docs.google.com/spreadsheets/d/1jbRvF3knvj3eoOGoaiNy0b8HWsYEBL0xwoQArBw_Aj4/edit" target="_blank"><span class="icona">🗄️</span><span class="testo">Database Produzioni</span></a>
+        <a class="quick-link" href="https://drive.google.com/drive/folders/1vz0kI4ufpsVwQISXqpvTuRCW2TRHJ27L" target="_blank"><span class="icona">📁</span><span class="testo">Cartella Drive</span></a>
+        <a class="quick-link" href="https://github.com/Marcogatti2138/MODULI-PRODUZIONE-BRICCIALDI" target="_blank"><span class="icona">💻</span><span class="testo">Repository GitHub</span></a>
+        <a class="quick-link" href="https://console.firebase.google.com/project/briccialdi-produzioni/firestore/databases/-default-/data/~2Fprogetti" target="_blank"><span class="icona">🔥</span><span class="testo">Firebase Console</span></a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase SDK compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyCnB-Ck9sE4Tt2m_P5rhG8lruWLfEfpXx8",
+    authDomain: "briccialdi-produzioni.firebaseapp.com",
+    projectId: "briccialdi-produzioni",
+    storageBucket: "briccialdi-produzioni.firebasestorage.app",
+    messagingSenderId: "447173206446",
+    appId: "1:447173206446:web:6bb69d152d286ce957e83f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  var MODULI_URL = {
+    'sinfonico-corale': 'Modulo_1_SinfonicoCORALE.html',
+    'piccolo-concerto': 'Modulo_2_PiccoloConcerto.html',
+    'masterclass': 'Modulo_3_Masterclass.html',
+    'evento-istituzionale': 'Modulo_4_EventoIstituzionale.html'
+  };
+  var MODULO_URL_DEFAULT = 'Modulo_1_SinfonicoCORALE.html'; // progetti creati prima che salvassimo la tipologia
+
+  function parseDataIT(str) {
+    if (!str) return null;
+    var p = String(str).split('/');
+    if (p.length !== 3) return null;
+    var gg = parseInt(p[0], 10), mm = parseInt(p[1], 10), aa = parseInt(p[2], 10);
+    if (isNaN(gg) || isNaN(mm) || isNaN(aa)) return null;
+    if (aa < 100) aa += 2000;
+    var d = new Date(aa, mm - 1, gg);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function formatDataIT(d) {
+    var gg = ('0' + d.getDate()).slice(-2), mm = ('0' + (d.getMonth() + 1)).slice(-2);
+    return gg + '/' + mm + '/' + d.getFullYear();
+  }
+
+  function giorniMancanti(data) {
+    var oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+    return Math.round((data - oggi) / 86400000);
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function linkModulo(id, tipologia) {
+    var url = (tipologia && MODULI_URL[tipologia]) ? MODULI_URL[tipologia] : MODULO_URL_DEFAULT;
+    return url + '?id=' + encodeURIComponent(id) + '&ruolo=responsabile';
+  }
+
+  function confermaAperturaModulo(id, tipologia) {
+    if (!tipologia || !MODULI_URL[tipologia]) {
+      return confirm('Nessuna tipologia salvata per il progetto "' + id + '" — verrà aperto con il modulo Sinfonico-Corale (quello di default per i progetti storici).\n\nSe pensavi fosse un altro tipo di progetto (es. Masterclass), probabilmente la creazione non è andata a buon fine — meglio cancellare questa bozza e ricrearla dalla card giusta.\n\nContinuare comunque?');
+    }
+    return true;
+  }
+
+  function statoInfo(stato) {
+    stato = stato || {};
+    if (stato.completato_responsabile) return { testo: '✓ Completo', bg: 'var(--verde-l)', col: 'var(--verde)' };
+    if (stato.completato_referente) return { testo: 'Da completare — Responsabile', bg: 'var(--arancio-l)', col: 'var(--arancio)' };
+    return { testo: 'In compilazione — Referente', bg: 'var(--blu-light)', col: 'var(--blu-mid)' };
+  }
+
+  function renderScadenze(progetti) {
+    var raggruppati = [];
+    progetti.forEach(function(p) {
+      var titolo = p.meta.titolo || p.id;
+      var voci = [];
+      var dataEvento = parseDataIT(p.dr.data_evento);
+      var scadenza = parseDataIT(p.meta.scadenza);
+      if (dataEvento) voci.push({ tipo: 'Data evento', data: dataEvento });
+      if (scadenza && !(p.stato && p.stato.completato_referente)) voci.push({ tipo: 'Scadenza risposta Referente', data: scadenza });
+      voci = voci.filter(function(v) { return giorniMancanti(v.data) >= -1; }); // nasconde scadenze passate da tempo
+      if (voci.length === 0) return;
+      voci.sort(function(a, b) { return a.data - b.data; });
+      raggruppati.push({ id: p.id, titolo: titolo, voci: voci, primaData: voci[0].data, tipologia: p.meta.tipologia });
+    });
+    raggruppati.sort(function(a, b) { return a.primaData - b.primaData; });
+
+    var el = document.getElementById('scadenze-body');
+    if (raggruppati.length === 0) { el.innerHTML = '<div class="empty-msg">Nessuna scadenza imminente.</div>'; return; }
+
+    var html = '';
+    raggruppati.forEach(function(r) {
+      var gg = giorniMancanti(r.primaData);
+      var colore = gg <= 3 ? 'var(--rosso)' : gg <= 7 ? 'var(--arancio)' : 'var(--verde)';
+      var righeInfo = r.voci.map(function(v) {
+        var ggV = giorniMancanti(v.data);
+        var testoGgV = ggV < 0 ? 'ieri' : ggV === 0 ? 'oggi' : ggV === 1 ? 'domani' : 'tra ' + ggV + ' giorni';
+        return '<span class="scadenza-tipo">' + v.tipo + ' — ' + formatDataIT(v.data) + ' (' + testoGgV + ')</span>';
+      }).join('');
+      html += '<div class="scadenza-item" style="border-left-color:' + colore + '">' +
+        '<div class="scadenza-info"><strong>' + escapeHtml(r.titolo) + '</strong>' + righeInfo + '</div>' +
+        '<a href="' + linkModulo(r.id, r.tipologia) + '" onclick="return confermaAperturaModulo(\'' + r.id + '\', \'' + (r.tipologia || '') + '\')" class="btn-mini">Apri →</a>' +
+        '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderElenco(progetti) {
+    var el = document.getElementById('progetti-body');
+    if (progetti.length === 0) { el.innerHTML = '<div class="empty-msg">Nessun progetto trovato su Firestore.</div>'; return; }
+
+    var ordinati = progetti.slice().sort(function(a, b) {
+      return (a.meta.titolo || a.id).localeCompare(b.meta.titolo || b.id);
+    });
+
+    var TIPOLOGIA_LABEL = { 'sinfonico-corale': '🎼 Sinfonico-Corale', 'piccolo-concerto': '🎹 Piccolo Concerto', 'masterclass': '🎓 Masterclass', 'evento-istituzionale': '🏛 Evento Istituzionale' };
+    var html = '<table class="progetti-table"><thead><tr><th>ID</th><th>Titolo</th><th>Tipologia</th><th>Referente</th><th>Stato</th><th></th></tr></thead><tbody>';
+    ordinati.forEach(function(p) {
+      var s = statoInfo(p.stato);
+      var tipLabel = TIPOLOGIA_LABEL[p.meta.tipologia] || '— (non specificata)';
+      html += '<tr>' +
+        '<td>' + escapeHtml(p.id) + '</td>' +
+        '<td>' + escapeHtml(p.meta.titolo || '—') + '</td>' +
+        '<td style="font-size:11px;color:var(--muted)">' + tipLabel + '</td>' +
+        '<td>' + escapeHtml(p.meta.referente || '—') + '</td>' +
+        '<td><span class="stato-badge" style="background:' + s.bg + ';color:' + s.col + '">' + s.testo + '</span></td>' +
+        '<td><a href="' + linkModulo(p.id, p.meta.tipologia) + '" onclick="return confermaAperturaModulo(\'' + p.id + '\', \'' + (p.meta.tipologia || '') + '\')" class="btn-mini">Apri →</a></td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  db.collection('progetti').get().then(function(snapshot) {
+    var progetti = [];
+    snapshot.forEach(function(doc) {
+      var d = doc.data();
+      progetti.push({ id: doc.id, meta: d.metadati || {}, stato: d.stato || {}, dr: d.dati_referente || {} });
+    });
+    renderScadenze(progetti);
+    renderElenco(progetti);
+  }).catch(function(e) {
+    var msg = '<div class="error-msg">Errore nel caricamento da Firestore: ' + escapeHtml(e.message || e) + '</div>';
+    document.getElementById('scadenze-body').innerHTML = msg;
+    document.getElementById('progetti-body').innerHTML = msg;
+  });
+</script>
+
+</body>
+</html>
