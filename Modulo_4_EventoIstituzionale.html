@@ -969,7 +969,7 @@
         <button class="btn btn-primary" onclick="generaRichiestaDotazioneMateriale()" style="margin-top:10px">📤 Genera richiesta Dotazione/Materiale</button>
       </div>
 
-      <button class="btn btn-primary" onclick="generaRichiestaTrasporti()" style="margin-top:14px">🚚 Genera richiesta Trasporti (Acquisti)</button>
+      <button class="btn btn-primary" onclick="generaRichiestaTrasporti()" style="margin-top:14px">🚚 Genera richiesta Trasporti (Produzione)</button>
 
     </div>
 
@@ -995,7 +995,7 @@
     <div id="modal-trasporti" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
       <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Richiesta trasporti — Ufficio Acquisti</h2>
+          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Richiesta trasporti — Ufficio Produzione</h2>
           <button onclick="chiudiModalTrasporti()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
         </div>
         <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
@@ -2127,7 +2127,9 @@ var checklistVoci = [
     var sel = document.querySelector('[name="trasferta"]');
     return sel && sel.value && sel.value !== '';
   }},
-  { id: 'cl_contatti',  label: 'Contatti docenti — almeno 1',          tag: 'OBBLIGATORIO', obblig: true,  check: function() { return !!getField('doc_email_1'); } },
+  { id: 'cl_contatti',  label: 'Contatti docenti — almeno 1',          tag: 'OBBLIGATORIO', obblig: true,  check: function() {
+    return Array.prototype.some.call(document.querySelectorAll('#docenti-body [name^="doc_email_"]'), function(el) { return el.value.trim(); });
+  }},
   { id: 'cl_foto',      label: 'Materiale grafico (se necessario)',    tag: 'STAMPA',       obblig: false, check: function() { return !!getField('foto_ensemble') || !!getField('testo_descr'); } },
 ];
 
@@ -2443,14 +2445,52 @@ function generaRichiestaTrasporti() {
   }
   var dest = getField('dest_trasferta');
   var note = getField('note_vitto');
+
+  // Materiale disponibile in Conservatorio (da 3A, classificato dal Responsabile) — deve viaggiare con la trasferta
+  var vociDot = [
+    ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie'],
+    ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
+    ['dot_leggii_lum', 'dot_leggii_lum_n', 'leggii_lum', 'Leggii illuminati'],
+    ['dot_podio', 'dot_podio_n', 'podio', 'Podio'],
+    ['dot_piano', 'dot_piano_n', 'piano', 'Pianoforte'],
+    ['dot_audio', 'dot_audio_n', 'audio', 'Impianto audio / PA'],
+    ['dot_luci', 'dot_luci_n', 'luci', 'Impianto luci'],
+    ['dot_service', 'dot_service_n', 'service', 'Service esterno richiesto'],
+    ['dot_altro', 'dot_altro_n', 'altro', 'Altro materiale (3A)']
+  ];
+  var materialeDisponibile = [];
+  vociDot.forEach(function(v) {
+    var qta = getField(v[0]);
+    if (!qta) return;
+    if (getField('dot_disp_' + v[2]) === 'Già disponibile (Conservatorio)') {
+      var nt = getField(v[1]);
+      materialeDisponibile.push('  · ' + v[3] + ': ' + qta + (nt ? ' — ' + nt : ''));
+    }
+  });
+
+  // Altro materiale libero (da 3B)
+  var altroMateriale = [];
+  var c = 1;
+  while (document.querySelector('[name="collo_' + c + '"]')) {
+    var vColl = getField('collo_' + c);
+    if (vColl) altroMateriale.push('  · ' + vColl);
+    c++;
+  }
+
   var lines = [];
-  lines.push('Gentile Ufficio Acquisti,');
+  lines.push('Gentile Ufficio Produzione,');
   lines.push('');
   lines.push('si richiede organizzazione trasporto per il progetto "' + (metadati.titolo || '') + '" (ID ' + (metadati.id || '') + '):');
   lines.push('');
   lines.push('Tipo trasferta: ' + trasf);
   if (dest) lines.push('Destinazione: ' + dest);
-  if (note) lines.push('Note: ' + note);
+  if (materialeDisponibile.length || altroMateriale.length) {
+    lines.push('');
+    lines.push('Materiale da trasportare (già disponibile in Conservatorio):');
+    lines = lines.concat(materialeDisponibile);
+    lines = lines.concat(altroMateriale);
+  }
+  if (note) { lines.push(''); lines.push('Note: ' + note); }
   lines.push('');
   lines.push('Si prega di confermare disponibilità e procedere con quanto necessario.');
   lines.push('');
@@ -2490,7 +2530,7 @@ function copiaTestoTrasporti() {
 function apriMailTrasporti() {
   var sogg = encodeURIComponent('[Richiesta trasporti] ' + (metadati.titolo || 'Progetto'));
   var corpo = encodeURIComponent(document.getElementById('testo-trasporti').value);
-  window.location.href = 'mailto:acquisti@briccialditerni.it?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
+  window.location.href = 'mailto:produzione@briccialditerni.it?cc=acquisti@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
 }
 
 // ═══ PANNELLO DISPONIBILITÀ — Responsabile classifica cosa è già in Conservatorio ═══
