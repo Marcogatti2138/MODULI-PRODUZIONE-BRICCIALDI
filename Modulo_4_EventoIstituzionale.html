@@ -916,25 +916,22 @@
     </div>
     <div class="section-body">
       <div class="sub-header">Assistenza logistica</div>
-      <div class="field-row">
-        <div class="field-label">N° studenti richiesti</div>
-        <div class="field-input"><input type="number" name="ass_log_num" min="0" placeholder="0"></div>
-      </div>
-      <p style="font-size:11px;color:var(--muted);margin:8px 4px 6px">Spunta gli appuntamenti (evento, repliche) per cui serve assistenza. L'orario è pre-compilato ma modificabile, perché può servire arrivare prima o restare dopo.</p>
+      <p style="font-size:11px;color:var(--muted);margin:8px 4px 6px">Spunta gli appuntamenti (evento, repliche) per cui serve assistenza, indicando quanti studenti servono <strong>per quel giorno specifico</strong> (può cambiare da un appuntamento all'altro). L'orario è pre-compilato ma modificabile, perché può servire arrivare prima o restare dopo.</p>
       <button class="btn-add" onclick="costruisciListaAssistenza()" style="margin-bottom:10px">🔄 Aggiorna vista (rilegge Sezione 1)</button>
       <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table style="width:100%;min-width:600px;border-collapse:collapse;font-size:12px">
+      <table style="width:100%;min-width:660px;border-collapse:collapse;font-size:12px">
         <thead>
           <tr style="background:var(--blu)">
             <th style="padding:6px 8px;color:white;font-size:11px;width:30px"></th>
             <th style="padding:6px 8px;text-align:left;color:white;font-size:11px">Appuntamento</th>
             <th style="padding:6px 8px;text-align:left;color:white;font-size:11px">Data</th>
             <th style="padding:6px 8px;text-align:left;color:white;font-size:11px">Luogo</th>
-            <th style="padding:6px 8px;text-align:left;color:white;font-size:11px;width:28%">Orario assistenza richiesto</th>
+            <th style="padding:6px 8px;text-align:left;color:white;font-size:11px;width:80px">N° studenti</th>
+            <th style="padding:6px 8px;text-align:left;color:white;font-size:11px;width:26%">Orario assistenza richiesto</th>
           </tr>
         </thead>
         <tbody id="assistenza-logistica-tbody">
-          <tr><td colspan="5" style="padding:10px;text-align:center;color:var(--muted);font-style:italic">Premi "Aggiorna vista" per generare l'elenco</td></tr>
+          <tr><td colspan="6" style="padding:10px;text-align:center;color:var(--muted);font-style:italic">Premi "Aggiorna vista" per generare l'elenco</td></tr>
         </tbody>
       </table>
       </div>
@@ -971,30 +968,6 @@
       <!-- Lista voci -->
       <ul class="checklist" id="checklist-voci"></ul>
 
-      <!-- Pulsante sollecito -->
-      <div id="blocco-sollecito" style="padding:14px 20px;border-top:1px solid #D0D7E3;display:none">
-        <div style="font-size:12px;color:#C62828;margin-bottom:10px;font-weight:600">⚠ Campi obbligatori mancanti — genera un sollecito al Referente:</div>
-        <button class="btn btn-primary" onclick="generaSollecito()" style="font-size:13px;padding:8px 20px">✉ Genera sollecito</button>
-      </div>
-
-      <!-- Modal sollecito -->
-      <div id="modal-sollecito" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
-        <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-            <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Sollecito — dati mancanti</h2>
-            <button onclick="chiudiSollecito()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
-          </div>
-          <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo al Referente, oppure apri direttamente in Mail.</p>
-          <textarea id="testo-sollecito" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
-          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-            <button onclick="copiaSollecito()" class="btn btn-primary" style="flex:1">Copia testo</button>
-            <button onclick="apriMailSollecito()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
-            <button onclick="chiudiSollecito()" class="btn btn-secondary" style="flex:1">Chiudi</button>
-          </div>
-          <p id="copia-confirm-sol" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -1005,6 +978,18 @@
       <span class="toggle">▾</span>
     </div>
     <div class="section-body" style="padding:16px 20px">
+
+      <div style="padding:10px 14px;background:#FDF0EF;border-radius:8px;border:1px solid #F0C4BF;margin-bottom:16px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#C0392B;margin-bottom:6px;font-weight:700">📢 Sollecito Referente</div>
+        <p style="font-size:11px;color:#8B4A43;margin-bottom:10px">Se mancano ancora dati obbligatori, genera un sollecito con l'elenco preciso. Se è tutto completo, puoi invece chiedere di approfondire alcuni contenuti già presenti.</p>
+        <button type="button" onclick="generaSollecitoReferente()" style="background:#C0392B;color:white;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer">📢 Genera Sollecito</button>
+
+        <div id="pannello-approfondimento" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid #F0C4BF">
+          <p style="font-size:11px;color:#8B4A43;margin-bottom:8px">Checklist completa — spunta i contenuti da approfondire e aggiungi una nota facoltativa per ciascuno:</p>
+          <div id="lista-approfondimento"></div>
+          <button type="button" onclick="generaRichiestaApprofondimento()" style="margin-top:10px;background:#C0392B;color:white;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer">Genera richiesta approfondimento</button>
+        </div>
+      </div>
 
       <div style="padding:10px 14px;background:#F4F7FC;border-radius:8px;border:1px solid var(--bordo);margin-bottom:16px">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blu);margin-bottom:6px;font-weight:700;cursor:pointer" onclick="var l=document.getElementById('lista-richieste-generate'); l.style.display = l.style.display==='none' ? 'block' : 'none';">📤 Richieste generate <span style="font-weight:400;text-transform:none;font-style:italic;color:var(--muted)">(tocca per aprire/chiudere)</span></div>
@@ -1259,6 +1244,24 @@
           <button onclick="chiudiModalCentralino()" class="btn btn-secondary" style="flex:1">Chiudi</button>
         </div>
         <p id="copia-confirm-centralino" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
+      </div>
+    </div>
+
+    <!-- Modal Sollecito Referente (usato sia per "sezioni mancanti" che per "richiesta approfondimento") -->
+    <div id="modal-sollecito" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+      <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B" id="titolo-modal-sollecito">Sollecito Referente</h2>
+          <button onclick="chiudiModalSollecito()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
+        </div>
+        <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
+        <textarea id="testo-sollecito" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <button onclick="copiaTestoSollecito()" class="btn btn-primary" style="flex:1">Copia testo</button>
+          <button onclick="apriMailSollecito()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
+          <button onclick="chiudiModalSollecito()" class="btn btn-secondary" style="flex:1">Chiudi</button>
+        </div>
+        <p id="copia-confirm-sollecito" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
       </div>
     </div>
 
@@ -2625,6 +2628,121 @@ var tagColors = {
 };
 
 // ═══ SEZIONE 8 — CHECKLIST stato avanzamento fascicolo ═══
+// ═══ SOLLECITO REFERENTE — due modalità ═══
+// Se mancano voci obbligatorie: elenca esattamente quelle (stessa logica della Checklist).
+// Se la Checklist è completa: permette di chiedere approfondimento su contenuti qualitativi specifici.
+var CAMPI_APPROFONDIMENTO = [
+  { key: 'testo_descr', label: 'Testo descrittivo' },
+  { key: 'bio_artisti', label: 'Biografie artisti' },
+  { key: 'brano_titolo_1', label: 'Programma artistico (brani)' },
+  { key: 'contesto_progetto', label: 'Contesto del progetto' },
+  { key: 'elementi_valorizzare', label: 'Elementi da valorizzare nella comunicazione' },
+  { key: 'classi_coinvolte', label: 'Classi coinvolte' }
+];
+
+function calcolaVociMancanti() {
+  var mancanti = [];
+  checklistVoci.forEach(function(voce) {
+    if (!voce.check()) mancanti.push(voce.label);
+  });
+  return mancanti;
+}
+
+function generaSollecitoReferente() {
+  var mancanti = calcolaVociMancanti();
+  var pannello = document.getElementById('pannello-approfondimento');
+  if (mancanti.length > 0) {
+    if (pannello) pannello.style.display = 'none';
+    var lines = [];
+    lines.push('Gentile Referente,');
+    lines.push('');
+    lines.push('per completare il fascicolo del progetto "' + (metadati.titolo || '') + '" mancano ancora i seguenti dati:');
+    lines.push('');
+    mancanti.forEach(function(m) { lines.push('- ' + m); });
+    lines.push('');
+    lines.push('La ringraziamo per la disponibilità a integrarli quanto prima.');
+    lines.push('');
+    lines.push('Cordiali saluti,');
+    lines.push('Ufficio Produzione');
+    document.getElementById('titolo-modal-sollecito').textContent = 'Sollecito — dati mancanti';
+    document.getElementById('testo-sollecito').value = lines.join('\n');
+    document.getElementById('modal-sollecito').style.display = 'block';
+  } else {
+    // Checklist completa: mostra il pannello per chiedere approfondimenti mirati, invece di generare subito.
+    if (pannello) {
+      pannello.style.display = pannello.style.display === 'none' ? 'block' : 'none';
+      if (pannello.style.display === 'block') costruisciPannelloApprofondimento();
+    }
+  }
+}
+
+function costruisciPannelloApprofondimento() {
+  var el = document.getElementById('lista-approfondimento');
+  if (!el) return;
+  var html = '';
+  CAMPI_APPROFONDIMENTO.forEach(function(campo) {
+    var presente = !!getField(campo.key);
+    html += '<div style="padding:7px 0;border-bottom:1px solid #F0C4BF">' +
+      '<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">' +
+      '<input type="checkbox" data-approfondimento="' + campo.key + '" style="width:15px;height:15px;margin:0">' +
+      campo.label + (presente ? '' : ' <span style="color:#999;font-style:italic;font-size:11px">(non ancora compilato)</span>') +
+      '</label>' +
+      '<input type="text" data-approfondimento-nota="' + campo.key + '" placeholder="Nota facoltativa (es. manca la durata dei brani)" style="width:100%;margin-top:5px;border:1px solid #E8D9A0;border-radius:5px;padding:5px 8px;font-family:inherit;font-size:12px;outline:none">' +
+      '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function generaRichiestaApprofondimento() {
+  var selezionati = [];
+  document.querySelectorAll('[data-approfondimento]').forEach(function(cb) {
+    if (!cb.checked) return;
+    var key = cb.getAttribute('data-approfondimento');
+    var notaEl = document.querySelector('[data-approfondimento-nota="' + key + '"]');
+    var nota = notaEl ? notaEl.value.trim() : '';
+    var etichetta = CAMPI_APPROFONDIMENTO.filter(function(c) { return c.key === key; })[0].label;
+    selezionati.push({ etichetta: etichetta, nota: nota });
+  });
+  if (selezionati.length === 0) {
+    alert('Seleziona almeno un contenuto da approfondire.');
+    return;
+  }
+  var lines = [];
+  lines.push('Gentile Referente,');
+  lines.push('');
+  lines.push('per il progetto "' + (metadati.titolo || '') + '" chiediamo di approfondire i seguenti contenuti, già presenti ma da arricchire:');
+  lines.push('');
+  selezionati.forEach(function(s) {
+    lines.push('- ' + s.etichetta + (s.nota ? ': ' + s.nota : ''));
+  });
+  lines.push('');
+  lines.push('La ringraziamo per la disponibilità.');
+  lines.push('');
+  lines.push('Cordiali saluti,');
+  lines.push('Ufficio Produzione');
+  document.getElementById('titolo-modal-sollecito').textContent = 'Richiesta approfondimento contenuti';
+  document.getElementById('testo-sollecito').value = lines.join('\n');
+  document.getElementById('modal-sollecito').style.display = 'block';
+}
+
+function chiudiModalSollecito() {
+  document.getElementById('modal-sollecito').style.display = 'none';
+}
+function copiaTestoSollecito() {
+  var ta = document.getElementById('testo-sollecito');
+  ta.focus(); ta.select();
+  try {
+    document.execCommand('copy');
+    document.getElementById('copia-confirm-sollecito').style.display = 'block';
+  } catch (e) {}
+}
+function apriMailSollecito() {
+  var sogg = encodeURIComponent('[' + (metadati.titolo || 'Progetto') + '] Richiesta integrazione dati');
+  var corpo = encodeURIComponent(document.getElementById('testo-sollecito').value);
+  var emailReferente = getField('doc_email_1') || '';
+  window.location.href = 'mailto:' + emailReferente + '?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
+}
+
 function aggiornaChecklist() {
   var avvisoData = document.getElementById('avviso-data-evento');
   if (avvisoData) avvisoData.style.display = getField('data_evento') ? 'none' : 'flex';
@@ -2656,74 +2774,15 @@ function aggiornaChecklist() {
   var elOk = document.getElementById('cl-count-ok');
   var elErr = document.getElementById('cl-count-err');
   var elLabel = document.getElementById('checklist-stato-label');
-  var elSollecito = document.getElementById('blocco-sollecito');
 
   if (elOk) elOk.textContent = '✓ ' + nOk + ' compilati';
   if (elErr) elErr.textContent = '✗ ' + nErr + ' mancanti';
 
   if (nErr === 0) {
     if (elLabel) { elLabel.style.background = '#E8F5E9'; elLabel.style.color = '#2E7D32'; elLabel.textContent = '✓ Modulo completo'; }
-    if (elSollecito) elSollecito.style.display = 'none';
   } else {
     if (elLabel) { elLabel.style.background = '#FFEBEE'; elLabel.style.color = '#C62828'; elLabel.textContent = 'Modulo incompleto'; }
-    if (elSollecito) elSollecito.style.display = 'block';
   }
-
-  // Aggiorna mancanti per sollecito
-  window._mancanti = mancanti;
-}
-
-// ── Sollecito ──
-// ═══ SOLLECITO — generazione email di richiesta dati mancanti ═══
-function generaSollecito() {
-  var referente = getField('doc_nome_1') || '{Docente Referente}';
-  var titolo = document.getElementById('sint_titolo') ? document.getElementById('sint_titolo').textContent : '{Titolo Progetto}';
-  var mancanti = window._mancanti || [];
-  var lines = [];
-  lines.push('Gentile ' + referente + ',');
-  lines.push('');
-  lines.push('in riferimento al progetto "' + titolo + '", ti chiedo cortesemente di integrare il modulo con i seguenti dati mancanti:');
-  lines.push('');
-  mancanti.forEach(function(m, i) { lines.push((i+1) + '. ' + m); });
-  lines.push('');
-  lines.push('Ti chiedo di compilare il modulo al seguente link (i dati già inseriti restano salvati) e inviare il PDF aggiornato entro il prima possibile:');
-  var baseLink = window.location.origin + window.location.pathname;
-  var pSol = new URLSearchParams();
-  if (metadati.id)            pSol.set('id', metadati.id);
-  if (metadati.titolo)        pSol.set('titolo', metadati.titolo);
-  if (metadati.referente)     pSol.set('referente', metadati.referente);
-  if (metadati.email)         pSol.set('email', metadati.email);
-  if (metadati.delibera)      pSol.set('delibera', metadati.delibera);
-  if (metadati.data_delibera) pSol.set('data_delibera', metadati.data_delibera);
-  if (metadati.scadenza)      pSol.set('scadenza', metadati.scadenza);
-  lines.push(baseLink + '?' + pSol.toString());
-  lines.push('');
-  lines.push('Grazie per la collaborazione.');
-  lines.push('');
-  lines.push('Marco Gatti');
-  lines.push('Responsabile Produzione — Conservatorio G. Briccialdi, Terni');
-  lines.push('produzione@briccialditerni.it');
-
-  var ta = document.getElementById('testo-sollecito');
-  if (ta) ta.value = lines.join('\n');
-  document.getElementById('modal-sollecito').style.display = 'block';
-  document.getElementById('copia-confirm-sol').style.display = 'none';
-}
-
-function chiudiSollecito() { document.getElementById('modal-sollecito').style.display = 'none'; }
-
-function copiaSollecito() {
-  var ta = document.getElementById('testo-sollecito');
-  ta.focus(); ta.select();
-  try { document.execCommand('copy'); document.getElementById('copia-confirm-sol').style.display = 'block'; } catch(e) {}
-}
-
-function apriMailSollecito() {
-  var titolo = metadati.titolo || 'Progetto';
-  var emailRef = metadati.email || '';
-  var sogg = encodeURIComponent('[Sollecito] ' + titolo + ' — dati mancanti');
-  var corpo = encodeURIComponent(document.getElementById('testo-sollecito').value);
-  window.location.href = 'mailto:' + emailRef + '?subject=' + sogg + '&body=' + corpo;
 }
 
 // ═══ SEZIONE 9 — ASSEGNAZIONE SPAZI (solo Responsabile) ═══
@@ -2891,7 +2950,7 @@ function costruisciListaAssistenza() {
   ordinaRigheCronologicamente(righe);
 
   if (righe.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="padding:10px;text-align:center;color:var(--muted);font-style:italic">Nessuna data ancora inserita (Sezione 1)</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:10px;text-align:center;color:var(--muted);font-style:italic">Nessuna data ancora inserita (Sezione 1)</td></tr>';
     return;
   }
 
@@ -2900,13 +2959,16 @@ function costruisciListaAssistenza() {
     var bg = idx % 2 === 0 ? 'white' : '#F4F7FC';
     var chiaveCheck = 'ass_log_check_' + riga.key;
     var chiaveOrario = 'ass_log_orario_' + riga.key;
+    var chiaveStudenti = 'ass_log_studenti_' + riga.key;
     var checked = checkSalvatoAssistenza(chiaveCheck) ? 'checked' : '';
     var orarioSalvato = valoreSpazioSalvato(chiaveOrario) || riga.ora || '';
+    var studentiSalvato = valoreSpazioSalvato(chiaveStudenti) || '';
     html += '<tr style="background:' + bg + ';border-bottom:1px solid #E8ECF3">' +
       '<td style="padding:6px 8px;text-align:center"><input type="checkbox" name="' + chiaveCheck + '" value="Sì" ' + checked + ' style="width:16px;height:16px;margin:0"></td>' +
       '<td style="padding:6px 8px;font-weight:600">' + riga.tipo + '</td>' +
       '<td style="padding:6px 8px">' + (riga.data || '—') + '</td>' +
       '<td style="padding:6px 8px;color:#6B7280">' + (riga.luogo || '—') + '</td>' +
+      '<td style="padding:4px"><input type="number" min="0" name="' + chiaveStudenti + '" value="' + String(studentiSalvato).replace(/"/g, '&quot;') + '" placeholder="0" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px"></td>' +
       '<td style="padding:4px"><input type="text" name="' + chiaveOrario + '" value="' + String(orarioSalvato).replace(/"/g, '&quot;') + '" onblur="formattaOrarioRange(this)" placeholder="es. 14:00–19:00" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px"></td>' +
       '</tr>';
   });
@@ -3588,12 +3650,13 @@ function generaRichiestaAssistenzaStudenti() {
     var tipo = row.children[1] ? row.children[1].textContent.trim() : '';
     var data = row.children[2] ? row.children[2].textContent.trim() : '';
     var luogo = row.children[3] ? row.children[3].textContent.trim() : '';
-    var orarioInput = row.querySelector('input[type="text"]');
+    var studentiInput = row.children[4] ? row.children[4].querySelector('input') : null;
+    var studenti = studentiInput ? studentiInput.value.trim() : '';
+    var orarioInput = row.children[5] ? row.children[5].querySelector('input') : null;
     var orario = orarioInput ? orarioInput.value.trim() : '';
-    righe.push({ tipo: tipo, data: data, luogo: luogo, orario: orario });
+    righe.push({ tipo: tipo, data: data, luogo: luogo, studenti: studenti, orario: orario });
   });
 
-  var numStudenti = getField('ass_log_num');
   var elAv = document.querySelector('[name="ass_av_richiesto"]');
   var avRichiesto = elAv && elAv.checked;
 
@@ -3610,9 +3673,9 @@ function generaRichiestaAssistenzaStudenti() {
   if (righe.length > 0) {
     lines.push('');
     lines.push('--- Assistenza logistica ---');
-    if (numStudenti) lines.push('N° studenti richiesti: ' + numStudenti);
     righe.forEach(function(r) {
-      lines.push('- ' + r.tipo + ' — ' + (r.data || 'data da definire') + ' — ' + (r.luogo || 'luogo da definire') + ' — orario: ' + (r.orario || 'da definire'));
+      var partStudenti = r.studenti ? (r.studenti + ' student' + (r.studenti === '1' ? 'e' : 'i')) : 'N° studenti da definire';
+      lines.push('- ' + r.tipo + ' — ' + (r.data || 'data da definire') + ' — ' + (r.luogo || 'luogo da definire') + ' — ' + partStudenti + ' — orario: ' + (r.orario || 'da definire'));
     });
   }
 
