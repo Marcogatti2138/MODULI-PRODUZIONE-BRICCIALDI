@@ -176,7 +176,7 @@
     gap: 4px;
   }
   .req { color: var(--arancio); }
-  .field-input { padding: 4px 8px; display: flex; align-items: flex-start; }
+  .field-input { padding: 4px 8px; display: flex; flex-wrap: wrap; align-items: flex-start; min-width: 0; }
 
   input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="time"],
   textarea, select {
@@ -995,7 +995,32 @@
       </table>
 
       <div class="sub-header" style="margin-top:20px">5B — Trasporti</div>
-      <p style="font-size:11px;color:var(--muted);margin:-4px 0 8px">Riguarda solo il Concerto principale (data e luogo indicati in Sezione 1). Se <strong>solo le Repliche</strong> richiedono trasferta, lascia "No" qui sotto — ogni Replica ha i propri campi.</p>
+      <div class="field-row">
+        <div class="field-label">Materiale da trasportare</div>
+        <div class="field-input">
+          <p style="font-size:11px;color:var(--muted);margin:0 0 8px">Spunta gli appuntamenti (prove, concerto, repliche) per cui serve trasportare materiale — ognuno ha la propria destinazione e il proprio elenco, perché possono essere in luoghi diversi.</p>
+          <button type="button" onclick="costruisciTabellaTrasportiMateriale()" style="margin-bottom:10px;background:var(--blu);color:white;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer">🔄 Aggiorna vista (rilegge Piano Prove)</button>
+          <div style="width:100%;flex-basis:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch">
+          <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:var(--blu)">
+                <th style="padding:6px 8px;color:white;font-size:11px;width:30px"></th>
+                <th style="padding:6px 8px;text-align:left;color:white;font-size:11px">Appuntamento</th>
+                <th style="padding:6px 8px;text-align:left;color:white;font-size:11px">Data</th>
+                <th style="padding:6px 8px;text-align:left;color:white;font-size:11px;width:24%">Destinazione</th>
+                <th style="padding:6px 8px;text-align:left;color:white;font-size:11px;width:32%">Materiale da trasportare</th>
+              </tr>
+            </thead>
+            <tbody id="trasporti-materiale-tbody">
+              <tr><td colspan="5" style="padding:10px;text-align:center;color:var(--muted);font-style:italic">Premi "Aggiorna vista" per generare l'elenco dal Piano Prove</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-header" style="margin-top:20px;background:#F3E9FF;color:#6A1B9A">Note generali sulla trasferta del Concerto principale</div>
+      <p style="font-size:11px;color:var(--muted);margin:-4px 0 8px">Non riguarda il materiale (già gestito sopra, riga per riga) — solo indicazioni generali sulla trasferta, se il Concerto si tiene fuori sede. Se <strong>solo le Repliche</strong> richiedono trasferta, lascia "No" qui sotto — ogni Replica ha i propri campi.</p>
       <div class="field-row">
         <div class="field-label">Trasporto richiesto <span class="req">*</span></div>
         <div class="field-input">
@@ -1018,17 +1043,6 @@
           <div class="field-label">Note esigenze particolari</div>
           <div class="field-input"><textarea name="note_vitto" placeholder="Es. capienza sala per almeno 140 persone, vitto/alloggio se serve, o altre esigenze della trasferta..."></textarea></div>
         </div>
-      </div>
-      <div class="field-row">
-        <div class="field-label">Materiale da trasportare</div>
-        <div class="field-input">
-          <div id="colli-body"></div>
-          <button type="button" class="btn-add" onclick="addCollo()" style="margin-top:6px;font-size:11px;padding:5px 12px">+ Aggiungi materiale</button>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field-label">Note trasporti</div>
-        <div class="field-input"><textarea name="note_trasporti" placeholder="Dettagli su strumenti da trasportare, dimensioni particolari, esigenze specifiche..."></textarea></div>
       </div>
 
     </div>
@@ -1108,7 +1122,7 @@
     <div class="section-body">
       <div class="sub-header">Assistenza logistica</div>
       <p style="font-size:11px;color:var(--muted);margin:8px 4px 6px">Spunta gli appuntamenti (concerto, repliche, prove — presi dal Piano Prove) per cui serve assistenza, indicando quanti studenti servono <strong>per quel giorno specifico</strong> (può cambiare da un appuntamento all'altro). L'orario è pre-compilato ma modificabile, perché può servire arrivare prima o restare dopo.</p>
-      <button class="btn-add" onclick="costruisciListaAssistenza()" style="margin-bottom:10px">🔄 Aggiorna vista (rilegge Piano Prove)</button>
+      <button onclick="costruisciListaAssistenza()" style="margin-bottom:10px;background:var(--blu);color:white;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer">🔄 Aggiorna vista (rilegge Piano Prove)</button>
       <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch">
       <table style="width:100%;min-width:660px;border-collapse:collapse;font-size:12px">
         <thead>
@@ -1575,7 +1589,7 @@
       <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--arancio)">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--arancio);margin-bottom:8px;font-weight:700">📦 Trasporto Strumenti/Materiali<a href="javascript:void(0)" onclick="vaiASezione('sezione-5')" style="float:right;font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;color:#1A3C6B;text-decoration:none">→ Vedi Sezione 5</a></div>
         <div id="lista-colli-riepilogo" style="margin-top:4px;font-size:12px"></div>
-        <p style="font-size:11px;color:var(--muted);margin-top:4px;font-style:italic">Il Referente indica cosa deve viaggiare (colli, note in Sez. 5) — le richieste operative qui sotto separano il trasporto del materiale (Produzione) dalla trasferta delle persone (Acquisti).</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:4px;font-style:italic">Il Referente spunta gli appuntamenti che richiedono trasporto e indica destinazione/materiale per ciascuno (Sez. 5) — le richieste operative qui sotto separano il trasporto del materiale (Produzione) dalla trasferta delle persone (Acquisti).</p>
       </div>
 
       <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--blu-mid)">
@@ -3094,18 +3108,6 @@ function eliminaRefLocale(btn, uid) {
 
 // ── Colli / materiale da trasportare ──
 var colliCount = 0;
-function addCollo() {
-  colliCount++;
-  var div = document.createElement('div');
-  div.setAttribute('data-riga', 'collo');
-  div.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:5px;';
-  div.innerHTML =
-    '<input type="text" data-f="" name="collo_' + colliCount + '" placeholder="Es. Cassa violoncello, 2 leggii, casse audio..." style="flex:1;border:1px solid #D0D7E3;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none;">' +
-    '<button type="button" onclick="eliminaRiga(this,\'colli-body\',\'collo\',[\'\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;">✕</button>';
-  document.getElementById('colli-body').appendChild(div);
-}
-addCollo(); // una riga iniziale
-
 // ── Materiale musicale da noleggiare (Biblioteca) ──
 var spartitiCount = 0;
 function addSpartito() {
@@ -3343,14 +3345,17 @@ function aggiornaSintesiCompleta() {
     else { elDot.textContent = 'Nessuna dotazione indicata'; elDot.style.fontStyle = 'italic'; elDot.style.color = '#6B7280'; }
   }
 
-  // Materiale da trasportare (colli)
+  // Materiale da trasportare — appuntamenti spuntati nella nuova tabella (Sezione 5B)
   var colliList = [];
-  var c = 1;
-  while (document.querySelector('[name="collo_' + c + '"]')) {
-    var cv = getField('collo_' + c);
-    if (cv) colliList.push(cv);
-    c++;
-  }
+  document.querySelectorAll('#trasporti-materiale-tbody input[type="checkbox"]').forEach(function(cb) {
+    if (!cb.checked) return;
+    var row = cb.closest('tr');
+    if (!row) return;
+    var tipo = row.children[1] ? row.children[1].textContent.trim() : '';
+    var materialeInput = row.children[4] ? row.children[4].querySelector('input, textarea') : null;
+    var materiale = materialeInput ? materialeInput.value.trim() : '';
+    colliList.push(tipo + (materiale ? ' — ' + materiale : ''));
+  });
   var elColli = document.getElementById('sint_colli');
   if (elColli) {
     if (colliList.length) { elColli.innerHTML = '<ul style="margin:0 0 0 18px;padding:0">' + colliList.map(function(v) { return '<li>' + v + '</li>'; }).join('') + '</ul>'; elColli.style.fontStyle = 'normal'; }
@@ -3607,22 +3612,27 @@ function valoreSpazioSalvato(chiave) {
   return '';
 }
 
+// Riepilogo nel Blocco ① — ora legge dagli appuntamenti spuntati nella nuova
+// tabella Trasporti Materiale (Sezione 5B), non più dai vecchi "colli" liberi.
 function aggiornaListaColli() {
   var el = document.getElementById('lista-colli-riepilogo');
   if (!el) return;
-  var colli = [];
-  var c = 1;
-  while (document.querySelector('[name="collo_' + c + '"]')) {
-    var v = getField('collo_' + c);
-    if (v) colli.push(v);
-    c++;
-  }
-  if (colli.length === 0) {
-    el.innerHTML = '<span style="color:#6B7280;font-style:italic">Nessun materiale indicato dal Referente in Sezione 5.</span>';
+  var righe = [];
+  document.querySelectorAll('#trasporti-materiale-tbody input[type="checkbox"]').forEach(function(cb) {
+    if (!cb.checked) return;
+    var row = cb.closest('tr');
+    if (!row) return;
+    var tipo = row.children[1] ? row.children[1].textContent.trim() : '';
+    var materialeInput = row.children[4] ? row.children[4].querySelector('input, textarea') : null;
+    var materiale = materialeInput ? materialeInput.value.trim() : '';
+    righe.push(tipo + (materiale ? ' — ' + materiale : ''));
+  });
+  if (righe.length === 0) {
+    el.innerHTML = '<span style="color:#6B7280;font-style:italic">Nessun appuntamento ancora spuntato per il trasporto materiale.</span>';
     return;
   }
-  var html = '<strong style="color:#1A3C6B;font-size:11px">Materiale indicato dal Referente:</strong><ul style="margin:4px 0 0 18px;padding:0">';
-  colli.forEach(function(v) { html += '<li>' + v + '</li>'; });
+  var html = '<strong style="color:#1A3C6B;font-size:11px">Appuntamenti con trasporto materiale:</strong><ul style="margin:4px 0 0 18px;padding:0">';
+  righe.forEach(function(v) { html += '<li>' + v + '</li>'; });
   html += '</ul>';
   el.innerHTML = html;
 }
@@ -3992,6 +4002,88 @@ function costruisciListaAssistenza() {
   tbody.innerHTML = html;
 }
 
+// ═══ TRASPORTI MATERIALE — una riga per appuntamento (Sezione 5B) ═══
+// Stessa logica di Assistenza logistica: il Referente spunta quali appuntamenti
+// richiedono trasporto, con destinazione e materiale specifici per ciascuno
+// (possono essere luoghi diversi: una prova fuori sede, il concerto altrove...).
+// Elenco della Dotazione tecnica segnata "già disponibile in Conservatorio" (Blocco ①) —
+// riusato sia per pre-compilare il materiale della riga Concerto sia nella mail.
+function elencoDotazioneDisponibile(prefisso) {
+  var vociDot = [
+    ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie orchestrali'],
+    ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
+    ['dot_leggii_lum', 'dot_leggii_lum_n', 'leggii_lum', 'Leggii illuminati'],
+    ['dot_podio', 'dot_podio_n', 'podio', 'Podio direttore'],
+    ['dot_piano', 'dot_piano_n', 'piano', 'Pianoforte / Grancoda'],
+    ['dot_audio', 'dot_audio_n', 'audio', 'Impianto audio / PA'],
+    ['dot_luci', 'dot_luci_n', 'luci', 'Impianto luci palco'],
+    ['dot_service', 'dot_service_n', 'service', 'Service esterno richiesto'],
+    ['dot_altro', 'dot_altro_n', 'altro', 'Altra dotazione tecnica']
+  ];
+  var voci = [];
+  vociDot.forEach(function(v) {
+    var qta = getField(v[0]);
+    if (!qta) return;
+    if (getField('dot_disp_' + v[2]) === 'Già disponibile (Conservatorio)') {
+      voci.push((prefisso || '') + v[3] + ': ' + qta);
+    }
+  });
+  return voci;
+}
+
+function costruisciTabellaTrasportiMateriale() {
+  var tbody = document.getElementById('trasporti-materiale-tbody');
+  if (!tbody) return;
+  var righe = [];
+
+  var dataC = getField('data_evento'), oraC = normalizzaOra(getField('ora_evento')) || getField('ora_evento'), luogoC = getField('luogo_concerto');
+  if (dataC || oraC || luogoC) righe.push({ tipo: 'Concerto', data: dataC, ora: oraC, luogo: luogoC, key: 'concerto' });
+
+  var r = 1;
+  while (document.querySelector('[name="replica_data_' + r + '"]')) {
+    var dR = getField('replica_data_' + r), oR = normalizzaOra(getField('replica_ora_' + r)) || getField('replica_ora_' + r), lR = getField('replica_luogo_' + r);
+    if (dR || oR || lR) righe.push({ tipo: 'Replica ' + r, data: dR, ora: oR, luogo: lR || luogoC, key: 'replica_' + r });
+    r++;
+  }
+
+  var p = 1;
+  while (document.querySelector('[name="prova_data_' + p + '"]')) {
+    var dP = getField('prova_data_' + p), lP = getField('prova_luogo_' + p);
+    if (dP) righe.push({ tipo: 'Prova ' + p, data: dP, luogo: lP, key: 'prova_' + p });
+    p++;
+  }
+
+  ordinaRigheCronologicamente(righe);
+
+  if (righe.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:10px;text-align:center;color:var(--muted);font-style:italic">Nessuna data ancora inserita (Sezione 1 / Piano Prove)</td></tr>';
+    return;
+  }
+
+  var html = '';
+  righe.forEach(function(riga, idx) {
+    var bg = idx % 2 === 0 ? 'white' : '#F4F7FC';
+    var chiaveCheck = 'trasp_mat_check_' + riga.key;
+    var chiaveDest = 'trasp_mat_dest_' + riga.key;
+    var chiaveMateriale = 'trasp_mat_materiale_' + riga.key;
+    var checked = checkSalvatoAssistenza(chiaveCheck) ? 'checked' : '';
+    var destSalvata = valoreSpazioSalvato(chiaveDest) || riga.luogo || '';
+    var materialeSalvato = valoreSpazioSalvato(chiaveMateriale) || '';
+    if (!materialeSalvato && riga.key === 'concerto') {
+      var dotDisp = elencoDotazioneDisponibile();
+      if (dotDisp.length) materialeSalvato = dotDisp.join(', ');
+    }
+    html += '<tr style="background:' + bg + ';border-bottom:1px solid #E8ECF3">' +
+      '<td style="padding:6px 8px;text-align:center"><input type="checkbox" name="' + chiaveCheck + '" value="Sì" ' + checked + ' style="width:16px;height:16px;margin:0"></td>' +
+      '<td style="padding:6px 8px;font-weight:600">' + riga.tipo + '</td>' +
+      '<td style="padding:6px 8px">' + (riga.data || '—') + '</td>' +
+      '<td style="padding:4px"><input type="text" name="' + chiaveDest + '" value="' + String(destSalvata).replace(/"/g, '&quot;') + '" placeholder="Città / luogo" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px"></td>' +
+      '<td style="padding:4px"><textarea name="' + chiaveMateriale + '" rows="1" placeholder="es. 2 leggii, 1 contrabbasso..." style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;resize:vertical">' + String(materialeSalvato).replace(/</g, '&lt;') + '</textarea></td>' +
+      '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
 function costruisciTabellaSpazi() {
   var tbody = document.getElementById('spazi-tbody');
   if (!tbody) return;
@@ -4135,53 +4227,22 @@ function apriMailSpazi() {
 
 // ═══ RICHIESTA TRASPORTI MATERIALE — Ufficio Produzione ═══
 function generaRichiestaTrasporti() {
-  var trasf = getField('trasferta');
-  var dest = getField('dest_trasferta');
-  var haDestinazionePrincipale = !!dest || (trasf && trasf.indexOf('Sì') === 0);
-
-  var repliche = [];
-  var r = 1;
-  while (document.querySelector('[name="replica_data_' + r + '"]')) {
-    var lR = getField('replica_luogo_' + r);
-    var dR = getField('replica_data_' + r);
-    if (lR || dR) repliche.push({ n: r, luogo: lR, data: dR });
-    r++;
-  }
-
-  var note = getField('note_trasporti');
-
-  var vociDot = [
-    ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie orchestrali'],
-    ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
-    ['dot_leggii_lum', 'dot_leggii_lum_n', 'leggii_lum', 'Leggii illuminati'],
-    ['dot_podio', 'dot_podio_n', 'podio', 'Podio direttore'],
-    ['dot_piano', 'dot_piano_n', 'piano', 'Pianoforte / Grancoda'],
-    ['dot_audio', 'dot_audio_n', 'audio', 'Impianto audio / PA'],
-    ['dot_luci', 'dot_luci_n', 'luci', 'Impianto luci palco'],
-    ['dot_service', 'dot_service_n', 'service', 'Service esterno richiesto'],
-    ['dot_altro', 'dot_altro_n', 'altro', 'Altra dotazione tecnica']
-  ];
-  var materialeDisponibile = [];
-  vociDot.forEach(function(v) {
-    var qta = getField(v[0]);
-    if (!qta) return;
-    if (getField('dot_disp_' + v[2]) === 'Già disponibile (Conservatorio)') {
-      var nt = getField(v[1]);
-      materialeDisponibile.push('  · ' + v[3] + ': ' + qta + (nt ? ' — ' + nt : ''));
-    }
+  var righeSelezionate = [];
+  document.querySelectorAll('#trasporti-materiale-tbody input[type="checkbox"]').forEach(function(cb) {
+    if (!cb.checked) return;
+    var row = cb.closest('tr');
+    if (!row) return;
+    var tipo = row.children[1] ? row.children[1].textContent.trim() : '';
+    var data = row.children[2] ? row.children[2].textContent.trim() : '';
+    var destInput = row.children[3] ? row.children[3].querySelector('input') : null;
+    var dest = destInput ? destInput.value.trim() : '';
+    var materialeInput = row.children[4] ? row.children[4].querySelector('input, textarea') : null;
+    var materiale = materialeInput ? materialeInput.value.trim() : '';
+    righeSelezionate.push({ tipo: tipo, data: data, dest: dest, materiale: materiale });
   });
 
-  var altroMateriale = [];
-  var c = 1;
-  while (document.querySelector('[name="collo_' + c + '"]')) {
-    var vColl = getField('collo_' + c);
-    if (vColl) altroMateriale.push('  · ' + vColl);
-    c++;
-  }
-  var materialeCompleto = materialeDisponibile.concat(altroMateriale);
-
-  if (!haDestinazionePrincipale && repliche.length === 0 && materialeCompleto.length === 0) {
-    alert('Nessuna trasferta, materiale disponibile da trasportare o altro materiale indicato. Compila prima Sezione 5 (lato Referente) o classifica la Dotazione Tecnica nel pannello Disponibilità qui sopra.');
+  if (righeSelezionate.length === 0) {
+    alert('Nessun appuntamento spuntato per il trasporto materiale. Spunta almeno una riga nella tabella qui sopra prima di generare la richiesta.');
     return;
   }
 
@@ -4189,36 +4250,14 @@ function generaRichiestaTrasporti() {
   lines.push('Gentile Ufficio Produzione,');
   lines.push('');
   lines.push('si richiede organizzazione trasporto materiale per il progetto "' + (metadati.titolo || '') + '" (ID ' + (metadati.id || '') + '):');
-
-  var destinazioni = [];
-  if (haDestinazionePrincipale) {
-    destinazioni.push({ label: 'Concerto principale', luogo: dest || '(destinazione da definire)', extra: trasf ? ('Tipo trasferta: ' + trasf) : null });
-  }
-  repliche.forEach(function(rep) {
-    destinazioni.push({ label: 'Replica ' + rep.n, luogo: rep.luogo || '(luogo da definire)', extra: rep.data ? ('Data: ' + rep.data) : null });
+  lines.push('');
+  lines.push('--- Trasporti per appuntamento ---');
+  righeSelezionate.forEach(function(r) {
+    var riga = '- ' + r.tipo + ' — ' + (r.data || 'data da definire') + ' — destinazione: ' + (r.dest || 'da definire');
+    if (r.materiale) riga += ' — materiale: ' + r.materiale;
+    lines.push(riga);
   });
 
-  if (destinazioni.length) {
-    lines.push('');
-    lines.push('Destinazioni:');
-    destinazioni.forEach(function(d) {
-      lines.push('  · ' + d.label + ' — ' + d.luogo + (d.extra ? ' (' + d.extra + ')' : ''));
-    });
-  }
-
-  if (materialeCompleto.length) {
-    lines.push('');
-    if (destinazioni.length > 1) {
-      lines.push('Materiale da trasportare (per tutte le destinazioni sopra indicate):');
-    } else {
-      lines.push('Materiale da trasportare:');
-    }
-    lines = lines.concat(materialeCompleto);
-  } else if (destinazioni.length) {
-    lines.push('');
-    lines.push('(Nessun materiale specifico da trasportare indicato — solo organizzazione della trasferta)');
-  }
-  if (note) { lines.push(''); lines.push('Note: ' + note); }
   lines.push('');
   lines.push('Si prega di confermare disponibilità e procedere con quanto necessario.');
   lines.push('');
@@ -5141,6 +5180,30 @@ function caricaDaFirestore(id) {
         if (m) maxReplica = Math.max(maxReplica, parseInt(m[1], 10));
       });
       while (replicheCount < maxReplica) { addReplica(); }
+      // Ricrea le righe "Prova" mancanti — solo 5 pre-create all'avvio, altrimenti
+      // le prove oltre la 5ª esistono su Firestore ma non hanno una riga dove
+      // essere scritte al caricamento, e sembrano "sparite" pur essendo salvate.
+      var maxProva = 0;
+      Object.keys(dr).forEach(function(k) {
+        var m = k.match(/^prova_data_(\d+)$/);
+        if (m) maxProva = Math.max(maxProva, parseInt(m[1], 10));
+      });
+      while (proveCount < maxProva) { addProva(); }
+      // Stesso problema riscontrato per Brani (solo 6 pre-create), Solisti (solo 3) e
+      // Personale/Distribuzione (solo 5) — oltre quel numero i dati esistevano su
+      // Firestore ma sparivano dalla vista al caricamento, senza una riga dove finire.
+      var maxBrano = 0;
+      Object.keys(dr).forEach(function(k) {
+        var m = k.match(/^brano_titolo_(\d+)$/);
+        if (m) maxBrano = Math.max(maxBrano, parseInt(m[1], 10));
+      });
+      while (braniCount < maxBrano) { addBrano(); }
+      var maxSolista = 0;
+      Object.keys(dr).forEach(function(k) {
+        var m = k.match(/^sol_nome_(\d+)$/);
+        if (m) maxSolista = Math.max(maxSolista, parseInt(m[1], 10));
+      });
+      while (solistiCount < maxSolista) { addSolista(); }
       // Ricrea le righe "Referente locale" mancanti, per ogni replica (in base alla sua posizione)
       var maxRefPerPos = {}; // { posizione: numero massimo di referenti salvati }
       Object.keys(dr).forEach(function(k) {
@@ -5156,13 +5219,6 @@ function caricaDaFirestore(id) {
         var uidRif = replicaEl.getAttribute('data-uid');
         while ((refLocaleCount[uidRif] || 0) < maxRefPerPos[posRif]) { addRefLocale(uidRif); }
       });
-      // Ricrea le righe "Collo" mancanti
-      var maxCollo = 0;
-      Object.keys(dr).forEach(function(k) {
-        var m3 = k.match(/^collo_(\d+)$/);
-        if (m3) maxCollo = Math.max(maxCollo, parseInt(m3[1], 10));
-      });
-      while (colliCount < maxCollo) { addCollo(); }
       // Ricrea le righe "Spartito" mancanti
       var maxSpartito = 0;
       Object.keys(dr).forEach(function(k) {
@@ -5170,12 +5226,6 @@ function caricaDaFirestore(id) {
         if (m4) maxSpartito = Math.max(maxSpartito, parseInt(m4[1], 10));
       });
       while (spartitiCount < maxSpartito) { addSpartito(); }
-      // Compatibilità: vecchi progetti avevano "n_colli" come campo unico, non più letto dalla nuova lista.
-      // Se non ci sono righe "collo_" salvate ma esiste il vecchio valore, lo travasiamo automaticamente.
-      if (maxCollo === 0 && dr.n_colli) {
-        var elCollo1 = document.querySelector('[name="collo_1"]');
-        if (elCollo1 && !elCollo1.value) { elCollo1.value = dr.n_colli; }
-      }
       // Prima popola i campi già presenti nel DOM
       Object.keys(dr).forEach(function(k) {
         var el = document.querySelector('[name="' + k + '"]');
@@ -5236,6 +5286,13 @@ function caricaDaFirestore(id) {
           if (mDet) maxDet = Math.max(maxDet, parseInt(mDet[1], 10));
         });
         while (determineCount < maxDet) { addDetermina(); }
+        // Stesso problema di Prova/Brani/Solisti: solo 5 righe Personale pre-create.
+        var maxPersona = 0;
+        Object.keys(dr2).forEach(function(k) {
+          var mP = k.match(/^pers_nome_(\d+)$/);
+          if (mP) maxPersona = Math.max(maxPersona, parseInt(mP[1], 10));
+        });
+        while (personaleCount < maxPersona) { addPersona(); }
         Object.keys(dr2).forEach(function(k) {
           var el = document.querySelector('[name="' + k + '"]');
           if (!el || dr2[k] === undefined) return;
@@ -5364,7 +5421,7 @@ document.addEventListener('input', function() {
   aggiornaRiepilogoPacchettoComunicazione();
   var n = event.target ? event.target.name : '';
   if (n && n.indexOf('org_') === 0) setTimeout(aggiornaDistrib, 50);
-  if (n && n.indexOf('collo_') === 0) aggiornaListaColli();
+  if (n && (n.indexOf('trasp_mat_') === 0)) aggiornaListaColli();
   if (n && n.indexOf('spartito_') === 0) aggiornaListaSpartiti();
   if (n && (n === 'trasferta' || n === 'dest_trasferta' || n === 'note_vitto' || n.indexOf('replica_trasporto_') === 0 || n.indexOf('replica_luogo_') === 0 || n.indexOf('replica_vitto_') === 0 || n.indexOf('replica_alloggio_') === 0)) {
     if (typeof costruisciTabellaTrasportoPersone === 'function') costruisciTabellaTrasportoPersone();
@@ -5380,6 +5437,7 @@ document.addEventListener('change', function() {
   aggiornaSintesiEvento();
   var n = event.target ? event.target.name : '';
   if (n === 'trasferta' && typeof costruisciTabellaTrasportoPersone === 'function') costruisciTabellaTrasportoPersone();
+  if (n && n.indexOf('trasp_mat_') === 0) aggiornaListaColli();
   if (n && (n.indexOf('dist_') === 0 || n.indexOf('pers_') === 0 || n.indexOf('spazio_') === 0 || n.indexOf('dot_disp_') === 0 || n.indexOf('determina_') === 0)) {
     salvaResponsabileSuFirestore();
   } else {
