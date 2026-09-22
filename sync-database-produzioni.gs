@@ -59,6 +59,7 @@ var COLONNA_DATA_DELIBERA = 10;      // J  — Data Delibera
 var COLONNA_STATO_PROGETTO = 14;     // N  — Stato Progetto
 var COLONNA_ULTIMO_AGGIORNAMENTO = 18; // R — Ultimo Aggiornamento
 var COLONNA_LINK = 27;               // AA — Link Modulo / Firestore
+var RIGA_PRIMA_DATI = 5;             // La prima riga con un progetto vero (1-4 sono titolo/intestazione)
 
 // Queste due NON sono tra le colonne sincronizzabili: la formula viene scritta
 // una sola volta, solo quando lo script crea una riga nuova — mai su una riga
@@ -127,13 +128,16 @@ function sincronizzaFirestore() {
 
   var ultimaRiga = foglio.getLastRow();
   var numColonne = Math.max(foglio.getLastColumn(), COLONNA_LINK);
-  var datiEsistenti = ultimaRiga >= 2 ? foglio.getRange(2, 1, ultimaRiga - 1, 1).getValues() : [];
+  // I dati veri partono da RIGA_PRIMA_DATI (5): le righe 1-4 sono titolo,
+  // sottotitolo e intestazione colonne — leggerle come dati faceva scambiare
+  // quel testo per un ID progetto "orfano" ad ogni sincronizzazione.
+  var datiEsistenti = ultimaRiga >= RIGA_PRIMA_DATI ? foglio.getRange(RIGA_PRIMA_DATI, 1, ultimaRiga - RIGA_PRIMA_DATI + 1, 1).getValues() : [];
 
   // Mappa ID Progetto (colonna A) → numero di riga reale nel foglio.
   var rigaPerId = {};
   for (var i = 0; i < datiEsistenti.length; i++) {
     var idRiga = String(datiEsistenti[i][0] || '').trim();
-    if (idRiga) rigaPerId[idRiga] = i + 2;
+    if (idRiga) rigaPerId[idRiga] = i + RIGA_PRIMA_DATI;
   }
 
   var aggiornate = 0;
