@@ -5,13 +5,13 @@
  * Cosa fa:
  * - Legge tutti i progetti dalla collezione Firestore "progetti" (lettura pubblica,
  *   nessuna autenticazione richiesta — le regole del database la consentono).
- * - Aggiorna SOLO le 11 colonne che si possono ricavare in modo affidabile dai
- *   moduli: ID, Anno, Tipologia, Titolo, Docente Referente, Data Evento,
- *   N° Delibera CA, Data Delibera, Stato Progetto, N° Progetto Conservatorio,
- *   Link Modulo/Firestore.
- * - Non tocca MAI le altre colonne (Sede, budget, spese, SIAE, Fascicolo Drive,
- *   Note, Determine, Pacchetto Comunicazione) — quelle restano solo a tua cura,
- *   sia sulle righe nuove sia su quelle già esistenti.
+ * - Aggiorna SOLO le 13 colonne che si possono ricavare in modo affidabile dai
+ *   moduli: ID, N° Progetto Conservatorio, Anno, Tipologia, Titolo, Docente
+ *   Referente, Data Evento, Sede, N° Delibera CA, Data Delibera, Stato
+ *   Progetto, Ultimo Aggiornamento, Link Modulo/Firestore.
+ * - Non tocca MAI le altre colonne (budget, SIAE, Fascicolo Drive, Note) —
+ *   quelle restano solo a tua cura, sia sulle righe nuove sia su quelle già
+ *   esistenti.
  * - Se un progetto Firestore non è ancora nel foglio, aggiunge una riga nuova con
  *   solo i campi sincronizzabili compilati, più le formule di Spese Consuntivo
  *   e Scostamento (mai riscritte sulle righe già esistenti); le colonne
@@ -25,39 +25,52 @@
  * questo script.
  *
  * Posizione delle colonne nel foglio "📁 Archivio Progetti" (verificata a mano
- * il 13/09/2026 — se il foglio viene ristrutturato, questi numeri vanno
- * riallineati): NON sono nell'ordine "pulito" A-X + AA-AF che dice la guida
- * del foglio — le colonne Y/Z NON sono vuote, sono già "N° Progetto
- * Conservatorio" e "Determina Dotazione Tecnica".
+ * il 22/09/2026, dopo la ristrutturazione concordata con Marco: N° Progetto
+ * Conservatorio spostato in colonna B, colonne Determina/Pacchetto
+ * Comunicazione eliminate — se il foglio viene ristrutturato di nuovo, questi
+ * numeri vanno riallineati).
+ *
+ * Sede (colonna H) — dato ricavato, non un campo diretto: nei moduli lo
+ * spazio "assegnato" vive per singolo evento (spazio_concerto, spazio_prova_1,
+ * spazio_replica_1...), non come un unico campo "sede del progetto"
+ * (spazioEffettivoOLuogo() nei moduli). Qui si sincronizza solo lo spazio del
+ * Concerto principale, che è l'evento di riferimento in tutto il resto del
+ * sistema — "—" se non ancora assegnato.
+ *
+ * Ultimo Aggiornamento (colonna R) — da stato.ultimo_aggiornamento, timbrato
+ * automaticamente dai moduli ad ogni salvataggio (non da "Ultima modifica
+ * Referente", che è un campo diverso).
  */
 
 var FIRESTORE_PROJECT_ID = 'briccialdi-produzioni';
 var NOME_FOGLIO = '📁 Archivio Progetti';
 
 // Numero di colonna (A=1, B=2, ... Z=26, AA=27, AB=28, ...)
-var COLONNA_ID = 1;                // A  — ID Progetto
-var COLONNA_ANNO = 2;              // B  — Anno (ricavato dall'anno della Data Evento)
-var COLONNA_TIPOLOGIA = 3;         // C  — Tipologia
-var COLONNA_TITOLO = 4;            // D  — Titolo Progetto
-var COLONNA_REFERENTE = 5;         // E  — Docente Referente
-var COLONNA_DATA_EVENTO = 6;       // F  — Data Evento
-var COLONNA_DELIBERA = 8;          // H  — N° Delibera CA
-var COLONNA_DATA_DELIBERA = 9;     // I  — Data Delibera
-var COLONNA_STATO_PROGETTO = 13;   // M  — Stato Progetto
-var COLONNA_ID_CONSERVATORIO = 25; // Y  — N° Progetto Conservatorio
-var COLONNA_LINK = 30;             // AD — Link Modulo / Firestore
+var COLONNA_ID = 1;                  // A  — ID Progetto
+var COLONNA_ID_CONSERVATORIO = 2;    // B  — N° Progetto Conservatorio
+var COLONNA_ANNO = 3;                // C  — Anno (ricavato dall'anno della Data Evento)
+var COLONNA_TIPOLOGIA = 4;           // D  — Tipologia
+var COLONNA_TITOLO = 5;              // E  — Titolo Progetto
+var COLONNA_REFERENTE = 6;           // F  — Docente Referente
+var COLONNA_DATA_EVENTO = 7;         // G  — Data Evento
+var COLONNA_SEDE = 8;                // H  — Sede (spazio assegnato al Concerto principale)
+var COLONNA_DELIBERA = 9;            // I  — N° Delibera CA
+var COLONNA_DATA_DELIBERA = 10;      // J  — Data Delibera
+var COLONNA_STATO_PROGETTO = 14;     // N  — Stato Progetto
+var COLONNA_ULTIMO_AGGIORNAMENTO = 18; // R — Ultimo Aggiornamento
+var COLONNA_LINK = 27;               // AA — Link Modulo / Firestore
 
 // Queste due NON sono tra le colonne sincronizzabili: la formula viene scritta
 // una sola volta, solo quando lo script crea una riga nuova — mai su una riga
 // già esistente, per non sovrascrivere formule che avessi personalizzato tu.
-var COLONNA_SPESE_CONSUNTIVO = 11; // K — Spese Consuntivo (€), somma voci di spesa
-var COLONNA_SCOSTAMENTO = 12;      // L — Scostamento (€), Budget - Spese
+var COLONNA_SPESE_CONSUNTIVO = 12;   // L — Spese Consuntivo (€), somma voci di spesa
+var COLONNA_SCOSTAMENTO = 13;        // M — Scostamento (€), Budget - Spese
 
 // Colonne che lo script scrive — usate per sapere quali toccare, mai le altre.
 var COLONNE_SINCRONIZZABILI = [
-  COLONNA_ID, COLONNA_ANNO, COLONNA_TIPOLOGIA, COLONNA_TITOLO, COLONNA_REFERENTE,
-  COLONNA_DATA_EVENTO, COLONNA_DELIBERA, COLONNA_DATA_DELIBERA, COLONNA_STATO_PROGETTO,
-  COLONNA_ID_CONSERVATORIO, COLONNA_LINK
+  COLONNA_ID, COLONNA_ID_CONSERVATORIO, COLONNA_ANNO, COLONNA_TIPOLOGIA, COLONNA_TITOLO,
+  COLONNA_REFERENTE, COLONNA_DATA_EVENTO, COLONNA_SEDE, COLONNA_DELIBERA, COLONNA_DATA_DELIBERA,
+  COLONNA_STATO_PROGETTO, COLONNA_ULTIMO_AGGIORNAMENTO, COLONNA_LINK
 ];
 
 // Codice interno salvato nei moduli (campo metadati.tipologia) → etichetta
@@ -178,26 +191,28 @@ function sincronizzaFirestore() {
     'Righe aggiornate: ' + aggiornate + '\n' +
     'Righe nuove aggiunte: ' + aggiunte + '\n' +
     (orfane > 0 ? ('Righe segnalate come non più su Firestore: ' + orfane + ' (vedi nota sulla cella ID)\n') : '') +
-    '\nLe colonne di Sede, budget, spese, SIAE, note e determine non sono mai state toccate.'
+    '\nLe colonne di budget, SIAE, Fascicolo Drive e Note non sono mai state toccate.'
   );
 }
 
 /**
  * Costruisce l'oggetto {numero_colonna: valore} per un progetto, applicando
- * le mappature (tipologia, stato) e i calcoli (anno, link) necessari.
+ * le mappature (tipologia, stato) e i calcoli (anno, sede, link) necessari.
  */
 function valoriSincronizzabili(p) {
   var valori = {};
   valori[COLONNA_ID] = p.id;
+  valori[COLONNA_ID_CONSERVATORIO] = p.idConservatorio || '';
   valori[COLONNA_ANNO] = annoDaData(p.dataEvento);
   valori[COLONNA_TIPOLOGIA] = TIPOLOGIA_LABEL[p.tipologia] || p.tipologia || '';
   valori[COLONNA_TITOLO] = p.titolo || '';
   valori[COLONNA_REFERENTE] = p.referente || '';
   valori[COLONNA_DATA_EVENTO] = p.dataEvento || '';
+  valori[COLONNA_SEDE] = p.sede || '—';
   valori[COLONNA_DELIBERA] = p.delibera || '';
   valori[COLONNA_DATA_DELIBERA] = p.dataDelibera || '';
   valori[COLONNA_STATO_PROGETTO] = statoSincronizzato(p.stato || {});
-  valori[COLONNA_ID_CONSERVATORIO] = p.idConservatorio || '';
+  valori[COLONNA_ULTIMO_AGGIORNAMENTO] = formattaTimestamp(p.ultimoAggiornamento);
   valori[COLONNA_LINK] = costruisciLinkModulo(p);
   return valori;
 }
@@ -213,6 +228,18 @@ function annoDaData(dataIT) {
   if (parti.length !== 3) return '';
   var anno = parseInt(parti[2], 10);
   return isNaN(anno) ? '' : anno;
+}
+
+/**
+ * Converte il timestamp Firestore (ISO 8601, es. "2026-09-20T14:32:00.123Z")
+ * nel formato data/ora italiano usato nel foglio. Restituisce '' se assente
+ * o non valido — non forza mai un valore indovinato.
+ */
+function formattaTimestamp(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return Utilities.formatDate(d, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
 }
 
 /**
@@ -239,14 +266,14 @@ function statoSincronizzato(stato) {
  * argomenti, quindi nessun problema di lingua/locale del foglio.
  */
 function formulaSpeseConsuntivo(riga) {
-  return '=SUM(R' + riga + ':X' + riga + ')+AC' + riga;
+  return '=SUM(S' + riga + ':Y' + riga + ')+Z' + riga;
 }
 
 /**
  * Formula per la colonna "Scostamento": Budget Autorizzato meno Spese Consuntivo.
  */
 function formulaScostamento(riga) {
-  return '=J' + riga + '-K' + riga;
+  return '=K' + riga + '-L' + riga;
 }
 
 /**
@@ -287,6 +314,7 @@ function leggiProgettiDaFirestore() {
       var id = doc.name.split('/').pop();
       var metadati = campi.metadati || {};
       var datiReferente = campi.dati_referente || {};
+      var datiResponsabile = campi.dati_responsabile || {};
       var stato = campi.stato || {};
 
       risultati.push({
@@ -295,10 +323,12 @@ function leggiProgettiDaFirestore() {
         titolo: metadati.titolo || '',
         referente: metadati.referente || '',
         dataEvento: datiReferente.data_evento || '',
+        sede: sedeEffettiva(datiResponsabile),
         delibera: metadati.delibera || '',
         dataDelibera: metadati.data_delibera || '',
         idConservatorio: metadati.id_conservatorio || '',
-        stato: stato
+        stato: stato,
+        ultimoAggiornamento: stato.ultimo_aggiornamento || ''
       });
     });
 
@@ -306,6 +336,19 @@ function leggiProgettiDaFirestore() {
   } while (pageToken);
 
   return risultati;
+}
+
+/**
+ * Spazio "assegnato" al Concerto principale (dati_responsabile.spazio_concerto,
+ * con spazio_concerto_altro se il valore è "Altro") — stessa risoluzione usata
+ * da spazioEffettivoOLuogo() nei moduli, limitata al solo Concerto: è l'unico
+ * evento del progetto rappresentabile come "la Sede" in una singola colonna.
+ * '' se non ancora assegnato (diventa "—" in valoriSincronizzabili).
+ */
+function sedeEffettiva(datiResponsabile) {
+  var v = datiResponsabile.spazio_concerto;
+  if (v === 'Altro') return datiResponsabile.spazio_concerto_altro || '';
+  return v || '';
 }
 
 /**
