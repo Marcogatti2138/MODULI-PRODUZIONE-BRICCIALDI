@@ -560,11 +560,11 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
         <input type="email" id="av_email" tabindex="4" enterkeyhint="next" placeholder="es. bianchi.marco@briccialditerni.it" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
-        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">N° Delibera C.A. *</label>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">N° Delibera C.A. <span style="font-weight:400;text-transform:none;color:#6B7280">(facoltativo — da integrare appena disponibile)</span></label>
         <input type="text" id="av_delibera" tabindex="5" enterkeyhint="next" placeholder="es. 12" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div>
-        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Data Delibera *</label>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Data Delibera <span style="font-weight:400;text-transform:none;color:#6B7280">(facoltativo — da integrare appena disponibile)</span></label>
         <input type="text" id="av_data_delibera" tabindex="6" enterkeyhint="next" onblur="formattaDataItaliana(this)" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
       <div style="grid-column:1/-1">
@@ -579,9 +579,13 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
         </div>
       </div>
       <div>
-        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Scadenza risposta *</label>
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Scadenza risposta <span style="font-weight:400;text-transform:none;color:#6B7280">(facoltativo — da integrare appena disponibile)</span></label>
         <input type="text" id="av_scadenza" tabindex="8" enterkeyhint="done" onblur="formattaDataItaliana(this)" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
         <p id="av-scadenza-nota" style="display:none;font-size:10px;color:#6B7280;margin-top:3px;font-style:italic">Calcolata automaticamente: 1 mese prima della data evento — modificabile</p>
+      </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:11px;font-weight:700;color:#1A3C6B;text-transform:uppercase;letter-spacing:.5px">Link scheda Drive <span style="font-weight:400;text-transform:none;color:#6B7280">(facoltativo)</span></label>
+        <input type="text" id="av_link_scheda" tabindex="9" enterkeyhint="done" placeholder="Incolla qui il link di condivisione Google Drive" style="width:100%;border:1px solid #D0D7E3;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;margin-top:4px;outline:none">
       </div>
     </div>
 
@@ -2844,7 +2848,7 @@ function popolaMetadati() {
 }
 
 // ═══ SCHERMATA AVVIO — navigazione tra campi con Invio (utile anche da mobile, senza tasto Tab fisico) ═══
-var campiAvvioOrdine = ['av_titolo','av_id','av_referente','av_email','av_delibera','av_data_delibera','av_data_evento','av_scadenza'];
+var campiAvvioOrdine = ['av_titolo','av_id','av_referente','av_email','av_delibera','av_data_delibera','av_data_evento','av_scadenza','av_link_scheda'];
 campiAvvioOrdine.forEach(function(cid, idx) {
   var el = document.getElementById(cid);
   if (!el) return;
@@ -2857,7 +2861,7 @@ campiAvvioOrdine.forEach(function(cid, idx) {
 });
 
 function confermaAvvio() {
-  var campi = ['av_titolo','av_referente','av_email','av_delibera','av_data_delibera','av_scadenza'];
+  var campi = ['av_titolo','av_referente','av_email'];
   var ok = true;
   campi.forEach(function(id) {
     var el = document.getElementById(id);
@@ -2933,13 +2937,17 @@ function proseguiConfermaAvvio(id) {
     data_delibera: document.getElementById('av_data_delibera').value.trim(),
     scadenza:      document.getElementById('av_scadenza').value.trim(),
   };
+  // Link scheda Drive: solo nei metadati salvati su Firestore, mai nei parametri
+  // URL del link inviato al Referente (a differenza degli altri campi qui sopra).
+  var linkScheda = document.getElementById('av_link_scheda').value.trim();
+  var metadatiCompleti = Object.assign({}, dati, { link_scheda: linkScheda });
 
   // Salva su Firestore — riprova finché Firebase non è pronto, invece di saltare silenziosamente
   (function salvaMetadatiConRetry(tentativi) {
     if (window.firebaseReady && window.db) {
       var docRef = window.fsDoc(window.db, 'progetti', id);
       window.fsSetDoc(docRef, {
-        metadati: dati,
+        metadati: metadatiCompleti,
         stato: { creato_il: window.fsTimestamp(), completato_referente: false, completato_responsabile: false }
       }, { merge: true }).then(function() {
         console.log('Progetto salvato su Firestore:', id);
@@ -2953,18 +2961,15 @@ function proseguiConfermaAvvio(id) {
     }
   })(20); // fino a 6 secondi di tentativi
 
-  // Chiude il cerchio con la Proposta C.A. di origine, se presente — non deve mai
-  // bloccare o rallentare la creazione del progetto sopra, quindi è "fire and forget".
-  if (window._pcaIdCollegato && window.firebaseReady && window.db) {
-    window.fsUpdateDoc(window.fsDoc(window.db, 'proposte_ca', window._pcaIdCollegato), {
-      stato: 'modulo_attivato',
-      progettoIdCollegato: id
-    }).catch(function(e) { console.warn('Impossibile aggiornare la Proposta C.A. collegata:', e); });
-  }
-
-  // Genera link Referente e Responsabile
+  // Genera link Referente e Responsabile — delibera/data_delibera/scadenza restano
+  // solo nei metadati su Firestore: la pagina li rilegge da lì tramite l'id
+  // (vedi caricaDaFirestore), non servono più nella query string del link.
   var base = window.location.origin + window.location.pathname;
-  var p = new URLSearchParams(dati);
+  var datiLink = Object.assign({}, dati);
+  delete datiLink.delibera;
+  delete datiLink.data_delibera;
+  delete datiLink.scadenza;
+  var p = new URLSearchParams(datiLink);
   var linkRef = base + '?' + p.toString();
   var linkResp = base + '?' + p.toString() + '&ruolo=responsabile';
   document.getElementById('av-link-testo').value = linkRef;
@@ -2986,24 +2991,6 @@ function apriModulo() {
 }
 
 // ── Inizializzazione ──
-// Se si arriva da "🚀 Configura progetto" in Dashboard (Proposte C.A.), precompila
-// i campi già noti e ricorda l'id della proposta per chiudere il cerchio più avanti
-// (vedi proseguiConfermaAvvio) — non blocca mai la creazione del progetto se fallisce.
-function precompilaDaPropostaCA() {
-  var params = new URLSearchParams(window.location.search);
-  var pcaId = params.get('pca_id');
-  if (!pcaId) return;
-  window._pcaIdCollegato = pcaId;
-  ['av_titolo', 'av_referente', 'av_delibera', 'av_data_delibera', 'av_data_evento'].forEach(function(campo) {
-    var val = params.get(campo);
-    var el = document.getElementById(campo);
-    if (val && el) el.value = val;
-  });
-  // Se è arrivata anche la data evento prevista, calcola subito la scadenza
-  // suggerita (−2 mesi), come farebbe l'onblur manuale sullo stesso campo.
-  if (params.get('av_data_evento') && typeof calcolaScadenzaDaEvento === 'function') calcolaScadenzaDaEvento();
-}
-
 function inizializza() {
   collassaSezioniIniziali();
   var haDati = leggiParams();
@@ -3013,7 +3000,6 @@ function inizializza() {
     applicaRuolo();
   } else {
     document.getElementById('schermata-avvio').style.display = 'block';
-    precompilaDaPropostaCA();
   }
   aggiornaChecklist();
   aggiornaSintesiEsecutori();

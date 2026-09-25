@@ -111,10 +111,9 @@
   </div>
 </header>
 
-<div id="striscia-numeri" style="background:var(--blu-pale);border-bottom:1px solid var(--bordo);padding:14px 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center">
+<div id="striscia-numeri" style="background:var(--blu-pale);border-bottom:1px solid var(--bordo);padding:14px 40px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;text-align:center">
   <div><div style="font-size:22px;font-weight:600;color:var(--blu)" id="num-attivi">—</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Progetti attivi</div></div>
-  <div style="border-left:1px solid var(--bordo);border-right:1px solid var(--bordo)"><div style="font-size:22px;font-weight:600;color:var(--arancio)" id="num-scadenza">—</div><div style="font-size:11px;color:var(--muted);margin-top:2px">In scadenza 30gg</div></div>
-  <div><div style="font-size:22px;font-weight:600;color:var(--blu-mid)" id="num-proposte">—</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Proposte in attesa</div></div>
+  <div style="border-left:1px solid var(--bordo)"><div style="font-size:22px;font-weight:600;color:var(--arancio)" id="num-scadenza">—</div><div style="font-size:11px;color:var(--muted);margin-top:2px">In scadenza 30gg</div></div>
 </div>
 
 <div class="wrapper">
@@ -173,57 +172,6 @@
     <div class="section-body" id="progetti-body"><div class="loading-msg">Caricamento da Firestore…</div></div>
   </div>
 
-  <!-- PROPOSTE C.A. -->
-  <div class="section">
-    <div class="section-header">
-      <div><h2>📋 Proposte C.A.</h2><p>Schede deliberate, in attesa di diventare un progetto operativo</p></div>
-    </div>
-    <div class="section-body">
-      <button type="button" onclick="toggleFormProposta()" style="background:var(--blu);color:white;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:14px">+ Nuova proposta</button>
-
-      <div id="proposte-ca-form" style="display:none;background:var(--blu-pale);border:1px solid var(--bordo);border-radius:8px;padding:16px;margin-bottom:18px">
-        <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
-          <div>
-            <label style="font-size:11px;font-weight:600;color:var(--blu);display:block;margin-bottom:3px">Titolo progetto *</label>
-            <input type="text" id="pca-titolo" style="width:100%;border:1px solid var(--bordo);border-radius:6px;padding:8px;font-family:inherit;font-size:13px;box-sizing:border-box">
-          </div>
-          <div>
-            <label style="font-size:11px;font-weight:600;color:var(--blu);display:block;margin-bottom:3px">Referente</label>
-            <input type="text" id="pca-referente" placeholder="es. Bianchi Marco" style="width:100%;border:1px solid var(--bordo);border-radius:6px;padding:8px;font-family:inherit;font-size:13px;box-sizing:border-box">
-          </div>
-          <div>
-            <label style="font-size:11px;font-weight:600;color:var(--blu);display:block;margin-bottom:3px">N° Delibera C.A.</label>
-            <input type="text" id="pca-delibera" placeholder="es. 35/5" style="width:100%;border:1px solid var(--bordo);border-radius:6px;padding:8px;font-family:inherit;font-size:13px;box-sizing:border-box">
-          </div>
-          <div>
-            <label style="font-size:11px;font-weight:600;color:var(--blu);display:block;margin-bottom:3px">Data Delibera</label>
-            <input type="text" id="pca-data-delibera" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid var(--bordo);border-radius:6px;padding:8px;font-family:inherit;font-size:13px;box-sizing:border-box">
-          </div>
-          <div>
-            <label style="font-size:11px;font-weight:600;color:var(--blu);display:block;margin-bottom:3px">Data evento prevista <span style="font-weight:400;color:var(--muted)">(facoltativa — dalla Scheda Sez.1)</span></label>
-            <input type="text" id="pca-data-evento" placeholder="GG/MM/AAAA — se già nota" style="width:100%;border:1px solid var(--bordo);border-radius:6px;padding:8px;font-family:inherit;font-size:13px;box-sizing:border-box">
-          </div>
-          <div style="grid-column:1/-1">
-            <label style="font-size:11px;font-weight:600;color:var(--blu);display:block;margin-bottom:3px">Link Drive alla Scheda compilata (facoltativo — puoi aggiungerlo anche dopo)</label>
-            <input type="text" id="pca-pdf-link" placeholder="Incolla qui il link di condivisione Google Drive" style="width:100%;border:1px solid var(--bordo);border-radius:6px;padding:8px;font-family:inherit;font-size:13px;box-sizing:border-box">
-          </div>
-        </div>
-        <p id="pca-errore" style="display:none;color:var(--rosso);font-size:12px;margin-top:10px"></p>
-        <div style="display:flex;gap:8px;margin-top:14px">
-          <button type="button" onclick="salvaProposta()" id="pca-btn-salva" style="background:var(--verde);color:white;border:none;border-radius:7px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer">Salva proposta</button>
-          <button type="button" onclick="toggleFormProposta()" style="background:#F5F5F5;color:var(--testo);border:1px solid var(--bordo);border-radius:7px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer">Annulla</button>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="filtri-vista-pca">
-        <button type="button" class="chip-filtro chip-attivo" data-vista="da_attivare" onclick="impostaVistaProposte('da_attivare')">Da attivare</button>
-        <button type="button" class="chip-filtro" data-vista="istruttoria" onclick="impostaVistaProposte('istruttoria')">🔍 Richiesta istruttoria</button>
-        <button type="button" class="chip-filtro" data-vista="modulo_attivato" onclick="impostaVistaProposte('modulo_attivato')">✅ Modulo attivato</button>
-      </div>
-      <div id="proposte-ca-body"><div class="loading-msg">Caricamento…</div></div>
-    </div>
-  </div>
-
   <!-- AVVIA NUOVO PROGETTO -->
   <div class="section">
     <div class="section-header" onclick="toggleSezioneDash(this)" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
@@ -263,6 +211,7 @@
     </div>
     <div class="section-body">
       <div class="quick-links-grid">
+        <a class="quick-link" href="https://drive.google.com/drive/folders/1W0Q7yKwfOKAz-hGwiI8bjFMNMLO122c9" target="_blank"><span class="icona">📥</span><span class="testo">Schede da elaborare</span></a>
         <a class="quick-link" href="https://docs.google.com/spreadsheets/d/1SjjIz-vz8RH4Q-52wjt7Mrtsbxo86SNSdCCfc8RxSvc/edit" target="_blank"><span class="icona">📊</span><span class="testo">Planning Eventi</span></a>
         <a class="quick-link" href="https://docs.google.com/spreadsheets/d/1jbRvF3knvj3eoOGoaiNy0b8HWsYEBL0xwoQArBw_Aj4/edit" target="_blank"><span class="icona">🗄️</span><span class="testo">Database Produzioni</span></a>
         <a class="quick-link" href="https://drive.google.com/drive/folders/1vz0kI4ufpsVwQISXqpvTuRCW2TRHJ27L" target="_blank"><span class="icona">📁</span><span class="testo">Cartella Drive</span></a>
@@ -272,18 +221,6 @@
     </div>
   </div>
 
-</div>
-
-<!-- Modal scelta modulo per Proposta CA -->
-<div id="modal-scegli-modulo" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
-  <div style="background:white;border-radius:12px;max-width:480px;margin:60px auto;padding:24px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <h2 style="font-family:Georgia,serif;font-size:17px;color:var(--blu)">Scegli il modulo</h2>
-      <button onclick="chiudiSceltaModulo()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#666">✕</button>
-    </div>
-    <p id="modal-scegli-modulo-sottotitolo" style="font-size:12px;color:var(--muted);margin-bottom:16px"></p>
-    <div class="categorie-grid" id="modal-scegli-modulo-links"></div>
-  </div>
 </div>
 
 <!-- Modal richiesta cumulativa (condiviso da Spazi/Trasporti/Centralino) -->
@@ -1503,10 +1440,8 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPIA
       var gg = giorniMancanti(primaData);
       if (gg >= 0 && gg <= 30) numScadenza++;
     });
-    var numProposte = TUTTE_LE_PROPOSTE_CA.filter(function(p) { return (p.stato || 'da_attivare') !== 'modulo_attivato'; }).length;
     document.getElementById('num-attivi').textContent = numAttivi;
     document.getElementById('num-scadenza').textContent = numScadenza;
-    document.getElementById('num-proposte').textContent = numProposte;
   }
 
   function filtraProgetti(query) {
@@ -1540,187 +1475,6 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPIA
     }
     renderElenco(filtrati);
   }
-
-  // ── Proposte C.A. ──────────────────────────────────────────────────
-  var TUTTE_LE_PROPOSTE_CA = [];
-  var vistaPropostaAttuale = 'da_attivare';
-
-  function toggleFormProposta() {
-    var f = document.getElementById('proposte-ca-form');
-    f.style.display = (f.style.display === 'none' || !f.style.display) ? 'block' : 'none';
-  }
-
-  function impostaVistaProposte(vista) {
-    vistaPropostaAttuale = vista;
-    document.querySelectorAll('#filtri-vista-pca .chip-filtro').forEach(function(btn) {
-      btn.classList.toggle('chip-attivo', btn.getAttribute('data-vista') === vista);
-    });
-    renderProposteCA();
-  }
-
-  function caricaProposteCA() {
-    db.collection('proposte_ca').orderBy('creatoIl', 'desc').get().then(function(snap) {
-      TUTTE_LE_PROPOSTE_CA = [];
-      snap.forEach(function(doc) {
-        var d = doc.data(); d.id = doc.id;
-        TUTTE_LE_PROPOSTE_CA.push(d);
-      });
-      renderProposteCA();
-      aggiornaStrisciaNumeri();
-    }).catch(function(e) {
-      document.getElementById('proposte-ca-body').innerHTML = '<div class="error-msg">Errore nel caricamento: ' + escapeHtml(e.message || e) + '</div>';
-    });
-  }
-
-  function renderProposteCA() {
-    var filtrate = TUTTE_LE_PROPOSTE_CA.filter(function(p) { return (p.stato || 'da_attivare') === vistaPropostaAttuale; });
-    var body = document.getElementById('proposte-ca-body');
-    if (filtrate.length === 0) {
-      var msgVuoto = vistaPropostaAttuale === 'da_attivare' ? 'Nessuna proposta in attesa.'
-        : vistaPropostaAttuale === 'istruttoria' ? 'Nessuna proposta in richiesta di istruttoria.'
-        : 'Nessuna proposta ancora segnata come Modulo attivato.';
-      body.innerHTML = '<div class="empty-msg">' + msgVuoto + '</div>';
-      return;
-    }
-    body.innerHTML = filtrate.map(function(p) {
-      var dettagli = [];
-      if (p.referente) dettagli.push('Referente: ' + escapeHtml(p.referente));
-      if (p.numeroDelibera) dettagli.push('Delibera N° ' + escapeHtml(p.numeroDelibera) + (p.dataDelibera ? ' del ' + escapeHtml(p.dataDelibera) : ''));
-      if (p.dataEventoPrevista) dettagli.push('Data evento prevista: ' + escapeHtml(p.dataEventoPrevista));
-      var notaIstruttoria = (p.stato === 'istruttoria' && p.noteIstruttoria)
-        ? '<div style="width:100%;font-size:12px;color:#8a5a00;background:#FFF3CD;border-radius:4px;padding:6px 9px;margin-top:6px;word-wrap:break-word;overflow-wrap:break-word;white-space:pre-wrap"><strong>🔍 Istruttoria richiesta:</strong> ' + escapeHtml(p.noteIstruttoria) + '</div>'
-        : '';
-      var pdfBtn = p.pdfUrl
-        ? '<a href="' + p.pdfUrl + '" target="_blank" class="btn-mini">📄 Apri link</a>'
-        : '<button type="button" onclick="allegaLinkProposta(\'' + p.id + '\')" class="btn-mini" style="background:var(--muted);border:none;font-family:inherit;cursor:pointer">📎 Allega link</button>';
-      var azioniStato = '';
-      if (p.stato === 'modulo_attivato') {
-        azioniStato = '<button type="button" onclick="cambiaStatoProposta(\'' + p.id + '\',\'da_attivare\')" class="btn-mini" style="background:var(--arancio);border:none;font-family:inherit;cursor:pointer">↩ Riporta a Da attivare</button>';
-      } else if (p.stato === 'istruttoria') {
-        azioniStato = '<button type="button" onclick="cambiaStatoProposta(\'' + p.id + '\',\'da_attivare\')" class="btn-mini" style="background:var(--arancio);border:none;font-family:inherit;cursor:pointer">↩ Pronta per rivalutazione</button>';
-      } else {
-        azioniStato = '<button type="button" onclick="richiediIstruttoria(\'' + p.id + '\')" class="btn-mini" style="background:#8a5a00;border:none;font-family:inherit;cursor:pointer">🔍 Richiedi istruttoria</button>'
-          + '<button type="button" onclick="cambiaStatoProposta(\'' + p.id + '\',\'modulo_attivato\')" class="btn-mini" style="background:var(--verde);border:none;font-family:inherit;cursor:pointer">✅ Modulo attivato</button>';
-      }
-      var btnConfigura = (p.stato !== 'modulo_attivato' && p.stato !== 'istruttoria')
-        ? '<button type="button" onclick="apriSceltaModulo(\'' + p.id + '\')" class="btn-mini" style="background:var(--blu-mid);border:none;font-family:inherit;cursor:pointer">🚀 Configura progetto</button>'
-        : '';
-      return '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:8px;border-left:4px solid var(--blu-mid);background:var(--blu-pale);border-radius:0 6px 6px 0;flex-wrap:wrap">'
-        + '<div style="flex:1;min-width:160px"><strong style="display:block;font-size:13px;color:var(--blu)">' + escapeHtml(p.titolo || '(senza titolo)') + '</strong><span style="font-size:11px;color:var(--muted)">' + (dettagli.join(' · ') || '&nbsp;') + '</span>' + notaIstruttoria + '</div>'
-        + pdfBtn + btnConfigura + azioniStato
-        + '<button type="button" onclick="eliminaProposta(\'' + p.id + '\')" class="btn-mini" style="background:var(--rosso);border:none;font-family:inherit;cursor:pointer" title="Elimina">🗑</button>'
-        + '</div>';
-    }).join('');
-  }
-
-  var PCA_MODULI = [
-    { url: 'Modulo_1_SinfonicoCORALE.html', icona: '🎼', label: 'Sinfonico-Corale' },
-    { url: 'Modulo_2_PiccoloConcerto.html', icona: '🎹', label: 'Piccolo Concerto' },
-    { url: 'Modulo_3_Masterclass.html', icona: '🎓', label: 'Masterclass / Seminario' },
-    { url: 'Modulo_4_EventoIstituzionale.html', icona: '🏛', label: 'Evento Istituzionale / Conferenza' }
-  ];
-
-  function apriSceltaModulo(pcaId) {
-    var p = TUTTE_LE_PROPOSTE_CA.find(function(x) { return x.id === pcaId; });
-    if (!p) return;
-    document.getElementById('modal-scegli-modulo-sottotitolo').textContent = 'Per: ' + (p.titolo || '(senza titolo)') + ' — scegli la tipologia corretta per aprire "Configura progetto" già precompilato con i dati della proposta.';
-    var params = new URLSearchParams();
-    params.set('pca_id', pcaId);
-    if (p.titolo) params.set('av_titolo', p.titolo);
-    if (p.referente) params.set('av_referente', p.referente);
-    if (p.numeroDelibera) params.set('av_delibera', p.numeroDelibera);
-    if (p.dataDelibera) params.set('av_data_delibera', p.dataDelibera);
-    if (p.dataEventoPrevista) params.set('av_data_evento', p.dataEventoPrevista);
-    var qs = params.toString();
-    document.getElementById('modal-scegli-modulo-links').innerHTML = PCA_MODULI.map(function(m) {
-      return '<a href="' + m.url + '?' + qs + '" class="cat-card active" style="text-align:center"><div class="icona">' + m.icona + '</div><div class="titolo">' + m.label + '</div></a>';
-    }).join('');
-    document.getElementById('modal-scegli-modulo').style.display = 'block';
-  }
-
-  function chiudiSceltaModulo() {
-    document.getElementById('modal-scegli-modulo').style.display = 'none';
-  }
-
-  function cambiaStatoProposta(id, nuovoStato) {
-    db.collection('proposte_ca').doc(id).update({ stato: nuovoStato }).then(function() {
-      var p = TUTTE_LE_PROPOSTE_CA.find(function(x) { return x.id === id; });
-      if (p) p.stato = nuovoStato;
-      renderProposteCA();
-    }).catch(function(e) { alert('Errore: ' + (e.message || e)); });
-  }
-
-  function richiediIstruttoria(id) {
-    var p = TUTTE_LE_PROPOSTE_CA.find(function(x) { return x.id === id; });
-    var nota = prompt('Cosa ha chiesto di approfondire il C.A.?', (p && p.noteIstruttoria) || '');
-    if (nota === null) return;
-    nota = nota.trim();
-    db.collection('proposte_ca').doc(id).update({ stato: 'istruttoria', noteIstruttoria: nota }).then(function() {
-      if (p) { p.stato = 'istruttoria'; p.noteIstruttoria = nota; }
-      renderProposteCA();
-    }).catch(function(e) { alert('Errore: ' + (e.message || e)); });
-  }
-
-  function eliminaProposta(id) {
-    if (!confirm('Eliminare definitivamente questa proposta?')) return;
-    db.collection('proposte_ca').doc(id).delete().then(function() {
-      TUTTE_LE_PROPOSTE_CA = TUTTE_LE_PROPOSTE_CA.filter(function(x) { return x.id !== id; });
-      renderProposteCA();
-    }).catch(function(e) { alert('Errore: ' + (e.message || e)); });
-  }
-
-  function allegaLinkProposta(id) {
-    var link = prompt('Incolla il link di condivisione Google Drive della Scheda compilata:');
-    if (link === null) return;
-    link = link.trim();
-    if (!link) return;
-    db.collection('proposte_ca').doc(id).update({ pdfUrl: link, pdfPath: null, pdfNome: null }).then(function() {
-      caricaProposteCA();
-    }).catch(function(e) { alert('Errore nel salvataggio del link: ' + (e.message || e)); });
-  }
-
-  function salvaProposta() {
-    var titolo = document.getElementById('pca-titolo').value.trim();
-    var errEl = document.getElementById('pca-errore');
-    errEl.style.display = 'none';
-    if (!titolo) {
-      errEl.textContent = 'Il titolo è obbligatorio.';
-      errEl.style.display = 'block';
-      return;
-    }
-    var referente = document.getElementById('pca-referente').value.trim();
-    var numeroDelibera = document.getElementById('pca-delibera').value.trim();
-    var dataDelibera = document.getElementById('pca-data-delibera').value.trim();
-    var dataEventoPrevista = document.getElementById('pca-data-evento').value.trim();
-    var pdfUrl = document.getElementById('pca-pdf-link').value.trim();
-
-    var btn = document.getElementById('pca-btn-salva');
-    btn.disabled = true; btn.textContent = 'Salvataggio…';
-
-    var datiBase = {
-      titolo: titolo, referente: referente, numeroDelibera: numeroDelibera, dataDelibera: dataDelibera,
-      dataEventoPrevista: dataEventoPrevista, pdfUrl: pdfUrl || null,
-      stato: 'da_attivare', creatoIl: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    db.collection('proposte_ca').add(datiBase).then(function() {
-      btn.disabled = false; btn.textContent = 'Salva proposta';
-      document.getElementById('pca-titolo').value = '';
-      document.getElementById('pca-referente').value = '';
-      document.getElementById('pca-delibera').value = '';
-      document.getElementById('pca-data-delibera').value = '';
-      document.getElementById('pca-data-evento').value = '';
-      document.getElementById('pca-pdf-link').value = '';
-      toggleFormProposta();
-      caricaProposteCA();
-    }).catch(function(e) {
-      btn.disabled = false; btn.textContent = 'Salva proposta';
-      errEl.textContent = 'Errore: ' + (e.message || e);
-      errEl.style.display = 'block';
-    });
-  }
-
-  caricaProposteCA();
 
   db.collection('progetti').get().then(function(snapshot) {
     var progetti = [];
