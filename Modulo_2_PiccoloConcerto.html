@@ -1378,13 +1378,15 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
                 <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">Importo €</th>
                 <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">N° Prot.</th>
                 <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">Data</th>
+                <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">Indirizzo</th>
+                <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">P.IVA/C.F.</th>
                 <th style="padding:4px 6px;text-align:center;border-bottom:1px solid #D0D7E3">Scelto</th>
                 <th style="padding:4px 6px;border-bottom:1px solid #D0D7E3"></th>
               </tr>
             </thead>
             <tbody id="preventivi-noleggio-body"></tbody>
           </table>
-          <button class="btn-add" onclick="addPreventivoGenerico('preventivi-noleggio-body','prevnol')" style="margin-bottom:10px;font-size:11px;padding:5px 12px">+ Aggiungi preventivo</button>
+          <button class="btn-add" onclick="addPreventivoGenerico('preventivi-noleggio-body','prevnol',true)" style="margin-bottom:10px;font-size:11px;padding:5px 12px">+ Aggiungi preventivo</button>
           <button class="btn btn-primary" onclick="generaBozzaDeterminaNoleggio(1, {sezioneDotazione:'Sezione 5A'})" style="background:var(--verde)">📝 Genera Bozza Determina Acquisti e Servizi <span id="stato-richiesta-determina_noleggio"></span></button>
         </div>
       </div>
@@ -1425,6 +1427,8 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
                 <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">Importo €</th>
                 <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">N° Prot.</th>
                 <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">Data</th>
+                <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">Indirizzo</th>
+                <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">P.IVA/C.F.</th>
                 <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">IBAN</th>
                 <th style="padding:4px 6px;text-align:center;border-bottom:1px solid #D0D7E3">Scelto</th>
                 <th style="padding:4px 6px;border-bottom:1px solid #D0D7E3"></th>
@@ -1432,7 +1436,7 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
             </thead>
             <tbody id="preventivi-personale-body"></tbody>
           </table>
-          <button class="btn-add" onclick="addPreventivoGenerico('preventivi-personale-body','prevpers',true)" style="margin-bottom:10px;font-size:11px;padding:5px 12px">+ Aggiungi preventivo</button>
+          <button class="btn-add" onclick="addPreventivoGenerico('preventivi-personale-body','prevpers',true,true)" style="margin-bottom:10px;font-size:11px;padding:5px 12px">+ Aggiungi preventivo</button>
           <label style="font-size:11px;color:var(--testo);display:flex;align-items:center;gap:6px;margin-bottom:10px;cursor:pointer">
             <input type="checkbox" name="determina_pers_deroga_rotazione" onchange="salvaResponsabileSuFirestore()" style="width:16px;height:16px;margin:0">
             Applica deroga al principio di rotazione (situazione da valutare caso per caso — non spuntare se non pertinente)
@@ -1592,20 +1596,20 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
           </div>
         </div>
         <p style="font-size:10px;color:var(--muted);margin:-4px 0 10px;font-style:italic">Facoltativo — se diverso dalle giornate dell'evento (es. ritiro un giorno prima).</p>
-        <button class="btn btn-primary" onclick="generaRichiestaCentralino()" style="background:#2E7D32">🏛 Genera richiesta Centralino <span id="stato-richiesta-centralino"></span></button>
+        <p style="font-size:11px;color:var(--muted);margin:0">↪ Inclusa nella <strong>📧 Mail Centralino</strong> qui sotto — nessuna richiesta separata da generare.</p>
       </div>
 
       <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid #2E7D32">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#2E7D32;margin-bottom:8px;font-weight:700">🎓 Assistenza Studenti<a href="javascript:void(0)" onclick="vaiASezione('sezione-8')" style="float:right;font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;color:#1A3C6B;text-decoration:none">→ Vedi Sezione 8</a></div>
         <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Appuntamenti spuntati dal Referente in Sezione 8, con luogo e orario — la richiesta va a Centralino, che coordina apertura e presenza.</p>
         <div id="riepilogo-ore-assistenza" style="margin-bottom:10px"></div>
-        <button class="btn btn-primary" onclick="generaRichiestaAssistenzaStudenti()" style="background:#2E7D32">🏛 Genera richiesta Assistenza Studenti (Centralino) <span id="stato-richiesta-assistenza_studenti"></span></button>
+        <p style="font-size:11px;color:var(--muted);margin:0">↪ Inclusa nella <strong>📧 Mail Centralino</strong> qui sotto — nessuna richiesta separata da generare.</p>
       </div>
 
       <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid #1A3C6B">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#1A3C6B;margin-bottom:8px;font-weight:700">📧 Mail unica Centralino</div>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Unisce in un'unica mail le richieste Centralino già generate per questo progetto (Dotazione Tecnica, Assistenza Studenti), evitando di inviarle separatamente.</p>
-        <button class="btn btn-primary" onclick="generaMailUnicaCentralino()" style="background:#1A3C6B">📧 Componi mail unica Centralino <span id="stato-richiesta-centralino_unificata"></span></button>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#1A3C6B;margin-bottom:8px;font-weight:700">📧 Mail Centralino</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Un'unica mail al Centralino, calcolata sempre dai dati attuali: materiale "già disponibile in Conservatorio" (Dotazione Tecnica) e Assistenza Studenti. Include solo le sezioni che hanno contenuto — se ce n'è una sola, la mail riguarda solo quella.</p>
+        <button class="btn btn-primary" onclick="generaMailCentralino()" style="background:#1A3C6B">📧 Genera mail Centralino <span id="stato-richiesta-centralino"></span></button>
       </div>
 
       <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--arancio)">
@@ -1667,23 +1671,6 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
       </div>
     </div>
 
-    <!-- Modal richiesta assistenza studenti -->
-    <div id="modal-assistenza-studenti" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
-      <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Richiesta Assistenza Studenti — Centralino</h2>
-          <button onclick="chiudiModalAssistenzaStudenti()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
-        </div>
-        <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
-        <textarea id="testo-assistenza-studenti" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
-        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-          <button onclick="copiaTestoAssistenzaStudenti()" class="btn btn-primary" style="flex:1">Copia testo</button>
-          <button onclick="apriMailAssistenzaStudenti()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
-          <button onclick="chiudiModalAssistenzaStudenti()" class="btn btn-secondary" style="flex:1">Chiudi</button>
-        </div>
-        <p id="copia-confirm-assistenza-studenti" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
-      </div>
-    </div>
 
     <!-- Modal pacchetto comunicazione -->
     <div id="modal-comunicazione" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
@@ -1725,7 +1712,7 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
     <div id="modal-centralino-unificata" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
       <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Mail unica Centralino</h2>
+          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Mail Centralino</h2>
           <button onclick="chiudiModalCentralinoUnificata()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
         </div>
         <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
@@ -1791,22 +1778,6 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
       </div>
     </div>
 
-    <div id="modal-centralino" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
-      <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Richiesta materiale disponibile — Centralino</h2>
-          <button onclick="chiudiModalCentralino()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
-        </div>
-        <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
-        <textarea id="testo-centralino" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
-        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-          <button onclick="copiaTestoCentralino()" class="btn btn-primary" style="flex:1">Copia testo</button>
-          <button onclick="apriMailCentralino()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
-          <button onclick="chiudiModalCentralino()" class="btn btn-secondary" style="flex:1">Chiudi</button>
-        </div>
-        <p id="copia-confirm-centralino" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
-      </div>
-    </div>
 
     <!-- Modal Sollecito Referente (usato sia per "sezioni mancanti" che per "richiesta approfondimento") -->
     <div id="modal-sollecito" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
@@ -3766,7 +3737,28 @@ function aggiornaSintesiCompleta() {
   var dotVoci = [];
   Object.keys(dotLabels).forEach(function(key) {
     var v = getField(key);
-    if (v) dotVoci.push('<strong>' + dotLabels[key] + ':</strong> ' + escapeHTML(v));
+    var disp = getField('dot_disp_' + key.replace('dot_', ''));
+    var badge = '';
+    if (disp === 'Già disponibile (Conservatorio)') badge = ' <span style="background:#E8F5E9;color:#2E7D32;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600">✓ Disponibile</span>';
+    else if (disp === 'Da acquistare/noleggiare') badge = ' <span style="background:#FFF3E0;color:#E65100;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600">⚠ Da acquistare/noleggiare</span>';
+    else if (disp === 'Disponibile nella struttura') badge = ' <span style="background:#F3E5F5;color:#6A1B9A;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600">🏛 Disponibile nella struttura</span>';
+    else if (disp === 'Prestito') {
+      badge = ' <span style="background:#E3F2FD;color:#1565C0;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600">📦 Prestito</span>';
+      var keyBase = key.replace('dot_', '');
+      var pLuogo = getField('dot_prestito_luogo_' + keyBase);
+      var pRitData = getField('dot_prestito_ritiro_data_' + keyBase);
+      var pRitOra = getField('dot_prestito_ritiro_ora_' + keyBase);
+      var pRicData = getField('dot_prestito_riconsegna_data_' + keyBase);
+      var pRicOra = getField('dot_prestito_riconsegna_ora_' + keyBase);
+      var prestitoBits = [];
+      if (pLuogo) prestitoBits.push('presso ' + escapeHTML(pLuogo));
+      var ritTxt = [pRitData, pRitOra].filter(Boolean).map(escapeHTML).join(' ore ');
+      if (ritTxt) prestitoBits.push('ritiro ' + ritTxt);
+      var ricTxt = [pRicData, pRicOra].filter(Boolean).map(escapeHTML).join(' ore ');
+      if (ricTxt) prestitoBits.push('riconsegna ' + ricTxt);
+      if (prestitoBits.length) badge += '<br><span style="font-size:10px;color:#1565C0;margin-left:2px">' + prestitoBits.join(' · ') + '</span>';
+    }
+    if (v) dotVoci.push('<strong>' + dotLabels[key] + ':</strong> ' + escapeHTML(v) + badge);
   });
   var elDot = document.getElementById('sint_dotazione');
   if (elDot) {
@@ -5570,7 +5562,7 @@ var DETERMINE_FINALITA = {
     tbodyBase: 'preventivi-noleggio-body',
     prefixPreventivo: 'prevnol',
     usaGenerico: true,
-    conIndirizzoPiva: false,
+    conIndirizzoPiva: true,
     oggettoLibero: true
   },
   pers: {
@@ -5592,7 +5584,8 @@ var DETERMINE_FINALITA = {
     tbodyBase: 'preventivi-personale-body',
     prefixPreventivo: 'prevpers',
     usaGenerico: true,
-    conIndirizzoPiva: false,
+    conIndirizzoPiva: true,
+    conIban: true,
     labelDitta: 'Ditta/Cooperativa',
     capitoloEditabile: true,
     capitoloDefault: 'U.P.B. 1.1.2 art. 69 "Collaborazione – Convenzione Orchestra – Corso Direzione d\'Orchestra"'
@@ -5604,11 +5597,12 @@ function renderPannelloDetermina(finKey, istanza) {
   var s = istanza > 1 ? '_' + istanza : '';
   var tbodyId = f.tbodyBase + s;
   var onclickAdd = f.usaGenerico
-    ? f.fnAddPreventivo + "('" + tbodyId + "','" + f.prefixPreventivo + (istanza > 1 ? istanza : '') + "')"
+    ? f.fnAddPreventivo + "('" + tbodyId + "','" + f.prefixPreventivo + (istanza > 1 ? istanza : '') + "'," + !!f.conIndirizzoPiva + "," + !!f.conIban + ")"
     : f.fnAddPreventivo + '(' + istanza + ')';
   var righeExtra = f.conIndirizzoPiva
     ? '<th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">Indirizzo</th>' +
-      '<th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">P.IVA/C.F.</th>'
+      '<th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">P.IVA/C.F.</th>' +
+      (f.conIban ? '<th style="padding:4px 6px;text-align:left;border-bottom:1px solid #D0D7E3">IBAN</th>' : '')
     : '';
   return (
     '<div data-istanza-determina="' + istanza + '" style="margin-top:16px;padding:10px 12px;background:' + f.bgBox + ';border-radius:6px;border-left:3px solid ' + f.colore + '">' +
@@ -5718,19 +5712,21 @@ function aggiornaAssegnazioneVociNoleggio() {
     '</div>';
 }
 
-function addPreventivoGenerico(tbodyId, prefix, conIban) {
+function addPreventivoGenerico(tbodyId, prefix, conIndirizzoPiva, conIban) {
   var tbody = document.getElementById(tbodyId);
   if (!tbody) return;
   var next = parseInt(tbody.getAttribute('data-next-idx') || '0', 10) + 1;
   tbody.setAttribute('data-next-idx', next);
   var tr = document.createElement('tr');
   tr.setAttribute('data-riga', prefix);
-  var campiElimina = conIban ? "['ditta','importo','prot','data','iban','scelto']" : "['ditta','importo','prot','data','scelto']";
+  var campiElimina = "['ditta','importo','prot','data'," + (conIndirizzoPiva ? "'indirizzo','piva'," : '') + (conIban ? "'iban'," : '') + "'scelto']";
   tr.innerHTML =
     '<td style="padding:3px 4px"><input type="text" data-f="ditta" name="' + prefix + '_ditta_' + next + '" placeholder="es. Ditta Rossi Srl" onchange="salvaResponsabileSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:11px;outline:none"></td>' +
     '<td style="padding:3px 4px"><input type="text" data-f="importo" name="' + prefix + '_importo_' + next + '" placeholder="es. 850,00" onchange="salvaResponsabileSuFirestore()" style="width:90px;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:11px;outline:none"></td>' +
     '<td style="padding:3px 4px"><input type="text" data-f="prot" name="' + prefix + '_prot_' + next + '" placeholder="es. 402/2026" onchange="salvaResponsabileSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:11px;outline:none"></td>' +
     '<td style="padding:3px 4px"><input type="text" data-f="data" name="' + prefix + '_data_' + next + '" placeholder="GG/MM/AAAA" onblur="formattaDataItaliana(this)" onchange="salvaResponsabileSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:11px;outline:none"></td>' +
+    (conIndirizzoPiva ? '<td style="padding:3px 4px"><input type="text" data-f="indirizzo" name="' + prefix + '_indirizzo_' + next + '" placeholder="es. Via Roma 1, Terni" onchange="salvaResponsabileSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:11px;outline:none"></td>' +
+      '<td style="padding:3px 4px"><input type="text" data-f="piva" name="' + prefix + '_piva_' + next + '" placeholder="es. 01234567890" onchange="salvaResponsabileSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:11px;outline:none"></td>' : '') +
     (conIban ? '<td style="padding:3px 4px"><input type="text" data-f="iban" name="' + prefix + '_iban_' + next + '" placeholder="IT.." onchange="salvaResponsabileSuFirestore()" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:11px;outline:none"></td>' : '') +
     '<td style="padding:3px 4px;text-align:center"><input type="checkbox" data-f="scelto" name="' + prefix + '_scelto_' + next + '" onchange="gestisciSceltaPreventivoGenerico(this); salvaResponsabileSuFirestore();" style="width:16px;height:16px;margin:0"></td>' +
     '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="eliminaRiga(this,\'' + tbodyId + '\',\'' + prefix + '\',' + campiElimina + ',null); salvaResponsabileSuFirestore();" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;">✕</button></td>';
@@ -5841,7 +5837,7 @@ function generaPDFRichiestaPreventivoTrasportoPersone() {
     ['Denominazione', 'Conservatorio di Musica "G. Briccialdi" – Terni'],
     ['Indirizzo', 'Via del Tribunale, 22, 05100 Terni (TR)'],
     ['Codice Fiscale', '91052640553'],
-    ['Referente istruttore (RUP)', '[___ Nome RUP ___]'],
+    ['Referente istruttore (RUP)', 'Dott.ssa Alessandra Angelucci'],
     ['Contatto e-mail', 'acquisti@briccialditerni.it']
   ];
   doc.setDrawColor(200);
@@ -5901,7 +5897,7 @@ function generaPDFRichiestaPreventivoTrasportoPersone() {
   doc.setFont('times', 'normal'); doc.setFontSize(12);
   doc.text('Il Responsabile del Procedimento', marginL, y);
   y += 5;
-  doc.text('[___ Nome RUP ___]', marginL, y);
+  doc.text('Dott.ssa Alessandra Angelucci', marginL, y);
 
   var nPagine = doc.internal.getNumberOfPages();
   for (var pg = 1; pg <= nPagine; pg++) {
@@ -6263,6 +6259,9 @@ function generaPDFRichiestaPreventivoTrasporti(istanza) {
     if (dCp) dateConcerti.push(dCp);
     dcp++;
   }
+  var frasiDate = '';
+  if (dateProve.length) frasiDate += 'con prove nei giorni ' + dateProve.join(', ') + ' ';
+  if (dateConcerti.length) frasiDate += (dateProve.length ? 'e ' : 'con ') + 'concerti nei giorni ' + dateConcerti.join(', ') + ', ';
 
   var scadenzaData = getField('determina_trasp_scadenza_data' + suf) || '[___ Data scadenza ___]';
   var scadenzaOra = getField('determina_trasp_scadenza_ora' + suf) || '[___ Ora scadenza ___]';
@@ -6571,6 +6570,7 @@ function generaPDFRichiestaPreventivoPersonaleEsterno(istanza) {
   var dataEvento = getField('data_evento') || '';
   generaPDFRichiestaPreventivoGenerica({
     sottotitolo: 'Fornitura strumentisti/ruoli tramite cooperativa',
+    rup: 'Dott.ssa Susanna Fanizza',
     introTesto: 'Il Conservatorio di Musica "G. Briccialdi" di Terni necessita della fornitura, tramite cooperativa, dei seguenti strumentisti/ruoli esterni in occasione della produzione ' + (metadati.titolo || '[___ Titolo progetto ___]') + (dataEvento ? ', in programma il ' + dataEvento : '') + '.',
     elencoTitolo: 'Elenco strumentisti/ruoli richiesti',
     elencoVoci: elenco,
@@ -6601,7 +6601,9 @@ function generaBozzaDeterminaPersonale(istanza) {
     var dataP = row.querySelector('[data-f="data"]');
     var sceltoCb = row.querySelector('[data-f="scelto"]');
     var iban = row.querySelector('[data-f="iban"]');
-    var v = { ditta: ditta ? ditta.value.trim() : '', importo: importo ? importo.value.trim() : '', prot: prot ? prot.value.trim() : '', data: dataP ? dataP.value.trim() : '', iban: iban ? iban.value.trim() : '' };
+    var indirizzo = row.querySelector('[data-f="indirizzo"]');
+    var piva = row.querySelector('[data-f="piva"]');
+    var v = { ditta: ditta ? ditta.value.trim() : '', importo: importo ? importo.value.trim() : '', prot: prot ? prot.value.trim() : '', data: dataP ? dataP.value.trim() : '', iban: iban ? iban.value.trim() : '', indirizzo: indirizzo ? indirizzo.value.trim() : '', piva: piva ? piva.value.trim() : '' };
     if (!v.ditta && !v.importo) return;
     preventivi.push(v);
     if (sceltoCb && sceltoCb.checked) scelto = v;
@@ -6940,7 +6942,9 @@ function apriMailNoleggio() {
 }
 
 // ═══ RICHIESTA CENTRALINO — materiale già disponibile in Conservatorio, con indicazione delle giornate ═══
-function generaRichiestaCentralino() {
+// Costruisce il testo della sezione per la Mail Centralino: { lines } se c'è
+// contenuto, altrimenti { vuoto: motivo } — nessun avviso, decide il chiamante.
+function costruisciTestoCentralino() {
   var voci = [
     ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie orchestrali'],
     ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
@@ -6963,8 +6967,7 @@ function generaRichiestaCentralino() {
     }
   });
   if (righeMateriale.length === 0) {
-    alert('Nessuna voce marcata "Già disponibile (Conservatorio)". Vai al pannello "✅ Dotazione Tecnica — Disponibilità" qui sopra e classifica le voci.');
-    return;
+    return { vuoto: 'Nessuna voce marcata "Già disponibile (Conservatorio)". Vai al pannello "✅ Dotazione Tecnica — Disponibilità" qui sopra e classifica le voci.' };
   }
   var lines = [];
   lines.push('Gentile Centralino,');
@@ -7026,25 +7029,13 @@ function generaRichiestaCentralino() {
   lines.push('');
   lines.push('Cordiali saluti,');
   lines.push('Ufficio Produzione');
-  document.getElementById('testo-centralino').value = lines.join('\n');
-  autoResizeTextarea(document.getElementById('testo-centralino'));
-  if (!registraRichiestaGenerata('centralino', 'Centralino')) return;
-  document.getElementById('modal-centralino').style.display = 'block';
-}
-function chiudiModalCentralino() { document.getElementById('modal-centralino').style.display = 'none'; }
-function copiaTestoCentralino() {
-  var ta = document.getElementById('testo-centralino');
-  ta.select();
-  try { document.execCommand('copy'); document.getElementById('copia-confirm-centralino').style.display = 'block'; } catch(e) {}
-}
-function apriMailCentralino() {
-  var sogg = encodeURIComponent('[Richiesta materiale disponibile] ' + (metadati.titolo || 'Progetto'));
-  var corpo = encodeURIComponent(document.getElementById('testo-centralino').value);
-  window.location.href = 'mailto:centralino@briccialditerni.it?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
+  return { lines: lines };
 }
 
 // ── Richiesta Assistenza Studenti (Sezione 8) — verso Centralino ──
-function generaRichiestaAssistenzaStudenti() {
+// Costruisce il testo della sezione per la Mail Centralino: { lines } se c'è
+// contenuto, altrimenti { vuoto: motivo } — nessun avviso, decide il chiamante.
+function costruisciTestoAssistenzaStudenti() {
   var righe = [];
   document.querySelectorAll('#assistenza-logistica-tbody input[type="checkbox"]').forEach(function(cb) {
     if (!cb.checked) return;
@@ -7064,8 +7055,7 @@ function generaRichiestaAssistenzaStudenti() {
   var avRichiesto = elAv && elAv.checked;
 
   if (righe.length === 0 && !avRichiesto) {
-    alert('Nessun appuntamento spuntato per l\'assistenza logistica e nessuna richiesta di assistenza video in Sezione 8. Verifica con il Referente prima di generare la richiesta.');
-    return;
+    return { vuoto: 'Nessun appuntamento spuntato per l\'assistenza logistica e nessuna richiesta di assistenza video in Sezione 8. Verifica con il Referente prima di generare la richiesta.' };
   }
 
   var lines = [];
@@ -7094,62 +7084,59 @@ function generaRichiestaAssistenzaStudenti() {
   lines.push('Cordiali saluti,');
   lines.push('Responsabile Produzione');
 
-  document.getElementById('testo-assistenza-studenti').value = lines.join('\n');
-  autoResizeTextarea(document.getElementById('testo-assistenza-studenti'));
-  if (!registraRichiestaGenerata('assistenza_studenti', 'Assistenza Studenti')) return;
-  document.getElementById('modal-assistenza-studenti').style.display = 'block';
-}
-function chiudiModalAssistenzaStudenti() { document.getElementById('modal-assistenza-studenti').style.display = 'none'; }
-function copiaTestoAssistenzaStudenti() {
-  var ta = document.getElementById('testo-assistenza-studenti');
-  ta.select();
-  try { document.execCommand('copy'); document.getElementById('copia-confirm-assistenza-studenti').style.display = 'block'; } catch(e) {}
-}
-function apriMailAssistenzaStudenti() {
-  var sogg = encodeURIComponent('[Richiesta Assistenza Studenti] ' + (metadati.titolo || 'Progetto'));
-  var corpo = encodeURIComponent(document.getElementById('testo-assistenza-studenti').value);
-  window.location.href = 'mailto:centralino@briccialditerni.it?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
+  return { lines: lines };
 }
 
-// ═══ MAIL UNICA CENTRALINO — unisce Dotazione Tecnica + Assistenza Studenti già generate ═══
-// Non ricalcola nulla: prende i testi già pronti nelle rispettive textarea, così il
-// contenuto resta identico a quanto il Responsabile ha già verificato singolarmente.
-function generaMailUnicaCentralino() {
+// ═══ MAIL CENTRALINO — unico punto di generazione per tutto ciò che va al Centralino.
+// Legge direttamente i dati attuali di ogni sezione, senza richieste singole da
+// generare prima: una sola sezione con contenuto → mail semplice con il testo di
+// quella sezione; più sezioni → mail cumulativa; nessuna → non genera nulla. ═══
+function generaMailCentralino() {
   var sezioni = [
-    { chiave: 'centralino', etichetta: 'DOTAZIONE TECNICA', taId: 'testo-centralino' },
-    { chiave: 'assistenza_studenti', etichetta: 'ASSISTENZA STUDENTI', taId: 'testo-assistenza-studenti' }
+    { etichetta: 'DOTAZIONE TECNICA', costruisci: costruisciTestoCentralino, oggetto: '[Richiesta materiale disponibile]' },
+    { etichetta: 'ASSISTENZA STUDENTI', costruisci: costruisciTestoAssistenzaStudenti, oggetto: '[Richiesta Assistenza Studenti]' }
   ];
-  var disponibili = sezioni.filter(function(s) {
-    var ta = document.getElementById(s.taId);
-    return !!(ta && ta.value && ta.value.trim().length > 0);
+  var piene = [], motiviVuote = [];
+  sezioni.forEach(function(s) {
+    var r = s.costruisci();
+    if (r.lines) piene.push({ sezione: s, lines: r.lines });
+    else motiviVuote.push('• ' + s.etichetta + ': ' + r.vuoto);
   });
-  if (disponibili.length < 2) {
-    alert('Genera sia la richiesta Dotazione Tecnica sia quella Assistenza Studenti prima di comporre la mail unica.');
+  if (piene.length === 0) {
+    alert('Nessun contenuto da inviare al Centralino:\n\n' + motiviVuote.join('\n'));
     return;
   }
-  var lines = [];
-  lines.push('Gentile Centralino,');
-  lines.push('');
-  lines.push('si riepilogano di seguito le richieste per il progetto "' + (metadati.titolo || '') + '":');
-  disponibili.forEach(function(s) {
-    var ta = document.getElementById(s.taId);
-    var testo = ta ? ta.value : '';
-    var corpo = testo
-      .replace(/^Gentile[^\n]*\n+/, '')
-      .replace(/\n*Cordiali saluti,\n*Ufficio Produzione\s*$/, '')
-      .trim();
+  var lines;
+  if (piene.length === 1) {
+    // Una sola sezione: stesso testo (e stesso oggetto) della vecchia richiesta singola.
+    lines = piene[0].lines;
+    window._oggettoMailCentralino = piene[0].sezione.oggetto;
+  } else {
+    lines = [];
+    lines.push('Gentile Centralino,');
     lines.push('');
-    lines.push('── ' + s.etichetta + ' ──');
-    lines.push(corpo);
-  });
-  lines.push('');
-  lines.push('Si prega di confermare disponibilità.');
-  lines.push('');
-  lines.push('Cordiali saluti,');
-  lines.push('Ufficio Produzione');
+    lines.push('si riepilogano di seguito le richieste per il progetto "' + (metadati.titolo || '') + '":');
+    piene.forEach(function(p) {
+      // Tolgo il saluto/firma di ciascuna sezione, che qui è ridondante:
+      // resta solo il corpo specifico.
+      var corpo = p.lines.join('\n')
+        .replace(/^Gentile[^\n]*\n+/, '')
+        .replace(/\n*Cordiali saluti,\n*Ufficio Produzione\s*$/, '')
+        .trim();
+      lines.push('');
+      lines.push('── ' + p.sezione.etichetta + ' ──');
+      lines.push(corpo);
+    });
+    lines.push('');
+    lines.push('Si prega di confermare disponibilità.');
+    lines.push('');
+    lines.push('Cordiali saluti,');
+    lines.push('Ufficio Produzione');
+    window._oggettoMailCentralino = '[Richiesta Centralino]';
+  }
   document.getElementById('testo-centralino-unificata').value = lines.join('\n');
   autoResizeTextarea(document.getElementById('testo-centralino-unificata'));
-  if (!registraRichiestaGenerata('centralino_unificata', 'Centralino (mail unica)')) return;
+  if (!registraRichiestaGenerata('centralino', 'Centralino')) return;
   document.getElementById('modal-centralino-unificata').style.display = 'block';
 }
 function chiudiModalCentralinoUnificata() { document.getElementById('modal-centralino-unificata').style.display = 'none'; }
@@ -7159,7 +7146,7 @@ function copiaTestoCentralinoUnificata() {
   try { document.execCommand('copy'); document.getElementById('copia-confirm-centralino-unificata').style.display = 'block'; } catch(e) {}
 }
 function apriMailCentralinoUnificata() {
-  var sogg = encodeURIComponent('[Richiesta Centralino] ' + (metadati.titolo || 'Progetto'));
+  var sogg = encodeURIComponent((window._oggettoMailCentralino || '[Richiesta Centralino]') + ' ' + (metadati.titolo || 'Progetto'));
   var corpo = encodeURIComponent(document.getElementById('testo-centralino-unificata').value);
   window.location.href = 'mailto:centralino@briccialditerni.it?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
 }
@@ -7473,7 +7460,7 @@ function caricaDaFirestore(id) {
           });
           for (var jPrevTrasp = 0; jPrevTrasp < maxPrevIstTrasp; jPrevTrasp++) { addPreventivoTrasporti(iIstTrasp); }
         }
-        for (var iPN = 0; iPN < maxPrevNol; iPN++) { addPreventivoGenerico('preventivi-noleggio-body', 'prevnol'); }
+        for (var iPN = 0; iPN < maxPrevNol; iPN++) { addPreventivoGenerico('preventivi-noleggio-body', 'prevnol', true); }
         // Ricrea eventuali istanze aggiuntive di Determina Noleggio (2, 3...) — qui il
         // pulsante "+ Aggiungi Determina" resta visibile (a differenza di Trasporti/Personale).
         var maxIstanzaNol = 1;
@@ -7488,10 +7475,10 @@ function caricaDaFirestore(id) {
             var mPIN = k.match(new RegExp('^prevnol' + iIstNol + '_ditta_(\\d+)$'));
             if (mPIN) maxPrevIstNol = Math.max(maxPrevIstNol, parseInt(mPIN[1], 10));
           });
-          for (var jPrevNol = 0; jPrevNol < maxPrevIstNol; jPrevNol++) { addPreventivoGenerico('preventivi-noleggio-body_' + iIstNol, 'prevnol' + iIstNol); }
+          for (var jPrevNol = 0; jPrevNol < maxPrevIstNol; jPrevNol++) { addPreventivoGenerico('preventivi-noleggio-body_' + iIstNol, 'prevnol' + iIstNol, true); }
         }
         aggiornaAssegnazioneVociNoleggio();
-        for (var iPP = 0; iPP < maxPrevPers; iPP++) { addPreventivoGenerico('preventivi-personale-body', 'prevpers'); }
+        for (var iPP = 0; iPP < maxPrevPers; iPP++) { addPreventivoGenerico('preventivi-personale-body', 'prevpers', true, true); }
         // Ricrea eventuali istanze aggiuntive di Determina Personale (2, 3...) — il
         // pulsante "+ Aggiungi Determina" resta nascosto per Personale (non serve
         // dividere), ma la ricostruzione resta corretta se in futuro venisse riattivato.
@@ -7507,7 +7494,7 @@ function caricaDaFirestore(id) {
             var mPIP = k.match(new RegExp('^prevpers' + iIstPers + '_ditta_(\\d+)$'));
             if (mPIP) maxPrevIstPers = Math.max(maxPrevIstPers, parseInt(mPIP[1], 10));
           });
-          for (var jPrevPers = 0; jPrevPers < maxPrevIstPers; jPrevPers++) { addPreventivoGenerico('preventivi-personale-body_' + iIstPers, 'prevpers' + iIstPers); }
+          for (var jPrevPers = 0; jPrevPers < maxPrevIstPers; jPrevPers++) { addPreventivoGenerico('preventivi-personale-body_' + iIstPers, 'prevpers' + iIstPers, true, true); }
         }
         // Ricrea le righe "Preventivi Trasporto Persone" mancanti (istanza singola)
         for (var iPTP = 0; iPTP < maxPrevTrper; iPTP++) { addPreventivoTrasportoPersone(); }

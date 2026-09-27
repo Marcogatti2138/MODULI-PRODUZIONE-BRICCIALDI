@@ -36,6 +36,9 @@ function costruisciTestoDeterminaTrasporti(cfg) {
   var preventivi = cfg.preventivi;
   var importoScelto = parseImportoIt(scelto.importo);
   var nomeRUP = (!isNaN(importoScelto) && importoScelto < 5000) ? 'Dott.ssa Alessandra Angelucci' : 'Dott.ssa Susanna Fanizza';
+  var protRichiesta = cfg.protRichiesta;
+  var scadenzaOraRichiesta = cfg.scadenzaOraRichiesta;
+  var scadenzaDataRichiesta = cfg.scadenzaDataRichiesta;
   var ivaCalcolata = isNaN(importoScelto) ? NaN : importoScelto * 0.22;
   var totaleConIva = isNaN(importoScelto) ? NaN : importoScelto * 1.22;
   var lines = [];
@@ -254,6 +257,9 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   var preventivi = cfg.preventivi;
   var importoScelto = parseImportoIt(scelto.importo);
   var nomeRUP = (!isNaN(importoScelto) && importoScelto < 5000) ? 'Dott.ssa Alessandra Angelucci' : 'Dott.ssa Susanna Fanizza';
+  var protRichiesta = cfg.protRichiesta;
+  var scadenzaOraRichiesta = cfg.scadenzaOraRichiesta;
+  var scadenzaDataRichiesta = cfg.scadenzaDataRichiesta;
   var ivaCalcolata = isNaN(importoScelto) ? NaN : importoScelto * 0.22;
   var totaleConIva = isNaN(importoScelto) ? NaN : importoScelto * 1.22;
   var lines = [];
@@ -281,7 +287,7 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('');
   lines.push('si rende necessario procedere all\'affidamento del servizio di cui in oggetto al fine di consentire lo svolgimento ' + cfg.eventoRichiamatoTxt + ';');
   lines.push('');
-  lines.push('TENUTO CONTO della Delibera del Consiglio Accademico ' + (metadati.delibera ? 'n. ' + metadati.delibera + (metadati.data_delibera ? ' del ' + metadati.data_delibera : '') : '[___ N. Delibera ___]') + ' di approvazione ' + cfg.approvazioneEventoTxt + ';');
+  lines.push('TENUTO CONTO della Delibera del Consiglio Accademico ' + (cfg.delibera ? 'n. ' + cfg.delibera + (cfg.dataDelibera ? ' del ' + cfg.dataDelibera : '') : '[___ N. Delibera ___]') + ' di approvazione ' + cfg.approvazioneEventoTxt + ';');
   lines.push('');
   lines.push('RAVVISATA come da richieste inviate, via e-mail, dal Responsabile Produzione avente prot. ' + protRichiesta + ', la necessità di supportare la realizzazione ' + cfg.realizzazioneEventoTxt + ' con la fornitura di quanto segue:');
   lines.push('');
@@ -292,7 +298,7 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('CONSIDERATO che, entro il termine sopra indicato sono pervenute n. ' + preventivi.length + ' offerta/e dalle seguenti ditte:');
   lines.push('');
   preventivi.forEach(function(p) {
-    lines.push('- ditta ' + p.ditta + ', con sede in [___ indirizzo ___] (P.IVA/C.F. [___ P.IVA/C.F. ___]), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA;');
+    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA;');
     lines.push('');
   });
   lines.push('CONSIDERATO che la ditta ' + scelto.ditta + ' si è resa disponibile a svolgere il servizio alle condizioni economiche più vantaggiose e con le modalità richieste da questo Ente;');
@@ -355,7 +361,7 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, della fornitura di beni/servizi' + cfg.fraseDeterminaFinale + ', alla ' + scelto.ditta + ', [___ indirizzo completo ___], P.IVA/C.F. [___ P.IVA/C.F. ___], alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
+  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, della fornitura di beni/servizi' + cfg.fraseDeterminaFinale + ', alla ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
   lines.push('');
   lines.push('di impegnare la somma complessiva di € ' + formattaImportoIt(totaleConIva) + ', di cui € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment, dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica;');
   lines.push('');
@@ -413,7 +419,9 @@ function generaBozzaDeterminaNoleggio(istanza, cfgSezioni) {
     var prot = row.querySelector('[data-f="prot"]');
     var dataP = row.querySelector('[data-f="data"]');
     var sceltoCb = row.querySelector('[data-f="scelto"]');
-    var v = { ditta: ditta ? ditta.value.trim() : '', importo: importo ? importo.value.trim() : '', prot: prot ? prot.value.trim() : '', data: dataP ? dataP.value.trim() : '' };
+    var indirizzo = row.querySelector('[data-f="indirizzo"]');
+    var piva = row.querySelector('[data-f="piva"]');
+    var v = { ditta: ditta ? ditta.value.trim() : '', importo: importo ? importo.value.trim() : '', prot: prot ? prot.value.trim() : '', data: dataP ? dataP.value.trim() : '', indirizzo: indirizzo ? indirizzo.value.trim() : '', piva: piva ? piva.value.trim() : '' };
     if (!v.ditta && !v.importo) return;
     preventivi.push(v);
     if (sceltoCb && sceltoCb.checked) scelto = v;
@@ -441,6 +449,8 @@ function generaBozzaDeterminaNoleggio(istanza, cfgSezioni) {
     realizzazioneEventoTxt: 'dell\'evento',
     fraseFornitura: (dataEventoTesto ? ' del ' + dataEventoTesto : '') + (metadati.titolo ? ' in occasione di "' + metadati.titolo + '"' : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : ''),
     fraseDeterminaFinale: (dataEventoTesto ? ' del ' + dataEventoTesto : '') + (metadati.titolo ? ' in occasione di "' + metadati.titolo + '"' : ''),
+    delibera: metadati.delibera,
+    dataDelibera: metadati.data_delibera,
     protRichiesta: protRichiesta,
     scadenzaOraRichiesta: scadenzaOraRichiesta,
     scadenzaDataRichiesta: scadenzaDataRichiesta,
@@ -506,7 +516,7 @@ function costruisciPDFRichiestaPreventivoTrasporti(cfg, jsPDFCtor) {
     ['Denominazione', 'Conservatorio di Musica "G. Briccialdi" – Terni'],
     ['Indirizzo', 'Via del Tribunale, 22, 05100 Terni (TR)'],
     ['Codice Fiscale', '91052640553'],
-    ['Referente istruttore (RUP)', '[___ Nome RUP ___]'],
+    ['Referente istruttore (RUP)', 'Dott.ssa Alessandra Angelucci'],
     ['Contatto e-mail', 'acquisti@briccialditerni.it']
   ];
   doc.setDrawColor(200);
@@ -601,7 +611,7 @@ function costruisciPDFRichiestaPreventivoTrasporti(cfg, jsPDFCtor) {
   doc.setFont('times', 'normal'); doc.setFontSize(12);
   doc.text('Il Responsabile del Procedimento', marginL, y);
   y += 5;
-  doc.text('[___ Nome RUP ___]', marginL, y);
+  doc.text('Dott.ssa Alessandra Angelucci', marginL, y);
 
   var nPagine = doc.internal.getNumberOfPages();
   for (var pg = 1; pg <= nPagine; pg++) {
@@ -660,7 +670,7 @@ function costruisciPDFRichiestaPreventivoNoleggio(cfg, jsPDFCtor) {
     ['Denominazione', 'Conservatorio di Musica "G. Briccialdi" – Terni'],
     ['Indirizzo', 'Via del Tribunale, 22, 05100 Terni (TR)'],
     ['Codice Fiscale', '91052640553'],
-    ['Referente istruttore (RUP)', '[___ Nome RUP ___]'],
+    ['Referente istruttore (RUP)', 'Dott.ssa Alessandra Angelucci'],
     ['Contatto e-mail', 'acquisti@briccialditerni.it']
   ];
   doc.setDrawColor(200);
@@ -721,7 +731,7 @@ function costruisciPDFRichiestaPreventivoNoleggio(cfg, jsPDFCtor) {
   doc.setFont('times', 'normal'); doc.setFontSize(12);
   doc.text('Il Responsabile del Procedimento', marginL, y);
   y += 5;
-  doc.text('[___ Nome RUP ___]', marginL, y);
+  doc.text('Dott.ssa Alessandra Angelucci', marginL, y);
 
   var nPagine = doc.internal.getNumberOfPages();
   for (var pg = 1; pg <= nPagine; pg++) {
@@ -897,8 +907,9 @@ function generaPDFRichiestaPreventivoGenerica(config) {
     alert('Libreria PDF non ancora caricata — verifica la connessione internet e riprova tra qualche secondo.');
     return;
   }
+  var nomeRUP = config.rup || 'Dott.ssa Alessandra Angelucci';
   pdfIntestazioneIstituzionale(ctx, 'RICHIESTA DI PREVENTIVO', config.sottotitolo);
-  pdfTabellaStazioneAppaltante(ctx);
+  pdfTabellaStazioneAppaltante(ctx, nomeRUP);
   pdfParagrafo(ctx, config.introTesto);
   ctx.y += 2;
   pdfParagrafo(ctx, 'L\'affidamento avviene in modalità diretta ai sensi dell\'art. 50, comma 1, lett. b), del D.Lgs. 36/2023 (Codice dei contratti pubblici), trattandosi di servizio di importo inferiore alla soglia di € 140.000. La valutazione di congruità del costo sarà condotta dall\'ufficio sulla base dei prezzi unitari dichiarati in offerta e del raffronto con i valori di mercato.');
@@ -908,7 +919,7 @@ function generaPDFRichiestaPreventivoGenerica(config) {
   if (config.requisitiMinimi) pdfRequisitiMinimi(ctx, config.requisitiMinimi);
   var scadenzaData = getField(config.scadenzaDataFieldName) || '[___ Data scadenza ___]';
   var scadenzaOra = getField(config.scadenzaOraFieldName) || '[___ Ora scadenza ___]';
-  pdfChiusuraLegaleEFirma(ctx, scadenzaData, scadenzaOra, config.oggettoOfferta);
+  pdfChiusuraLegaleEFirma(ctx, scadenzaData, scadenzaOra, config.oggettoOfferta, nomeRUP);
   pdfFooterOgniPagina(ctx);
   pdfSalva(ctx, config.nomeFilePrefisso);
 }
@@ -918,7 +929,10 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   var preventivi = cfg.preventivi;
   var elencoPersonale = cfg.elencoPersonale;
   var importoScelto = parseImportoIt(scelto.importo);
-  var nomeRUP = (!isNaN(importoScelto) && importoScelto < 5000) ? 'Dott.ssa Alessandra Angelucci' : 'Dott.ssa Susanna Fanizza';
+  // RUP fisso (non a soglia €5.000 come Trasporti/Noleggio): per il Personale
+  // Esterno Angelucci firma solo come Direttore di Ragioneria — confermato da Marco.
+  var nomeRUP = 'Dott.ssa Susanna Fanizza';
+  var sedeScelto = (scelto.indirizzo || '[___ indirizzo completo ___]') + ' – P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]');
   var protRichiesta = cfg.protRichiesta;
   var scadenzaOraRichiesta = cfg.scadenzaOraRichiesta;
   var scadenzaDataRichiesta = cfg.scadenzaDataRichiesta;
@@ -957,7 +971,7 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
     lines.push('Entro il termine sopra indicato sono pervenute n. ' + preventivi.length + ' offerte dalle seguenti ditte/cooperative:');
     lines.push('');
     preventivi.forEach(function(p) {
-      lines.push('– ' + p.ditta + ', con sede in [___ indirizzo ___] (P.IVA/C.F. [___ P.IVA/C.F. ___]), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA' + (p === scelto ? ' — SCELTA' : '') + ';');
+      lines.push('– ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA' + (p === scelto ? ' — SCELTA' : '') + ';');
     });
   }
   lines.push('');
@@ -1002,7 +1016,7 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   lines.push('Ai sensi dell\'art. 17 del D.Lgs. 36/2023 e dell\'art. 192 del TUEL, che le caratteristiche essenziali del contratto sono le seguenti:');
   lines.push('');
   lines.push('Oggetto del contratto: Servizio di personale artistico esterno (strumentisti/ruoli)' + (metadati.titolo ? ' per "' + metadati.titolo + '"' : '') + (dataEventoTesto ? ' — ' + dataEventoTesto : '') + (luogoEventoTesto ? ', ' + luogoEventoTesto : ''));
-  lines.push('Operatore economico affidatario: ' + scelto.ditta + ' – [___ indirizzo completo ___] – P.IVA/C.F. [___ P.IVA/C.F. ___] – Rappresentante legale: [___ nome ___]');
+  lines.push('Operatore economico affidatario: ' + scelto.ditta + ' – ' + sedeScelto + ' – Rappresentante legale: [___ nome ___]');
   lines.push('Importo del contratto: € ' + scelto.importo + ' oltre IVA' + (isNaN(totaleConIva) ? '' : ' = € ' + formattaImportoIt(totaleConIva) + ' totale') + ' (split payment)');
   lines.push('Modalità di svolgimento: [___ luogo prove/orari, a carico di chi — completare ___]');
   lines.push('Forma del contratto: Scambio di lettere tramite PEC/sistemi elettronici di recapito certificato qualificato, ai sensi dell\'art. 18, Allegato I.1 D.Lgs. 36/2023');
@@ -1034,7 +1048,7 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('DI AFFIDARE per le motivazioni espresse in premessa il servizio di personale artistico esterno (strumentisti/ruoli)' + (dataEventoTesto ? ' per l\'evento del ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ' a ' + scelto.ditta + ' – [___ indirizzo completo ___] (P.IVA/C.F. [___ P.IVA/C.F. ___]).');
+  lines.push('DI AFFIDARE per le motivazioni espresse in premessa il servizio di personale artistico esterno (strumentisti/ruoli)' + (dataEventoTesto ? ' per l\'evento del ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ' a ' + scelto.ditta + ' – ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ' (P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ').');
   lines.push('');
   lines.push('DI IMPEGNARE la somma complessiva di € ' + (isNaN(totaleConIva) ? scelto.importo + ' oltre IVA' : formattaImportoIt(totaleConIva) + ' (di cui € ' + scelto.importo + ' per imponibile ed € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment)') + ' sul ' + capitolo + ' del Bilancio [___ anno ___], dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica.');
   lines.push('');
