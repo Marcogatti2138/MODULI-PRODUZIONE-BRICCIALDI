@@ -4860,6 +4860,24 @@ function avvisaRimozioneDaTrasporti(label, qta) {
   aggiornaListaColli();
 }
 
+// Campi della Dotazione Tecnica compilati in Sezione 5 (quantità dot_<voce> e nota
+// dot_<voce>_n) — esclusi quelli che stanno dentro il pannello Verifica Materiali.
+function eCampoDotazioneSezione5(n) {
+  return !!n && n.indexOf('dot_') === 0 && n.indexOf('dot_disp_') !== 0 &&
+    n.indexOf('dot_prestito_') !== 0 && n.indexOf('dot_struttura_nota_') !== 0;
+}
+// Ridisegna "Verifica Materiali" dopo una modifica in Sezione 5 (prima veniva
+// costruito solo al caricamento o con "Aggiorna vista"). Prima copia nella cache
+// i valori attuali del pannello (disponibilità, Prestito, Struttura): una riga che
+// sparisce per un attimo (quantità svuotata e riscritta) ritrova le scelte fatte
+// in questa sessione invece di quelle dell'ultimo salvataggio.
+function aggiornaVerificaMateriali() {
+  var cache = window._datiResponsabileCache || (window._datiResponsabileCache = {});
+  document.querySelectorAll('#dotazione-disp-tbody [name]').forEach(function(el) {
+    cache[el.name] = el.value;
+  });
+  costruisciTabellaDotazioneDisp();
+}
 function costruisciTabellaDotazioneDisp() {
   var tbody = document.getElementById('dotazione-disp-tbody');
   if (!tbody) return;
@@ -8690,6 +8708,7 @@ document.addEventListener('input', function() {
   aggiornaSintesiEvento();
   aggiornaRiepilogoPacchettoComunicazione();
   var n = event.target ? event.target.name : '';
+  if (eCampoDotazioneSezione5(n)) aggiornaVerificaMateriali();
   if (n && n.indexOf('dot_') === 0) aggiornaMaterialiTrasportoAutomatici();
   if (n && n.indexOf('org_') === 0) setTimeout(aggiornaDistrib, 50);
   if (n && (n.indexOf('trasp_mat_') === 0)) { aggiornaListaColli(); if (typeof aggiornaSintesiCompleta === 'function') aggiornaSintesiCompleta(); }
@@ -8708,6 +8727,7 @@ document.addEventListener('change', function() {
   aggiornaChecklist();
   aggiornaSintesiEvento();
   var n = event.target ? event.target.name : '';
+  if (eCampoDotazioneSezione5(n)) aggiornaVerificaMateriali();
   if (n && n.indexOf('dot_') === 0) aggiornaMaterialiTrasportoAutomatici();
   if (n === 'trasferta' && typeof costruisciTabellaTrasportoPersone === 'function') costruisciTabellaTrasportoPersone();
   if (n && n.indexOf('trasp_mat_') === 0) { aggiornaListaColli(); if (typeof aggiornaSintesiCompleta === 'function') aggiornaSintesiCompleta(); }
