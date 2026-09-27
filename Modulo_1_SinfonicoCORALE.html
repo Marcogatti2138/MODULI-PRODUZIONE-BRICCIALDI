@@ -4837,6 +4837,9 @@ function avvisaRimozioneDaTrasporti(label, qta) {
   var campiConVoce = [];
   document.querySelectorAll('#trasporti-materiale-tbody textarea[name^="trasp_mat_materiale_"]').forEach(function(input) {
     if (input.value.indexOf(testoVoce) !== -1) {
+      // Tappa che segue ancora la Dotazione: si riallinea da sola (aggiornaMaterialiTrasportoAutomatici).
+      var marcatore = document.querySelector('[name="' + input.name.replace('trasp_mat_materiale_', 'trasp_mat_auto_') + '"]');
+      if (marcatore && input.value.trim() === marcatore.value) return;
       campiConVoce.push(input);
     }
   });
@@ -4845,7 +4848,7 @@ function avvisaRimozioneDaTrasporti(label, qta) {
   if (!conferma) return;
   var nomiCampiToccati = [];
   campiConVoce.forEach(function(input) {
-    var parti = input.value.split(',').map(function(p) { return p.trim(); }).filter(function(p) { return p !== testoVoce; });
+    var parti = input.value.split(',').map(function(p) { return p.trim(); }).filter(function(p) { return p !== testoVoce && p.indexOf(testoVoce + ' — ') !== 0; });
     input.value = parti.join(', ');
     nomiCampiToccati.push(input.name);
   });
@@ -5470,6 +5473,31 @@ function rigeneraTuttiMaterialiTrasporto() {
   salvaReferenteSuFirestore();
 }
 
+// Testo "Materiale da trasportare" di una tappa. L'ultimo suggerimento automatico
+// (Dotazione Tecnica "già disponibile", note incluse) è ricordato nel campo nascosto
+// trasp_mat_auto_<tappa>: finché il testo della tappa coincide con quel suggerimento
+// non è mai stato ritoccato a mano, quindi segue la Dotazione attuale (es. una nota
+// completata dopo); se invece è stato modificato a mano resta com'è.
+function materialeTrasportoTappa(salvato, ultimoAuto, autoAttuale) {
+  var segueAuto = !salvato || salvato === ultimoAuto || salvato === autoAttuale;
+  if (segueAuto) return { testo: autoAttuale, auto: autoAttuale };
+  return { testo: salvato, auto: ultimoAuto };
+}
+// Riallinea al volo le tappe non ritoccate a mano quando cambia la Dotazione Tecnica,
+// senza ricostruire la tabella (che non viene ridisegnata a ogni modifica di Sezione 5).
+function aggiornaMaterialiTrasportoAutomatici() {
+  var autoAttuale = elencoDotazioneDisponibile().join(', ');
+  var cambiati = false;
+  document.querySelectorAll('#trasporti-materiale-tbody textarea[name^="trasp_mat_materiale_"]').forEach(function(ta) {
+    var marcatore = document.querySelector('[name="' + ta.name.replace('trasp_mat_materiale_', 'trasp_mat_auto_') + '"]');
+    if (!marcatore) return;
+    var stato = materialeTrasportoTappa(ta.value.trim(), marcatore.value, autoAttuale);
+    if (ta.value !== stato.testo) { ta.value = stato.testo; cambiati = true; }
+    marcatore.value = stato.auto;
+  });
+  if (cambiati) { aggiornaListaColli(); salvaReferenteSuFirestore(); }
+}
+
 function costruisciTabellaTrasportiMateriale() {
   var tbody = document.getElementById('trasporti-materiale-tbody');
   if (!tbody) return;
@@ -5513,6 +5541,7 @@ function costruisciTabellaTrasportiMateriale() {
   }
 
   var html = '';
+  var materialeAutoAttuale = elencoDotazioneDisponibile().join(', ');
   righe.forEach(function(riga, idx) {
     var bg = idx % 2 === 0 ? 'white' : '#F4F7FC';
     var chiaveCheck = 'trasp_mat_check_' + riga.key;
@@ -5526,14 +5555,11 @@ function costruisciTabellaTrasportiMateriale() {
     // effettivamente assegnato in Vista Spazi (fonte più aggiornata — può
     // differire da quanto proposto dal Referente) 3) proposta originale del Referente.
     var destSalvata = valoreSpazioSalvato(chiaveDest) || spazioEffettivo || riga.luogo || '';
-    var materialeSalvato = valoreSpazioSalvato(chiaveMateriale) || '';
-    // Suggerimento automatico (con note incluse) per qualunque appuntamento con
-    // campo ancora vuoto — non solo il Concerto. Resta comunque modificabile:
-    // una volta salvato un valore manuale, questo non viene più sovrascritto.
-    if (!materialeSalvato) {
-      var dotDisp = elencoDotazioneDisponibile();
-      if (dotDisp.length) materialeSalvato = dotDisp.join(', ');
-    }
+    // Suggerimento automatico (con note incluse) per ogni appuntamento: segue la
+    // Dotazione finché il testo non viene ritoccato a mano (vedi materialeTrasportoTappa).
+    var chiaveMaterialeAuto = 'trasp_mat_auto_' + riga.key;
+    var statoMateriale = materialeTrasportoTappa(valoreSpazioSalvato(chiaveMateriale) || '', valoreSpazioSalvato(chiaveMaterialeAuto) || '', materialeAutoAttuale);
+    var materialeSalvato = statoMateriale.testo;
     var colonnaFurgone;
     if (isRespFurgone) {
       var chiavePartenza = 'trasp_mat_furg_partenza_' + riga.key;
@@ -5561,7 +5587,7 @@ function costruisciTabellaTrasportiMateriale() {
       '<td style="padding:6px 8px">' + escapeHTML(riga.data || '—') + '</td>' +
       '<td style="padding:6px 8px">' + escapeHTML(riga.ora || '—') + '</td>' +
       '<td style="padding:4px"><input type="text" name="' + chiaveDest + '" value="' + escapeAttr(destSalvata) + '" placeholder="Città / luogo" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px"></td>' +
-      '<td style="padding:4px"><textarea name="' + chiaveMateriale + '" rows="1" placeholder="es. 2 leggii, 1 contrabbasso..." style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;resize:vertical">' + escapeHTML(materialeSalvato) + '</textarea></td>' +
+      '<td style="padding:4px"><textarea name="' + chiaveMateriale + '" rows="1" placeholder="es. 2 leggii, 1 contrabbasso..." style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12px;resize:vertical">' + escapeHTML(materialeSalvato) + '</textarea><input type="hidden" name="' + chiaveMaterialeAuto + '" value="' + escapeAttr(statoMateriale.auto) + '"></td>' +
       colonnaFurgone +
       '</tr>';
   });
@@ -8664,6 +8690,7 @@ document.addEventListener('input', function() {
   aggiornaSintesiEvento();
   aggiornaRiepilogoPacchettoComunicazione();
   var n = event.target ? event.target.name : '';
+  if (n && n.indexOf('dot_') === 0) aggiornaMaterialiTrasportoAutomatici();
   if (n && n.indexOf('org_') === 0) setTimeout(aggiornaDistrib, 50);
   if (n && (n.indexOf('trasp_mat_') === 0)) { aggiornaListaColli(); if (typeof aggiornaSintesiCompleta === 'function') aggiornaSintesiCompleta(); }
   if (n && n.indexOf('spartito_') === 0) aggiornaListaSpartiti();
@@ -8681,6 +8708,7 @@ document.addEventListener('change', function() {
   aggiornaChecklist();
   aggiornaSintesiEvento();
   var n = event.target ? event.target.name : '';
+  if (n && n.indexOf('dot_') === 0) aggiornaMaterialiTrasportoAutomatici();
   if (n === 'trasferta' && typeof costruisciTabellaTrasportoPersone === 'function') costruisciTabellaTrasportoPersone();
   if (n && n.indexOf('trasp_mat_') === 0) { aggiornaListaColli(); if (typeof aggiornaSintesiCompleta === 'function') aggiornaSintesiCompleta(); }
   if (n && (n.indexOf('dist_') === 0 || n.indexOf('pers_') === 0 || n.indexOf('spazio_') === 0 || n.indexOf('dot_disp_') === 0 || n.indexOf('determina_') === 0)) {
