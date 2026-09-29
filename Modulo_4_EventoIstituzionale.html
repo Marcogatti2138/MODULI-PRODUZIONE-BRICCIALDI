@@ -2635,14 +2635,18 @@ function proseguiConfermaAvvio(id, noRef) {
     }
   })(20); // fino a 6 secondi di tentativi
 
-  // Genera link Referente e Responsabile — delibera/data_delibera/scadenza restano
-  // solo nei metadati su Firestore: la pagina li rilegge da lì tramite l'id
-  // (vedi caricaDaFirestore), non servono più nella query string del link.
+  // Genera link Referente e Responsabile — delibera/data_delibera/scadenza e
+  // referente/email restano solo nei metadati su Firestore: la pagina li rilegge
+  // da lì tramite l'id (vedi caricaDaFirestore), non servono nella query string.
+  // I link già inviati con referente/email nell'URL continuano a funzionare
+  // (leggiParams li legge, poi Firestore li sostituisce).
   var base = window.location.origin + window.location.pathname;
   var datiLink = Object.assign({}, dati);
   delete datiLink.delibera;
   delete datiLink.data_delibera;
   delete datiLink.scadenza;
+  delete datiLink.referente;
+  delete datiLink.email;
   var p = new URLSearchParams(datiLink);
   var linkResp = base + '?' + p.toString() + '&ruolo=responsabile';
   document.getElementById('av-link-resp').value = linkResp;
