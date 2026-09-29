@@ -497,6 +497,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
 <script src="determina-legale.js"></script>
+<script src="coerenza-date.js"></script>
 <script>
   var firebaseConfig = {
     apiKey: "AIzaSyCnB-Ck9sE4Tt2m_P5rhG8lruWLfEfpXx8",
@@ -2936,12 +2937,12 @@ function verificaCoerenzaProgetto() {
     }
   }
 
-  if (problemi.length === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  // Congruità tra tutte le date del progetto (coerenza-date.js, condiviso dai 4 moduli)
+  var congruita = (typeof verificaCongruitaDate === 'function') ? verificaCongruitaDate(1) : { errori: [], attenzione: [] };
+  var daVerificare = problemi.concat(congruita.attenzione);
+  if (congruita.errori.length === 0 && daVerificare.length === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
   el.style.display = 'block';
-  el.innerHTML = '<div style="background:#FFF3E0;border:1px solid #FFCC80;border-radius:6px;padding:8px 12px;font-size:11px;color:#8B4A00">' +
-    '⚠ Date/orari da verificare (non bloccante — potrebbe essere corretto così):<ul style="margin:4px 0 0 16px;padding:0">' +
-    problemi.map(function(msg) { return '<li>' + escapeHTML(msg) + '</li>'; }).join('') +
-    '</ul></div>';
+  el.innerHTML = htmlAvvisoCoerenzaDate(congruita.errori, daVerificare);
   } catch (e) {
     console.warn('verificaCoerenzaProgetto — errore non bloccante:', e);
   }
