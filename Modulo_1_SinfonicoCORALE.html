@@ -1890,7 +1890,7 @@
             <h2 id="titolo-modal-determina-personale" style="font-family:Georgia,serif;font-size:18px;color:#C62828">Bozza Determina — Personale Esterno</h2>
             <button onclick="chiudiModalDeterminaPersonale()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
           </div>
-          <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Bozza istruttoria ricalcata su facsimile reale (Determina n. 083/2026, Aggiunti Orchestrali) — verificare comunque con attenzione prima dell'invio. I campi tra [___ ___] vanno completati da Acquisti/Ragioneria (CIG, N° Protocollo, N° Determina). RUP e capitolo di bilancio sono precompilati ma modificabili nel pannello qui sopra. Copia il testo, apri in Mail, o genera il documento Word con intestazione pronto per essere rifinito e protocollato.</p>
+          <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Bozza istruttoria ricalcata su facsimile reale (Determina n. 134/2026, Aggiunti Orchestrali) — verificare comunque con attenzione prima dell'invio. I campi tra [___ ___] vanno completati da Acquisti/Ragioneria (CIG, N° Protocollo, N° Determina). RUP e capitolo di bilancio sono precompilati ma modificabili nel pannello qui sopra. Copia il testo, apri in Mail, o genera il documento Word con intestazione pronto per essere rifinito e protocollato.</p>
           <textarea id="testo-determina-personale" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical"></textarea>
           <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
             <button onclick="generaDOCXDeterminaPersonale()" class="btn btn-primary" style="flex:1;background:#C62828">📝 Genera Documento Word Determina</button>
@@ -7055,7 +7055,10 @@ function generaPDFRichiestaPreventivoPersonaleEsterno(istanza) {
 // Ricalcata sul facsimile reale Determina n. 083/2026 (Aggiunti Orchestrali,
 // Prot. 2860 del 22/05/2026): struttura Premesso/Tenuto conto/Rilevato che
 // (deroga rotazione)/Dato atto (tabella caratteristiche contratto)/Considerato/
-// Visti/Determina — non più "per analogia" con Trasporti/Noleggio. Due
+// Visti/Determina — non più "per analogia" con Trasporti/Noleggio.
+// Aggiornata poi sul facsimile Determina n. 134/2026 (settembre 2026, stessa
+// categoria), che aggiunge la nomina del RUP come Direttore dell'Esecuzione
+// (art. 114 c.3) e la clausola risolutiva per carenza requisiti. Due
 // differenze sostanziali rispetto a Trasporti/Noleggio, confermate da Marco:
 // 1) RUP fisso Dott.ssa Susanna Fanizza (non Angelucci — qui Angelucci firma
 //    solo come Direttore di Ragioneria per la copertura finanziaria);
