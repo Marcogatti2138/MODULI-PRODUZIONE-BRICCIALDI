@@ -2586,9 +2586,10 @@ function verificaCoerenzaProgetto() {
   // Congruità tra tutte le date del progetto (coerenza-date.js, condiviso dai 4 moduli)
   var congruita = (typeof verificaCongruitaDate === 'function') ? verificaCongruitaDate(2) : { errori: [], attenzione: [] };
   var daVerificare = problemi.concat(congruita.attenzione);
-  if (congruita.errori.length === 0 && daVerificare.length === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
-  el.style.display = 'block';
-  el.innerHTML = htmlAvvisoCoerenzaDate(congruita.errori, daVerificare);
+  // Sempre chiamata, anche senza segnalazioni: toglie i bordi ambra rimasti dal giro precedente
+  var htmlAvviso = htmlAvvisoCoerenzaDate(congruita.errori, daVerificare);
+  el.style.display = htmlAvviso ? 'block' : 'none';
+  el.innerHTML = htmlAvviso;
   } catch (e) {
     console.warn('verificaCoerenzaProgetto — errore non bloccante:', e);
   }

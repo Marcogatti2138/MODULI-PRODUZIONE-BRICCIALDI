@@ -4,11 +4,13 @@
 // le incongruenze in due gruppi: errori probabili e punti da verificare.
 // Sola lettura: non modifica campi né dati salvati, non blocca nulla. Il
 // risultato si aggiunge all'avviso ambra di verificaCoerenzaProgetto() in cima
-// al modulo. Le regole sui campi del Responsabile (furgone, prestito,
+// al modulo: ogni voce è cliccabile (porta al campo) e i campi coinvolti hanno
+// il bordo ambra. Le regole sui campi del Responsabile (furgone, prestito,
 // centralino, scadenze offerte) si vedono solo in vista Responsabile.
 //
 // Usa, se presenti nel modulo che carica il file: getField, metadati,
-// elencoVociInPrestito, valoreSpazioSalvato, window._statoProgetto.
+// elencoVociInPrestito, valoreSpazioSalvato, ricalcolaTextareaSezione,
+// window._statoProgetto.
 //
 // Regole (decise con Marco il 29/09/2026):
 //   E0 data evento a più di 12 mesi da oggi          (errore)
@@ -26,10 +28,15 @@
 //   A5 scadenza offerte non prima del primo servizio (Resp)
 //   A6 replica in altra sede senza persone da trasportare indicate (Mod. 1, 2, 4)
 //   A7 concerti finali fuori dal periodo masterclass ±7 giorni (Mod. 3)
+//
+// Ogni voce è { testo, campi }: campi elenca i riferimenti ai campi coinvolti —
+// il nome del campo, oppure "prestito|<voce>|ritiro|riconsegna", "furgone|<tipo tappa>",
+// "trasferta|<tappa>" quando il nome dipende da una riga della tabella.
 
 var CD_MESI_E1 = 6;
 var CD_MESI_E0 = 12;
 var CD_MARGINE_GIORNI = 7;
+var CD_SERVIZI = { trasp: 'Trasporti', nol: 'Noleggio/Service', trper: 'Trasferta Persone', pers: 'Personale Esterno' };
 
 function cdCampo(nome) {
   if (typeof getField === 'function') return getField(nome);
@@ -117,6 +124,8 @@ function cdSedeAppuntamento(key) {
 // modulo: 1 Sinfonico-Corale, 2 Piccolo Concerto, 3 Masterclass, 4 Evento Istituzionale
 function verificaCongruitaDate(modulo) {
   var errori = [], attenzione = [];
+  var err = function(testo, campi) { errori.push({ testo: testo, campi: campi || [] }); };
+  var att = function(testo, campi) { attenzione.push({ testo: testo, campi: campi || [] }); };
   try {
     var isResp = typeof metadati !== 'undefined' && metadati && metadati.ruolo === 'responsabile';
     var masterclass = modulo === 3;
@@ -129,6 +138,7 @@ function verificaCongruitaDate(modulo) {
     var inizioEvento = cdData(cdCampo('data_evento'));
     var fineEvento = masterclass ? (cdData(cdCampo('data_evento_fine')) || inizioEvento) : inizioEvento;
     var nomeEvento = masterclass ? 'Periodo Masterclass' : 'Data evento';
+    var campiEvento = masterclass ? ['data_evento', 'data_evento_fine'] : ['data_evento'];
 
     var prove = cdIndici('prova_data_').map(function(n) {
       return { n: n, str: cdCampo('prova_data_' + n), data: cdData(cdCampo('prova_data_' + n)) };
@@ -172,24 +182,27 @@ function verificaCongruitaDate(modulo) {
     }
     campiReferente.concat(campiResp).forEach(function(c) {
       var v = cdCampo(c[0]);
-      if (v && !cdData(v)) { errori.push(c[1] + ': "' + v + '" non è una data valida (formato GG/MM/AAAA)'); segnalati[c[0]] = true; }
+      if (v && !cdData(v)) { err(c[1] + ': "' + v + '" non è una data valida (formato GG/MM/AAAA)', [c[0]]); segnalati[c[0]] = true; }
     });
     prestiti.forEach(function(p) {
       [['ritiroData', 'ritiro'], ['riconsegnaData', 'riconsegna']].forEach(function(x) {
-        if (p[x[0]] && !cdData(p[x[0]])) { errori.push('Prestito "' + p.label + '" — ' + x[1] + ': "' + p[x[0]] + '" non è una data valida'); segnalati['prestito_' + p.label] = true; }
+        if (p[x[0]] && !cdData(p[x[0]])) {
+          err('Prestito "' + p.label + '" — ' + x[1] + ': "' + p[x[0]] + '" non è una data valida', ['prestito|' + p.label + '|' + x[1]]);
+          segnalati['prestito_' + p.label] = true;
+        }
       });
     });
 
     // ── E0 / D0 — data evento rispetto a oggi ──
     if (inizioEvento) {
       if (inizioEvento > cdAggiungiMesi(oggi, CD_MESI_E0)) {
-        errori.push(nomeEvento + ' (' + cdFmt(inizioEvento) + ') è a più di ' + CD_MESI_E0 + ' mesi da oggi: controlla l\'anno');
+        err(nomeEvento + ' (' + cdFmt(inizioEvento) + ') è a più di ' + CD_MESI_E0 + ' mesi da oggi: controlla l\'anno', ['data_evento']);
       }
       var st = window._statoProgetto || {};
       var attivo = !st.completato && !st.annullato && !st.rimandato;
       var ultimoEvento = cdMax([fineEvento].concat(repliche.map(function(r) { return r.data; }).filter(Boolean)));
       if (attivo && ultimoEvento && ultimoEvento < oggi) {
-        attenzione.push('L\'evento (' + cdFmt(ultimoEvento) + ') è già passato ma il progetto risulta ancora attivo: controlla l\'anno o aggiorna lo stato');
+        att('L\'evento (' + cdFmt(ultimoEvento) + ') è già passato ma il progetto risulta ancora attivo: controlla l\'anno o aggiorna lo stato', campiEvento);
       }
     }
 
@@ -197,20 +210,20 @@ function verificaCongruitaDate(modulo) {
     if (inizioEvento) {
       var limiteInf = cdAggiungiMesi(inizioEvento, -CD_MESI_E1), limiteSup = cdAggiungiMesi(fineEvento, CD_MESI_E1);
       var periodoTesto = cdFmt(inizioEvento) + (fineEvento - inizioEvento ? '–' + cdFmt(fineEvento) : '');
-      var fuoriPeriodo = function(chiave, etichetta, d) {
+      var fuoriPeriodo = function(chiave, etichetta, d, campo) {
         if (!d || segnalati[chiave]) return;
         if (d < limiteInf || d > limiteSup) {
-          errori.push(etichetta + ' (' + cdFmt(d) + ') è a più di ' + CD_MESI_E1 + ' mesi dall\'evento (' + periodoTesto + '): controlla l\'anno');
+          err(etichetta + ' (' + cdFmt(d) + ') è a più di ' + CD_MESI_E1 + ' mesi dall\'evento (' + periodoTesto + '): controlla l\'anno', [campo]);
           segnalati[chiave] = true;
         }
       };
       campiReferente.concat(campiResp).forEach(function(c) {
         if (c[0] === 'data_evento' || c[0] === 'data_evento_fine' || c[0].indexOf('determina_') === 0) return;
-        fuoriPeriodo(c[0], c[1], cdData(cdCampo(c[0])));
+        fuoriPeriodo(c[0], c[1], cdData(cdCampo(c[0])), c[0]);
       });
       prestiti.forEach(function(p) {
-        fuoriPeriodo('prestito_' + p.label, 'Prestito "' + p.label + '" — ritiro', cdData(p.ritiroData));
-        fuoriPeriodo('prestito_' + p.label, 'Prestito "' + p.label + '" — riconsegna', cdData(p.riconsegnaData));
+        fuoriPeriodo('prestito_' + p.label, 'Prestito "' + p.label + '" — ritiro', cdData(p.ritiroData), 'prestito|' + p.label + '|ritiro');
+        fuoriPeriodo('prestito_' + p.label, 'Prestito "' + p.label + '" — riconsegna', cdData(p.riconsegnaData), 'prestito|' + p.label + '|riconsegna');
       });
     }
 
@@ -222,35 +235,35 @@ function verificaCongruitaDate(modulo) {
       prestiti.forEach(function(p) {
         if (segnalati['prestito_' + p.label]) return;
         var rit = cdData(p.ritiroData), ric = cdData(p.riconsegnaData);
-        if (rit && primoUso && rit > primoUso) errori.push('Prestito "' + p.label + '": ritiro (' + cdFmt(rit) + ') dopo il primo utilizzo (' + cdFmt(primoUso) + ')');
-        if (ric && ultimoUso && ric < ultimoUso) errori.push('Prestito "' + p.label + '": riconsegna (' + cdFmt(ric) + ') prima dell\'ultimo utilizzo (' + cdFmt(ultimoUso) + ')');
+        if (rit && primoUso && rit > primoUso) err('Prestito "' + p.label + '": ritiro (' + cdFmt(rit) + ') dopo il primo utilizzo (' + cdFmt(primoUso) + ')', ['prestito|' + p.label + '|ritiro']);
+        if (ric && ultimoUso && ric < ultimoUso) err('Prestito "' + p.label + '": riconsegna (' + cdFmt(ric) + ') prima dell\'ultimo utilizzo (' + cdFmt(ultimoUso) + ')', ['prestito|' + p.label + '|riconsegna']);
       });
     }
 
     // ── E3 — trasferta della replica (Mod. 1-2) ──
     repliche.forEach(function(r) {
-      var nomeP = 'replica_partenza_data_' + r.n, nomeR = 'replica_rientro_data_' + r.n;
+      var nomeP = 'replica_partenza_data_' + r.n, nomeR = 'replica_rientro_data_' + r.n, nomeD = 'replica_data_' + r.n;
       var etichetta = 'Trasferta Replica ' + r.n;
       if (r.partenza && r.rientro && !segnalati[nomeP] && !segnalati[nomeR]) {
         var tP = r.partenza.getTime() + (cdMinuti(r.partenzaOra) || 0) * 60000;
         var tR = r.rientro.getTime() + (cdMinuti(r.rientroOra) || 0) * 60000;
-        if (tR < tP) errori.push(etichetta + ': rientro (' + r.rientroStr + (r.rientroOra ? ' ' + r.rientroOra : '') + ') prima della partenza (' + r.partenzaStr + (r.partenzaOra ? ' ' + r.partenzaOra : '') + ')');
+        if (tR < tP) err(etichetta + ': rientro (' + r.rientroStr + (r.rientroOra ? ' ' + r.rientroOra : '') + ') prima della partenza (' + r.partenzaStr + (r.partenzaOra ? ' ' + r.partenzaOra : '') + ')', [nomeP, nomeR]);
       }
-      if (r.data && r.partenza && !segnalati[nomeP] && r.partenza > r.data) errori.push(etichetta + ': partenza (' + r.partenzaStr + ') dopo la data della replica (' + r.str + ')');
-      if (r.data && r.rientro && !segnalati[nomeR] && r.rientro < r.data) errori.push(etichetta + ': rientro (' + r.rientroStr + ') prima della data della replica (' + r.str + ')');
+      if (r.data && r.partenza && !segnalati[nomeP] && r.partenza > r.data) err(etichetta + ': partenza (' + r.partenzaStr + ') dopo la data della replica (' + r.str + ')', [nomeP, nomeD]);
+      if (r.data && r.rientro && !segnalati[nomeR] && r.rientro < r.data) err(etichetta + ': rientro (' + r.rientroStr + ') prima della data della replica (' + r.str + ')', [nomeR, nomeD]);
     });
 
     // ── E4 / A7 — Masterclass ──
     if (masterclass) {
       var fineDich = cdData(cdCampo('data_evento_fine'));
-      if (inizioEvento && fineDich && fineDich < inizioEvento) errori.push('Fine Periodo Masterclass (' + cdFmt(fineDich) + ') prima dell\'inizio (' + cdFmt(inizioEvento) + ')');
+      if (inizioEvento && fineDich && fineDich < inizioEvento) err('Fine Periodo Masterclass (' + cdFmt(fineDich) + ') prima dell\'inizio (' + cdFmt(inizioEvento) + ')', ['data_evento', 'data_evento_fine']);
       var arr = cdData(cdCampo('alloggio_arrivo')), par = cdData(cdCampo('alloggio_partenza'));
-      if (arr && par && par < arr) errori.push('Alloggio: partenza (' + cdFmt(par) + ') prima dell\'arrivo (' + cdFmt(arr) + ')');
+      if (arr && par && par < arr) err('Alloggio: partenza (' + cdFmt(par) + ') prima dell\'arrivo (' + cdFmt(arr) + ')', ['alloggio_arrivo', 'alloggio_partenza']);
       if (inizioEvento) {
         concerti.forEach(function(c) {
           if (!c.data || segnalati['dataconcerto_data_' + c.n]) return;
           if (c.data < cdAggiungiGiorni(inizioEvento, -CD_MARGINE_GIORNI) || c.data > cdAggiungiGiorni(fineEvento, CD_MARGINE_GIORNI)) {
-            attenzione.push('Concerto ' + c.n + ' (' + c.str + ') fuori dal Periodo Masterclass (oltre ' + CD_MARGINE_GIORNI + ' giorni)');
+            att('Concerto ' + c.n + ' (' + c.str + ') fuori dal Periodo Masterclass (oltre ' + CD_MARGINE_GIORNI + ' giorni)', ['dataconcerto_data_' + c.n]);
           }
         });
       }
@@ -261,8 +274,8 @@ function verificaCongruitaDate(modulo) {
       var precedente = null;
       prove.forEach(function(p) {
         if (!p.data || segnalati['prova_data_' + p.n]) return;
-        if (precedente && p.data < precedente.data) errori.push('Prova ' + p.n + ' (' + p.str + ') è prima di Prova ' + precedente.n + ' (' + precedente.str + ')');
-        if (inizioEvento && p.data > inizioEvento) errori.push('Prova ' + p.n + ' (' + p.str + ') è dopo la data dell\'evento (' + cdFmt(inizioEvento) + ')');
+        if (precedente && p.data < precedente.data) err('Prova ' + p.n + ' (' + p.str + ') è prima di Prova ' + precedente.n + ' (' + precedente.str + ')', ['prova_data_' + p.n, 'prova_data_' + precedente.n]);
+        if (inizioEvento && p.data > inizioEvento) err('Prova ' + p.n + ' (' + p.str + ') è dopo la data dell\'evento (' + cdFmt(inizioEvento) + ')', ['prova_data_' + p.n]);
         precedente = p;
       });
     }
@@ -272,7 +285,7 @@ function verificaCongruitaDate(modulo) {
       var sedeConcerto = cdNormLuogo(cdCampo('luogo_concerto'));
       repliche.forEach(function(r) {
         if (!r.luogo || !sedeConcerto || cdNormLuogo(r.luogo) === sedeConcerto) return;
-        if (r.trasporto === '' && !r.partenzaStr) attenzione.push('Replica ' + r.n + ' a "' + r.luogo + '" (sede diversa dal concerto): indicare quante persone vanno trasportate (0 se nessuna)');
+        if (r.trasporto === '' && !r.partenzaStr) att('Replica ' + r.n + ' a "' + r.luogo + '" (sede diversa dal concerto): indicare quante persone vanno trasportate (0 se nessuna)', ['replica_trasporto_' + r.n]);
       });
     }
 
@@ -283,17 +296,18 @@ function verificaCongruitaDate(modulo) {
         tappe.forEach(function(t, i) {
           var sede = cdSedeAppuntamento(t.key);
           if (t.dest && sede && cdNormLuogo(t.dest) !== cdNormLuogo(sede)) {
-            attenzione.push('Furgone "' + t.tipo + '": destinazione "' + t.dest + '" diversa dalla sede dell\'appuntamento "' + sede + '"');
+            att('Furgone "' + t.tipo + '": destinazione "' + t.dest + '" diversa dalla sede dell\'appuntamento "' + sede + '"', ['trasp_mat_dest_' + t.key]);
           }
           var mC = cdMinuti(t.consegna), mR = cdMinuti(t.ritiro);
           if (mC !== null && mR !== null && mC === mR) {
-            attenzione.push('Furgone "' + t.tipo + '": consegna e ritiro alla stessa ora (' + t.consegna + ')');
+            att('Furgone "' + t.tipo + '": consegna e ritiro alla stessa ora (' + t.consegna + ')', ['trasp_mat_furg_consegna_' + t.key, 'trasp_mat_furg_ritiro_' + t.key]);
           }
           var prec = tappe[i - 1];
           if (prec && prec.dataStr && prec.dataStr === t.dataStr && cdNormLuogo(prec.dest) !== cdNormLuogo(t.dest)) {
             var mRprec = cdMinuti(prec.ritiro);
             if (mRprec !== null && mC !== null && mC <= mRprec) {
-              attenzione.push('Furgone ' + t.dataStr + ': consegna a "' + t.dest + '" (' + t.tipo + ', ore ' + t.consegna + ') non dopo il ritiro da "' + prec.dest + '" (' + prec.tipo + ', ore ' + prec.ritiro + ') — manca il tempo di viaggio');
+              att('Furgone ' + t.dataStr + ': consegna a "' + t.dest + '" (' + t.tipo + ', ore ' + t.consegna + ') non dopo il ritiro da "' + prec.dest + '" (' + prec.tipo + ', ore ' + prec.ritiro + ') — manca il tempo di viaggio',
+                ['trasp_mat_furg_ritiro_' + prec.key, 'trasp_mat_furg_consegna_' + t.key]);
             }
           }
         });
@@ -305,7 +319,7 @@ function verificaCongruitaDate(modulo) {
         [['centralino_ritiro_data', 'Centralino — ritiro materiale'], ['centralino_rientro_data', 'Centralino — rientro materiale']].forEach(function(c) {
           var d = cdData(cdCampo(c[0]));
           if (!d || segnalati[c[0]]) return;
-          if (d < da || d > a) attenzione.push(c[1] + ' (' + cdFmt(d) + ') fuori dal periodo del progetto (' + cdFmt(primoAppuntamento) + '–' + cdFmt(ultimoAppuntamento) + ', ±' + CD_MARGINE_GIORNI + ' giorni)');
+          if (d < da || d > a) att(c[1] + ' (' + cdFmt(d) + ') fuori dal periodo del progetto (' + cdFmt(primoAppuntamento) + '–' + cdFmt(ultimoAppuntamento) + ', ±' + CD_MARGINE_GIORNI + ' giorni)', [c[0]]);
         });
       }
 
@@ -328,7 +342,7 @@ function verificaCongruitaDate(modulo) {
         var m = /^determina_(trasp|nol|trper|pers)_scadenza_data(_\d+)?$/.exec(c[0]);
         if (!m || segnalati[c[0]]) return;
         var sc = cdData(cdCampo(c[0])), primo = primoServizio[m[1]];
-        if (sc && primo && sc >= primo) attenzione.push(c[1] + ' (' + cdFmt(sc) + ') non è prima del primo servizio (' + cdFmt(primo) + ')');
+        if (sc && primo && sc >= primo) att(c[1] + ' (' + cdFmt(sc) + ') non è prima del primo servizio (' + cdFmt(primo) + ')', [c[0]]);
       });
     }
   } catch (e) {
@@ -337,19 +351,116 @@ function verificaCongruitaDate(modulo) {
   return { errori: errori, attenzione: attenzione };
 }
 
-var CD_SERVIZI = { trasp: 'Trasporti', nol: 'Noleggio/Service', trper: 'Trasferta Persone', pers: 'Personale Esterno' };
+// ── Voci dell'avviso: dal riferimento al campo vero nella pagina ──
+
+// Messaggi dei controlli già presenti nei moduli (stringhe semplici): ne
+// ricavo i campi dal testo, così diventano cliccabili senza toccare i moduli.
+function cdCampiDaMessaggio(msg) {
+  var m;
+  if ((m = /^Prestito "(.+?)": (.*)$/.exec(msg))) {
+    var solo = /manca la data di riconsegna|riconsegna \(/.test(m[2]) ? ['riconsegna'] : /manca la data di ritiro/.test(m[2]) ? ['ritiro'] : ['ritiro', 'riconsegna'];
+    return solo.map(function(t) { return 'prestito|' + m[1] + '|' + t; });
+  }
+  if (/^Centralino: /.test(msg)) return ['centralino_ritiro_data', 'centralino_rientro_data'];
+  if ((m = /^Furgone "(.+?)": /.exec(msg))) return ['furgone|' + m[1]];
+  if ((m = /^Trasferta "(.+?)": /.exec(msg))) return ['trasferta|' + m[1]];
+  if ((m = /^(?:Prova|Lezione) (\d+) /.exec(msg))) return ['prova_data_' + m[1]];
+  if ((m = /^Replica (\d+) /.exec(msg))) return ['replica_data_' + m[1]];
+  return [];
+}
+
+// Campi nella riga di tabella che riporta un testo: nelle prime due colonne
+// (tappa Trasporti / Trasferta) o come etichetta "— <voce>" (riga Prestito).
+function cdCampiInRiga(selettoreCampi, testo) {
+  var out = [];
+  document.querySelectorAll(selettoreCampi).forEach(function(el) {
+    var tr = el.closest('tr');
+    if (!tr) return;
+    var cella0 = tr.children[0] ? tr.children[0].textContent.trim() : '';
+    var cella1 = tr.children[1] ? tr.children[1].textContent.trim() : '';
+    if (cella0 === testo || cella1 === testo || tr.textContent.indexOf('— ' + testo) !== -1) out.push(el);
+  });
+  return out;
+}
+
+function cdElementiDaRiferimento(rif) {
+  var p = rif.split('|');
+  if (p[0] === 'prestito') return cdCampiInRiga('input[name^="dot_prestito_' + p[2] + '_data_"]', p[1]);
+  if (p[0] === 'furgone') return cdCampiInRiga('input[name^="trasp_mat_furg_consegna_"], input[name^="trasp_mat_furg_ritiro_"]', p[1]);
+  if (p[0] === 'trasferta') return cdCampiInRiga('input[name^="trasp_pers_partenza_"], input[name^="trasp_pers_rientro_"]', p[1]);
+  var el = document.querySelector('[name="' + rif + '"]');
+  return el ? [el] : [];
+}
+
+function cdElementiVoce(voce) {
+  var out = [];
+  voce.campi.forEach(function(rif) { out = out.concat(cdElementiDaRiferimento(rif)); });
+  return out;
+}
+
+// Bordo ambra sui campi coinvolti (box-shadow: non tocca il bordo originale né
+// l'impaginazione). Prima toglie quello messo al giro precedente.
+function cdEvidenziaCampi(voci) {
+  document.querySelectorAll('[data-cd-evidenza]').forEach(function(el) {
+    el.style.boxShadow = el.getAttribute('data-cd-evidenza') === '-' ? '' : el.getAttribute('data-cd-evidenza');
+    el.removeAttribute('data-cd-evidenza');
+  });
+  voci.forEach(function(voce) {
+    cdElementiVoce(voce).forEach(function(el) {
+      if (el.hasAttribute('data-cd-evidenza')) return;
+      el.setAttribute('data-cd-evidenza', el.style.boxShadow || '-');
+      el.style.boxShadow = '0 0 0 2px #F59E0B';
+    });
+  });
+}
+
+// Porta al primo campo della voce: apre sezioni collassate e <details> chiusi
+// (come vaiASezione), poi scorre e mette il cursore nel campo.
+function cdVaiAVoce(indice) {
+  var voce = (window._cdVociAvviso || [])[indice];
+  if (!voce) return;
+  var el = cdElementiVoce(voce)[0];
+  if (!el) return;
+  for (var n = el.parentElement; n; n = n.parentElement) {
+    if (n.tagName === 'DETAILS') n.open = true;
+    if (n.classList && n.classList.contains('section-body') && n.classList.contains('hidden')) {
+      n.classList.remove('hidden');
+      var header = n.parentElement ? n.parentElement.querySelector('.section-header') : null;
+      if (header) header.classList.remove('collapsed');
+      if (typeof ricalcolaTextareaSezione === 'function') ricalcolaTextareaSezione(n);
+    }
+  }
+  var bersaglio = el;
+  while (bersaglio && bersaglio.offsetParent === null && bersaglio.parentElement) bersaglio = bersaglio.parentElement; // riga nascosta: scorro al primo contenitore visibile
+  bersaglio.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  try { el.focus({ preventScroll: true }); } catch (e) {}
+}
 
 function cdEscape(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // Riquadro ambra unico: prima gli errori probabili, poi i punti da verificare.
+// Accetta anche le stringhe dei controlli già presenti nei moduli. Restituisce
+// '' se non c'è nulla da segnalare (e toglie comunque i bordi ambra rimasti).
 function htmlAvvisoCoerenzaDate(errori, daVerificare) {
-  var lista = function(voci) {
-    return '<ul style="margin:4px 0 0 16px;padding:0">' + voci.map(function(msg) { return '<li>' + cdEscape(msg) + '</li>'; }).join('') + '</ul>';
+  var norm = function(v) { return typeof v === 'string' ? { testo: v, campi: cdCampiDaMessaggio(v) } : v; };
+  errori = errori.map(norm);
+  daVerificare = daVerificare.map(norm);
+  var voci = errori.concat(daVerificare);
+  window._cdVociAvviso = voci;
+  cdEvidenziaCampi(voci);
+  if (!voci.length) return '';
+  var indice = 0;
+  var lista = function(elenco) {
+    return '<ul style="margin:4px 0 0 16px;padding:0">' + elenco.map(function(v) {
+      var i = indice++;
+      var cliccabile = cdElementiVoce(v).length > 0;
+      return '<li' + (cliccabile ? ' onclick="cdVaiAVoce(' + i + ')" style="cursor:pointer;text-decoration:underline dotted" title="Vai al campo"' : '') + '>' + cdEscape(v.testo) + '</li>';
+    }).join('') + '</ul>';
   };
   var html = '<div style="background:#FFF3E0;border:1px solid #FFCC80;border-radius:6px;padding:8px 12px;font-size:11px;color:#8B4A00">' +
-    '⚠ Date/orari da verificare (non bloccante — potrebbe essere corretto così)';
+    '⚠ Date/orari da verificare (non bloccante — potrebbe essere corretto così). Clicca una voce per andare al campo.';
   if (errori.length) html += '<div style="margin-top:6px;font-weight:700">Errori probabili</div>' + lista(errori);
   if (daVerificare.length) html += (errori.length ? '<div style="margin-top:6px;font-weight:700">Da verificare</div>' : '') + lista(daVerificare);
   return html + '</div>';
