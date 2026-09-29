@@ -6663,6 +6663,8 @@ function caricaDaFirestore(id) {
         });
         for (var iPTP = 0; iPTP < maxPrevTrper; iPTP++) { addPreventivoTrasportoPersone(); }
         Object.keys(dr2).forEach(function(k) {
+          // Copie di quantità e note della Dotazione salvate qui in passato: la fonte è dati_referente.
+          if (k.indexOf('dot_') === 0 && !/^dot_(disp|prestito|struttura_nota)_/.test(k)) return;
           var el = document.querySelector('[name="' + k + '"]');
           if (!el || dr2[k] === undefined) return;
           if (el.type === 'checkbox') { el.checked = (dr2[k] === true || dr2[k] === 'true'); return; }
@@ -6816,7 +6818,9 @@ function salvaResponsabileSuFirestore() {
     // di default da escludere) — li integra, così un campo nuovo dimenticato
     // in futuro non sparisce più silenziosamente al ricaricamento pagina,
     // come già successo più volte (Prestito, Centralino, scadenze offerte).
-    var PREFISSI_RESP_NOTI = ['dist_', 'pers_', 'spazio_', 'dot_', 'determina_', 'trasp_mat_furg_', 'trasp_pers_', 'prev', 'centralino_'];
+    // Della Dotazione Tecnica il Responsabile possiede solo disponibilità, prestito e
+    // nota struttura: quantità e note (dot_<voce>, dot_<voce>_n) sono del Referente.
+    var PREFISSI_RESP_NOTI = ['dist_', 'pers_', 'spazio_', 'dot_disp_', 'dot_prestito_', 'dot_struttura_nota_', 'determina_', 'trasp_mat_furg_', 'trasp_pers_', 'prev', 'centralino_'];
     document.querySelectorAll('input[name], select[name], textarea[name]').forEach(function(el) {
       var n = el.name;
       if (!n || dati.hasOwnProperty(n)) return;
