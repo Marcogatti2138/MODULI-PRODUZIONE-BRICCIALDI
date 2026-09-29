@@ -6388,22 +6388,6 @@ function gestisciSceltaPreventivoGenerico(cb) {
     if (other !== cb) other.checked = false;
   });
 }
-function leggiPreventiviRicevuti(tbodyId) {
-  var preventivi = [];
-  var scelto = null;
-  document.querySelectorAll('#' + tbodyId + ' tr[data-riga]').forEach(function(row) {
-    var ditta = row.querySelector('[data-f="ditta"]');
-    var importo = row.querySelector('[data-f="importo"]');
-    var prot = row.querySelector('[data-f="prot"]');
-    var dataP = row.querySelector('[data-f="data"]');
-    var sceltoCb = row.querySelector('[data-f="scelto"]');
-    var v = { ditta: ditta ? ditta.value.trim() : '', importo: importo ? importo.value.trim() : '', prot: prot ? prot.value.trim() : '', data: dataP ? dataP.value.trim() : '' };
-    if (!v.ditta && !v.importo) return;
-    preventivi.push(v);
-    if (sceltoCb && sceltoCb.checked) scelto = v;
-  });
-  return { preventivi: preventivi, scelto: scelto };
-}
 
 function apriMailDeterminaTrasporti() {
   var sogg = encodeURIComponent('[Bozza Determina Trasporti] ' + (metadati.titolo || 'Progetto'));
