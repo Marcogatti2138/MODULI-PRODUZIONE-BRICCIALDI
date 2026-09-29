@@ -518,9 +518,11 @@
       if (p.stato && (p.stato.rimandato || p.stato.completato || p.stato.annullato)) return; // stati "terminali" — non sono più una scadenza attiva
       var titolo = p.meta.titolo || p.id;
       var voci = [];
-      var dataEvento = parseDataIT(p.dr.data_evento);
+      // Data evento del Referente; finché manca, quella prevista in "Configura progetto".
+      var dataEventoReale = parseDataIT(p.dr.data_evento);
+      var dataEvento = dataEventoReale || parseDataIT(p.meta.data_evento_prevista);
       var scadenza = parseDataIT(p.meta.scadenza);
-      if (dataEvento) voci.push({ tipo: 'Data evento', data: dataEvento });
+      if (dataEvento) voci.push({ tipo: dataEventoReale ? 'Data evento' : 'Data evento (prevista)', data: dataEvento });
       if (scadenza && !(p.stato && p.stato.referente_completato_il)) voci.push({ tipo: 'Scadenza risposta Referente', data: scadenza });
       voci = voci.filter(function(v) { return giorniMancanti(v.data) >= -1; }); // nasconde scadenze passate da tempo
       if (voci.length === 0) return;
@@ -1434,7 +1436,7 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPIA
     tuttiIProgetti.forEach(function(p) {
       if (p.stato && (p.stato.rimandato || p.stato.completato || p.stato.annullato)) return;
       var date = [];
-      var dataEvento = parseDataIT(p.dr.data_evento);
+      var dataEvento = parseDataIT(p.dr.data_evento) || parseDataIT(p.meta.data_evento_prevista); // come in renderScadenze
       var scadenza = parseDataIT(p.meta.scadenza);
       if (dataEvento) date.push(dataEvento);
       if (scadenza && !(p.stato && p.stato.referente_completato_il)) date.push(scadenza);

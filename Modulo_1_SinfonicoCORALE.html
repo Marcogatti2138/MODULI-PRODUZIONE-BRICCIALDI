@@ -3172,7 +3172,11 @@ function proseguiConfermaAvvio(id) {
   // Link scheda Drive: solo nei metadati salvati su Firestore, mai nei parametri
   // URL del link inviato al Referente (a differenza degli altri campi qui sopra).
   var linkScheda = document.getElementById('av_link_scheda').value.trim();
-  var metadatiCompleti = Object.assign({}, dati, { link_scheda: linkScheda });
+  // Data evento prevista: anche lei solo nei metadati. Serve alla Dashboard (KPI e
+  // Scadenze) finché il Referente non compila la data evento vera, e precompila
+  // il pannello "Gestione scadenza" del Responsabile.
+  var dataEventoPrevista = document.getElementById('av_data_evento').value.trim();
+  var metadatiCompleti = Object.assign({}, dati, { link_scheda: linkScheda, data_evento_prevista: dataEventoPrevista });
 
   // Salva su Firestore — riprova finché Firebase non è pronto, invece di saltare silenziosamente
   (function salvaMetadatiConRetry(tentativi) {
