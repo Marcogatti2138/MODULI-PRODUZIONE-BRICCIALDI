@@ -6312,15 +6312,18 @@ function generaPDFRichiestaPreventivoTrasporti(istanza) {
     if (dP) dateProve.push(dP);
     pp++;
   }
+  // Concerto principale (Sezione 1) e Repliche: i campi dataconcerto_ esistono
+  // solo nel Mod. 3, qui la frase restava sempre senza date di concerto.
   var dateConcerti = [];
-  var dcp = 1;
-  while (document.querySelector('[name="dataconcerto_data_' + dcp + '"]')) {
-    var dCp = getField('dataconcerto_data_' + dcp);
-    if (dCp) dateConcerti.push(dCp);
-    dcp++;
+  if (getField('data_evento')) dateConcerti.push(getField('data_evento'));
+  var rcp = 1;
+  while (document.querySelector('[name="replica_data_' + rcp + '"]')) {
+    var dRp = getField('replica_data_' + rcp);
+    if (dRp) dateConcerti.push(dRp);
+    rcp++;
   }
   var frasiDate = '';
-  if (dateProve.length) frasiDate += 'con prove nei giorni ' + dateProve.join(', ') + ' ';
+  if (dateProve.length) frasiDate += 'con prove nei giorni ' + dateProve.join(', ') + (dateConcerti.length ? ' ' : ', ');
   if (dateConcerti.length) frasiDate += (dateProve.length ? 'e ' : 'con ') + 'concerti nei giorni ' + dateConcerti.join(', ') + ', ';
 
   var scadenzaData = getField('determina_trasp_scadenza_data' + suf) || '[___ Data scadenza ___]';
