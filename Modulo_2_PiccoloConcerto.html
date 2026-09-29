@@ -4277,7 +4277,7 @@ function gestisciCambioDisponibilita(el, key, label, qta) {
   salvaResponsabileSuFirestore();
   toggleCampiPrestito(key, nuovo);
   toggleCampiStruttura(key, nuovo);
-  if (vecchio === 'Già disponibile (Conservatorio)' && nuovo !== 'Già disponibile (Conservatorio)') {
+  if (vecchio === 'Già disponibile (Conservatorio)' && nuovo !== 'Già disponibile (Conservatorio)' && nuovo !== 'Prestito') {
     avvisaRimozioneDaTrasporti(label, qta);
   }
   el.setAttribute('data-precedente', nuovo);
@@ -4915,6 +4915,14 @@ function elencoVociInPrestito() {
   return elenco;
 }
 
+// Materiale che viaggia tra le sedi: dotazione del Conservatorio più le voci in
+// Prestito, che dopo il ritiro seguono il resto del materiale fino alla riconsegna.
+function elencoMaterialeTappe() {
+  var voci = elencoDotazioneDisponibile();
+  elencoVociInPrestito().forEach(function(p) { voci.push(p.label + ': ' + p.qta); });
+  return voci;
+}
+
 // Elenco voci "Disponibile nella struttura" (es. il Teatro Secci ha già delle sedie
 // proprie) — stesso schema di elencoVociInPrestito, ma senza trasporto/ritiro:
 // il materiale semplicemente resta lì, non serve muoverlo.
@@ -5043,7 +5051,7 @@ function materialeTrasportoTappa(salvato, ultimoAuto, autoAttuale) {
 // Riallinea al volo le tappe non ritoccate a mano quando cambia la Dotazione Tecnica,
 // senza ricostruire la tabella (che non viene ridisegnata a ogni modifica di Sezione 5).
 function aggiornaMaterialiTrasportoAutomatici() {
-  var autoAttuale = elencoDotazioneDisponibile().join(', ');
+  var autoAttuale = elencoMaterialeTappe().join(', ');
   var cambiati = false;
   document.querySelectorAll('#trasporti-materiale-tbody textarea[name^="trasp_mat_materiale_"]').forEach(function(ta) {
     var marcatore = document.querySelector('[name="' + ta.name.replace('trasp_mat_materiale_', 'trasp_mat_auto_') + '"]');
@@ -5098,7 +5106,7 @@ function costruisciTabellaTrasportiMateriale() {
   }
 
   var html = '';
-  var materialeAutoAttuale = elencoDotazioneDisponibile().join(', ');
+  var materialeAutoAttuale = elencoMaterialeTappe().join(', ');
   righe.forEach(function(riga, idx) {
     var bg = idx % 2 === 0 ? 'white' : '#F4F7FC';
     var chiaveCheck = 'trasp_mat_check_' + riga.key;
@@ -5473,8 +5481,10 @@ function leggiRigheTrasportoSelezionate() {
 function costruisciMovimentiTrasporto(righeSelezionate) {
   var eventi = [];
   var luogoCorrente = 'Conservatorio';
+  var materialeACarico = ''; // ultimo materiale caricato: torna indietro con il rientro
   for (var i = 0; i < righeSelezionate.length; i++) {
     var r = righeSelezionate[i];
+    if (r.materiale) materialeACarico = r.materiale;
     var destTappa = r.dest || luogoCorrente;
     if (destTappa !== luogoCorrente) {
       var dettArrivo = [];
@@ -5497,7 +5507,7 @@ function costruisciMovimentiTrasporto(righeSelezionate) {
       if (r.rientroTappa) dettPartenza.push((ultima ? 'rientro' : 'arrivo') + ' ore ' + r.rientroTappa);
       eventi.push({
         giorno: r.data || '', tipo: ultima ? 'rientro' : 'ripartenza',
-        da: luogoCorrente, a: prossimaDest, appuntamento: null, materiale: '',
+        da: luogoCorrente, a: prossimaDest, appuntamento: null, materiale: materialeACarico,
         orarioTesto: dettPartenza.join(', '), haOrario: dettPartenza.length > 0
       });
     }
@@ -5546,7 +5556,7 @@ function costruisciTratteConPrestito(righeSelezionate) {
     var dettC = [];
     if (p.riconsegnaOra) dettC.push('riconsegna ore ' + p.riconsegnaOra);
     righeFinali.push({
-      giorno: p.riconsegnaData, tipo: 'tratta', da: 'Conservatorio', a: p.luogo, appuntamento: null, materiale: '',
+      giorno: p.riconsegnaData, tipo: 'tratta', da: 'Conservatorio', a: p.luogo, appuntamento: null, materiale: p.label + ' (prestito): ' + p.qta,
       orarioTesto: dettC.join(', '), haOrario: dettC.length > 0
     });
   });
