@@ -3250,7 +3250,10 @@ function parseImportoIt(s) {
 // Converte un numero (es. 1037.4) nel formato italiano "1.037,40"
 function formattaImportoIt(n) {
   if (isNaN(n)) return '[___ importo ___]';
-  return n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // Separatore migliaia fatto a mano: toLocaleString('it-IT') in Chrome non lo
+  // mette sotto i 10.000 (es. "1464,00" invece di "1.464,00").
+  var parti = Math.abs(n).toFixed(2).split('.');
+  return (n < 0 ? '-' : '') + parti[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + parti[1];
 }
 
 // ── Colli / materiale da trasportare ──
