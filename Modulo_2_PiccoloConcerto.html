@@ -3774,7 +3774,7 @@ function aggiornaSintesiCompleta() {
     var vociPrestito = (typeof elencoVociInPrestito === 'function') ? elencoVociInPrestito() : [];
     if (vociPrestito.length) {
       elPrestito.innerHTML = '📦 In prestito: ' + vociPrestito.map(function(p) {
-        return p.label + ' (' + p.luogo + ' — ritiro ' + (p.ritiroData || '?') + ' ' + (p.ritiroOra || '') + ', riconsegna ' + (p.riconsegnaData || '?') + ' ' + (p.riconsegnaOra || '') + ')';
+        return escapeHTML(p.label) + ' (' + escapeHTML(p.luogo) + ' — ritiro ' + escapeHTML(p.ritiroData || '?') + ' ' + escapeHTML(p.ritiroOra || '') + ', riconsegna ' + escapeHTML(p.riconsegnaData || '?') + ' ' + escapeHTML(p.riconsegnaOra || '') + ')';
       }).join('<br>');
       elPrestito.style.fontStyle = 'normal'; elPrestito.style.color = '#1a1a2e';
     } else { elPrestito.textContent = ''; }
@@ -3786,7 +3786,7 @@ function aggiornaSintesiCompleta() {
     var vociStruttura = (typeof elencoVociDisponibiliInStruttura === 'function') ? elencoVociDisponibiliInStruttura() : [];
     if (vociStruttura.length) {
       elStruttura.innerHTML = '🏛 Già disponibile nella struttura: ' + vociStruttura.map(function(s) {
-        return s.label + (s.dettaglio ? ' (' + s.dettaglio + ')' : '');
+        return escapeHTML(s.label) + (s.dettaglio ? ' (' + escapeHTML(s.dettaglio) + ')' : '');
       }).join('<br>');
       elStruttura.style.fontStyle = 'normal'; elStruttura.style.color = '#1a1a2e';
     } else { elStruttura.textContent = ''; }
@@ -3796,7 +3796,7 @@ function aggiornaSintesiCompleta() {
   var elTrasfOrari = document.getElementById('sint_trasferta_orari');
   if (elTrasfOrari) {
     var vociTrasf = (typeof elencoTrasportoPersone === 'function') ? elencoTrasportoPersone() : [];
-    if (vociTrasf.length) { elTrasfOrari.innerHTML = vociTrasf.join('<br>'); elTrasfOrari.style.fontStyle = 'normal'; elTrasfOrari.style.color = '#1a1a2e'; }
+    if (vociTrasf.length) { elTrasfOrari.innerHTML = vociTrasf.map(escapeHTML).join('<br>'); elTrasfOrari.style.fontStyle = 'normal'; elTrasfOrari.style.color = '#1a1a2e'; }
     else { elTrasfOrari.textContent = 'Nessuna trasferta indicata'; elTrasfOrari.style.fontStyle = 'italic'; elTrasfOrari.style.color = '#6B7280'; }
   }
 
@@ -4907,11 +4907,11 @@ function elencoVociInPrestito() {
     if (!qta) return;
     elenco.push({
       label: v[2], qta: qta,
-      luogo: getField('dot_prestito_luogo_' + v[1]) ? escapeHTML(getField('dot_prestito_luogo_' + v[1])) : '[___ luogo prestito ___]',
-      ritiroData: escapeHTML(getField('dot_prestito_ritiro_data_' + v[1]) || ''),
-      ritiroOra: escapeHTML(getField('dot_prestito_ritiro_ora_' + v[1]) || ''),
-      riconsegnaData: escapeHTML(getField('dot_prestito_riconsegna_data_' + v[1]) || ''),
-      riconsegnaOra: escapeHTML(getField('dot_prestito_riconsegna_ora_' + v[1]) || '')
+      luogo: getField('dot_prestito_luogo_' + v[1]) || '[___ luogo prestito ___]',
+      ritiroData: getField('dot_prestito_ritiro_data_' + v[1]) || '',
+      ritiroOra: getField('dot_prestito_ritiro_ora_' + v[1]) || '',
+      riconsegnaData: getField('dot_prestito_riconsegna_data_' + v[1]) || '',
+      riconsegnaOra: getField('dot_prestito_riconsegna_ora_' + v[1]) || ''
     });
   });
   return elenco;
@@ -4947,7 +4947,7 @@ function elencoVociDisponibiliInStruttura() {
     if (!qta) return;
     elenco.push({
       label: v[2], qta: qta,
-      dettaglio: escapeHTML(getField('dot_struttura_nota_' + v[1]) || '')
+      dettaglio: getField('dot_struttura_nota_' + v[1]) || ''
     });
   });
   return elenco;
@@ -4959,11 +4959,11 @@ function elencoTrasportoPersone() {
   var elenco = [];
   var trasfMain = getField('trasferta');
   if (trasfMain && trasfMain.indexOf('Sì') === 0) {
-    var luogoC = escapeHTML(getField('dest_trasferta') || getField('luogo_concerto') || '');
-    var modC = escapeHTML(getField('trasp_pers_modalita_concerto') || '');
-    var noteC = escapeHTML(getField('trasp_pers_note_concerto') || '');
-    var partC = escapeHTML(getField('trasp_pers_partenza_concerto') || '');
-    var rientC = escapeHTML(getField('trasp_pers_rientro_concerto') || '');
+    var luogoC = getField('dest_trasferta') || getField('luogo_concerto') || '';
+    var modC = getField('trasp_pers_modalita_concerto') || '';
+    var noteC = getField('trasp_pers_note_concerto') || '';
+    var partC = getField('trasp_pers_partenza_concerto') || '';
+    var rientC = getField('trasp_pers_rientro_concerto') || '';
     var dettC = [];
     if (modC) dettC.push(modC);
     if (partC) dettC.push('partenza ore ' + partC);
@@ -4974,13 +4974,13 @@ function elencoTrasportoPersone() {
   var r = 1;
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var nPersone = parseInt(getField('replica_trasporto_' + r), 10) || 0;
-    var luogoR = escapeHTML(getField('replica_luogo_' + r) || '');
-    var dataR = escapeHTML(getField('replica_data_' + r) || '');
+    var luogoR = getField('replica_luogo_' + r) || '';
+    var dataR = getField('replica_data_' + r) || '';
     if (nPersone > 0 || luogoR) {
-      var modR = escapeHTML(getField('trasp_pers_modalita_replica_' + r) || '');
-      var noteR = escapeHTML(getField('trasp_pers_note_replica_' + r) || '');
-      var partR = escapeHTML(getField('trasp_pers_partenza_replica_' + r) || '');
-      var rientR = escapeHTML(getField('trasp_pers_rientro_replica_' + r) || '');
+      var modR = getField('trasp_pers_modalita_replica_' + r) || '';
+      var noteR = getField('trasp_pers_note_replica_' + r) || '';
+      var partR = getField('trasp_pers_partenza_replica_' + r) || '';
+      var rientR = getField('trasp_pers_rientro_replica_' + r) || '';
       var dettR = [];
       if (nPersone > 0) dettR.push(nPersone + ' persone');
       if (modR) dettR.push(modR);
