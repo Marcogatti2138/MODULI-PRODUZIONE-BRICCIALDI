@@ -367,9 +367,9 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('');
   lines.push('che la spesa da imputare graverà sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca" di cui si attesta la disponibilità;');
   lines.push('');
-  lines.push('di nominare ' + nomeRUP + ' quale Responsabile Unico del Procedimento, ai sensi dell\'art. 15 del D.Lgs. 36/2023 e ss.mm.ii., che dovrà vigilare sullo svolgimento delle fasi di affidamento ed esecuzione della fornitura in parola, provvedendo a creare le condizioni affinché il processo di acquisto risulti condotto in modo unitario rispetto alle esigenze ed ai costi indicati nel presente atto, in conformità a qualsiasi altra disposizione di legge e di regolamento in materia ivi incluso l\'accertamento dei requisiti di carattere generale e tecnico-professionali, ove richiesti, in capo all\'operatore economico individuato;');
+  lines.push('di nominare ' + nomeRUP + ' quale Responsabile Unico del Progetto, ai sensi dell\'art. 15 del D.Lgs. 36/2023 e ss.mm.ii., che dovrà vigilare sullo svolgimento delle fasi di affidamento ed esecuzione della fornitura in parola, provvedendo a creare le condizioni affinché il processo di acquisto risulti condotto in modo unitario rispetto alle esigenze ed ai costi indicati nel presente atto, in conformità a qualsiasi altra disposizione di legge e di regolamento in materia ivi incluso l\'accertamento dei requisiti di carattere generale e tecnico-professionali, ove richiesti, in capo all\'operatore economico individuato; le funzioni di Direttore dell\'Esecuzione del Contratto sono svolte dal medesimo ' + nomeRUP + ' in qualità di RUP, ai sensi dell\'art. 114, comma 3, del D.Lgs. n. 36/2023, data la modesta entità e la limitata complessità del contratto;');
   lines.push('');
-  lines.push('che il contratto si debba considerare sciolto nel caso il Responsabile Unico del Procedimento rilevi la carenza del possesso dei prescritti requisiti.');
+  lines.push('che il contratto si debba considerare sciolto nel caso il Responsabile Unico del Progetto rilevi la carenza del possesso dei prescritti requisiti.');
   lines.push('');
   lines.push('Per la copertura finanziaria');
   lines.push('');
@@ -377,7 +377,7 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('');
   lines.push('Dott.ssa Fanizza Susanna\tDott.ssa Angelucci Alessandra');
   lines.push('');
-  lines.push('Documento informatico firmato digitalmente ai sensi dell\'art. 24 del D.Lgs. 82/2005 e ss.mm.ii. Pubblicato sul sito internet www.briccialditerni.it alla voce – "Amministrazione Trasparente" – "Bandi di Gara Contratti".');
+  lines.push('Documento informatico firmato digitalmente ai sensi dell\'art. 24 del D.Lgs. 82/2005 e ss.mm.ii. Pubblicato sul sito internet www.briccialditerni.it alla voce – "Amministrazione Trasparente" – "Bandi di Gara Contratti" e sulla Piattaforma digitale TRASPARE certificata e-procurement interoperabile con le Piattaforme ANAC al seguente link https://briccialditerni.traspare.com');
 
   return lines;
 }
@@ -1052,7 +1052,9 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   lines.push('');
   lines.push('DI IMPEGNARE la somma complessiva di € ' + (isNaN(totaleConIva) ? scelto.importo + ' oltre IVA' : formattaImportoIt(totaleConIva) + ' (di cui € ' + scelto.importo + ' per imponibile ed € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment)') + ' sul ' + capitolo + ' del Bilancio [___ anno ___], dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica.');
   lines.push('');
-  lines.push('DI NOMINARE ' + nomeRUP + ' quale Responsabile Unico del Progetto (RUP) ai sensi dell\'art. 15 del D.Lgs. 36/2023.');
+  lines.push('DI NOMINARE ' + nomeRUP + ' quale Responsabile Unico del Progetto (RUP) ai sensi dell\'art. 15 del D.Lgs. 36/2023; le funzioni di Direttore dell\'Esecuzione del Contratto sono svolte dal medesimo ' + nomeRUP + ' in qualità di RUP, ai sensi dell\'art. 114, comma 3, del D.Lgs. n. 36/2023, data la modesta entità e la limitata complessità del contratto.');
+  lines.push('');
+  lines.push('DI DARE ATTO che il contratto si debba considerare sciolto nel caso il Responsabile Unico del Progetto rilevi la carenza del possesso dei prescritti requisiti.');
   lines.push('');
   lines.push('DI DARE ATTO che il contratto sarà stipulato mediante scambio di corrispondenza, anche tramite PEC o sistemi elettronici di recapito certificato qualificato, ai sensi dell\'art. 18, Allegato I.1, D.Lgs. 36/2023.');
   lines.push('');
