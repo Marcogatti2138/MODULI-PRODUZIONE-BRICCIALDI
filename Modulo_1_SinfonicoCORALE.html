@@ -499,6 +499,7 @@
 <script src="importi.js"></script>
 <script src="determina-legale.js"></script>
 <script src="coerenza-date.js"></script>
+<script src="righe-dinamiche.js"></script>
 <script>
   var firebaseConfig = {
     apiKey: "AIzaSyCnB-Ck9sE4Tt2m_P5rhG8lruWLfEfpXx8",
@@ -8124,12 +8125,24 @@ function importaSolistiEDocenti() {
 }
 
 // ── Firestore: carica e salva dati ──
+// Tipi di riga aggiunti a mano nei dati del Referente: alla riapertura se ne
+// ricreano quante ne servono (ricreaRigheDinamiche, in righe-dinamiche.js).
+var RIGHE_DINAMICHE_REFERENTE = [
+  { campi: ['replica_data_', 'replica_ora_', 'replica_luogo_', 'replica_confermata_', 'replica_trasporto_', 'replica_trasporto_note_', 'replica_partenza_data_', 'replica_partenza_ora_', 'replica_rientro_data_', 'replica_rientro_ora_', 'replica_motivo_permanenza_', 'replica_persone_vitto_', 'replica_vitto_', 'replica_alloggio_', 'replica_alloggio_notti_', 'replica_note_altri_partecipanti_'], conta: function() { return replicheCount; }, aggiungi: addReplica },
+  { campi: ['prova_data_', 'prova_inizio_', 'prova_fine_', 'prova_luogo_', 'prova_sez_', 'prova_note_'], conta: function() { return proveCount; }, aggiungi: addProva },
+  { campi: ['brano_titolo_', 'brano_autore_', 'brano_nato_', 'brano_morto_', 'brano_durata_', 'brano_note_'], conta: function() { return braniCount; }, aggiungi: addBrano },
+  { campi: ['sol_nome_', 'sol_ruolo_', 'sol_voce_', 'sol_gg_', 'sol_note_'], conta: function() { return solistiCount; }, aggiungi: addSolista },
+  { campi: ['spartito_'], conta: function() { return spartitiCount; }, aggiungi: addSpartito },
+  { campi: ['doc_nome_', 'doc_ruolo_', 'doc_cattedra_', 'doc_email_', 'doc_tel_'], conta: function() { return docentiCount; }, aggiungi: addDocente }
+];
+
 // ═══ FIRESTORE — caricamento dati progetto esistente ═══
 function caricaDaFirestore(id) {
   if (!window.firebaseReady || !window.db) return;
+  window._caricamentoInCorso = true; // niente salvataggi finché la pagina non è ripopolata
   var docRef = window.fsDoc(window.db, 'progetti', id);
   window.fsGetDoc(docRef).then(function(snap) {
-    if (!snap.exists) { bloccaModuloProgettoCancellato(); return; }
+    if (!snap.exists) { window._caricamentoInCorso = false; bloccaModuloProgettoCancellato(); return; }
     var d = snap.data();
     // Popola metadati se presenti
     // Popola metadati se presenti (preservando "ruolo", che viene dal link e non va mai sovrascritto da Firestore)
@@ -8173,37 +8186,8 @@ function caricaDaFirestore(id) {
     if (datiRefRoot) {
       var dr = datiRefRoot;
       window._datiReferenteCache = dr; // per costruisciTabellaSpazi, letta prima che le select esistano
-      // Ricrea le righe "Replica" mancanti (non ce ne sono di pre-create come per brani/solisti/prove)
-      var maxReplica = 0;
-      Object.keys(dr).forEach(function(k) {
-        var m = k.match(/^replica_data_(\d+)$/);
-        if (m) maxReplica = Math.max(maxReplica, parseInt(m[1], 10));
-      });
-      while (replicheCount < maxReplica) { addReplica(); }
-      // Ricrea le righe "Prova" mancanti — solo 5 pre-create all'avvio, altrimenti
-      // le prove oltre la 5ª esistono su Firestore ma non hanno una riga dove
-      // essere scritte al caricamento, e sembrano "sparite" pur essendo salvate.
-      var maxProva = 0;
-      Object.keys(dr).forEach(function(k) {
-        var m = k.match(/^prova_data_(\d+)$/);
-        if (m) maxProva = Math.max(maxProva, parseInt(m[1], 10));
-      });
-      while (proveCount < maxProva) { addProva(); }
-      // Stesso problema riscontrato per Brani (solo 6 pre-create), Solisti (solo 3) e
-      // Personale/Distribuzione (solo 5) — oltre quel numero i dati esistevano su
-      // Firestore ma sparivano dalla vista al caricamento, senza una riga dove finire.
-      var maxBrano = 0;
-      Object.keys(dr).forEach(function(k) {
-        var m = k.match(/^brano_titolo_(\d+)$/);
-        if (m) maxBrano = Math.max(maxBrano, parseInt(m[1], 10));
-      });
-      while (braniCount < maxBrano) { addBrano(); }
-      var maxSolista = 0;
-      Object.keys(dr).forEach(function(k) {
-        var m = k.match(/^sol_nome_(\d+)$/);
-        if (m) maxSolista = Math.max(maxSolista, parseInt(m[1], 10));
-      });
-      while (solistiCount < maxSolista) { addSolista(); }
+      // Ricrea tutte le righe aggiunte a mano (prove, brani, docenti...) prima di popolare i campi
+      ricreaRigheDinamiche(dr, RIGHE_DINAMICHE_REFERENTE);
       // Ricrea le righe "Referente locale" mancanti, per ogni replica (in base alla sua posizione)
       var maxRefPerPos = {}; // { posizione: numero massimo di referenti salvati }
       Object.keys(dr).forEach(function(k) {
@@ -8219,13 +8203,6 @@ function caricaDaFirestore(id) {
         var uidRif = replicaEl.getAttribute('data-uid');
         while ((refLocaleCount[uidRif] || 0) < maxRefPerPos[posRif]) { addRefLocale(uidRif); }
       });
-      // Ricrea le righe "Spartito" mancanti
-      var maxSpartito = 0;
-      Object.keys(dr).forEach(function(k) {
-        var m4 = k.match(/^spartito_(\d+)$/);
-        if (m4) maxSpartito = Math.max(maxSpartito, parseInt(m4[1], 10));
-      });
-      while (spartitiCount < maxSpartito) { addSpartito(); }
       // Prima popola i campi già presenti nel DOM
       Object.keys(dr).forEach(function(k) {
         var el = document.querySelector('[name="' + k + '"]');
@@ -8401,9 +8378,10 @@ function caricaDaFirestore(id) {
       aggiornaStatoBloccoResp();
       if (typeof aggiornaStatoCompilazioneReferente === 'function') aggiornaStatoCompilazioneReferente();
       if (typeof verificaCoerenzaProgetto === 'function') verificaCoerenzaProgetto();
+      concludiCaricamento(); // sblocca i salvataggi, segnala i campi salvati senza posto
     }, 750);
     mostraNotificaSalvataggio('✓ Dati caricati');
-  }).catch(function(e) { console.warn('Errore caricamento Firestore:', e); });
+  }).catch(function(e) { window._caricamentoInCorso = false; console.warn('Errore caricamento Firestore:', e); });
 }
 
 // ═══ FIRESTORE — autosave referente/responsabile (debounce 2s) e notifiche ═══
@@ -8414,6 +8392,7 @@ function salvaReferenteSuFirestore(nomeCampo) {
   if (nomeCampo) _ultimoCampoModificatoRef = nomeCampo;
   clearTimeout(_salvaTimer);
   _salvaTimer = setTimeout(function() {
+    if (caricamentoInCorso()) { salvaReferenteSuFirestore(nomeCampo); return; }
     var dati = {};
     document.querySelectorAll('input[name], textarea[name], select[name]').forEach(function(el) {
       var n = el.name;
@@ -8421,6 +8400,9 @@ function salvaReferenteSuFirestore(nomeCampo) {
       if (el.type === 'checkbox') { dati[n] = el.checked; return; }
       if (el.value && el.value.trim()) dati[n] = el.value.trim();
     });
+    // Conserva i campi salvati che la pagina non mostra (non eliminati dall'utente)
+    conservaCampiSenzaPosto(dati, window._datiReferenteCache);
+    window._datiReferenteCache = dati;
     var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
     // "Ultima modifica Referente" — campo dedicato (non stato.ultimo_aggiornamento,
     // che viene scritto anche dal Responsabile e si sovrascriverebbero a vicenda).
@@ -8444,6 +8426,7 @@ function salvaResponsabileSuFirestore() {
   if (!window.firebaseReady || !window.db || !metadati.id) return;
   clearTimeout(_salvaRespTimer);
   _salvaRespTimer = setTimeout(function() {
+    if (caricamentoInCorso()) { salvaResponsabileSuFirestore(); return; }
     var dati = {};
     // Distribuzione organico — include anche i <select> (es. dist_modest_),
     // non solo gli <input>: prima venivano letti gli input numerici ma il
@@ -8592,6 +8575,9 @@ function salvaResponsabileSuFirestore() {
       if (el.value && el.value.trim()) dati[n] = el.value.trim();
     });
 
+    // Conserva i campi salvati che la pagina non mostra (non eliminati dall'utente)
+    conservaCampiSenzaPosto(dati, window._datiResponsabileCache);
+    window._datiResponsabileCache = dati;
     var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
     window.fsUpdateDoc(docRef, {
       dati_responsabile: dati,

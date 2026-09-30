@@ -130,7 +130,11 @@
   }
 
   function RiferimentoDoc(col, id) { this.col = col; this.id = id; }
-  RiferimentoDoc.prototype.get = function() { var r = this; return asincrono(function() { return new Istantanea(r.col, r.id); }); };
+  // Ritardo di lettura facoltativo (window.__FINTO_DB_RITARDO_LETTURA, ms): simula una rete lenta.
+  RiferimentoDoc.prototype.get = function() {
+    var r = this, ritardo = window.__FINTO_DB_RITARDO_LETTURA || 0;
+    return new Promise(function(ok) { setTimeout(ok, ritardo); }).then(function() { return asincrono(function() { return new Istantanea(r.col, r.id); }); });
+  };
   // Gli errori di formato escono subito (come nell'SDK vero), "documento inesistente" come promessa rifiutata.
   RiferimentoDoc.prototype.set = function(dati, opzioni) { validaSet(dati, opzioni); var r = this; return asincrono(function() { op.set(r.col, r.id, dati, opzioni); }); };
   RiferimentoDoc.prototype.update = function(campi) { validaUpdate(campi); var r = this; return asincrono(function() { op.update(r.col, r.id, campi); }); };

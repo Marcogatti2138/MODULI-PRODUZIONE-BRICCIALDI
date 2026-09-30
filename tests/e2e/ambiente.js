@@ -22,11 +22,15 @@ const FIREBASE_VIETATO = /(^|\.)(googleapis\.com|firebaseio\.com|firebaseapp\.co
 const test = base.test.extend({
   // Dati iniziali del finto Firestore: { progetti: { id: {...} } }. Solo dati inventati.
   datiIniziali: [{}, { option: true }],
+  // true: le finestre di conferma (confirm) vengono accettate invece che annullate.
+  accettaConferme: [false, { option: true }],
+  // Ritardo in ms delle letture dal finto Firestore (rete lenta).
+  ritardoLettura: [0, { option: true }],
 
-  ambiente: [async ({ page, datiIniziali }, use) => {
+  ambiente: [async ({ page, datiIniziali, accettaConferme, ritardoLettura }, use) => {
     const stato = { firebaseBloccate: [], esterneBloccate: [], erroriConsole: [], eccezioni: [], dialoghi: [] };
 
-    await page.addInitScript(dati => { window.__FINTO_DB_INIZIALE = dati; }, datiIniziali);
+    await page.addInitScript(([dati, ritardo]) => { window.__FINTO_DB_INIZIALE = dati; window.__FINTO_DB_RITARDO_LETTURA = ritardo; }, [datiIniziali, ritardoLettura]);
 
     await page.route('**/*', async route => {
       const url = route.request().url();
@@ -48,7 +52,10 @@ const test = base.test.extend({
 
     page.on('console', msg => { if (msg.type() === 'error') stato.erroriConsole.push(msg.text()); });
     page.on('pageerror', err => stato.eccezioni.push(String(err && err.stack || err)));
-    page.on('dialog', async dialog => { stato.dialoghi.push(dialog.type() + ': ' + dialog.message()); await dialog.dismiss(); });
+    page.on('dialog', async dialog => {
+      stato.dialoghi.push(dialog.type() + ': ' + dialog.message());
+      if (accettaConferme && dialog.type() === 'confirm') await dialog.accept(); else await dialog.dismiss();
+    });
 
     await use(stato);
 
