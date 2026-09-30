@@ -7220,13 +7220,15 @@ function salvaResponsabileSuFirestore() {
     conservaCampiSenzaPosto(dati, window._datiResponsabileCache);
     window._datiResponsabileCache = dati;
     var docRef = window.fsDoc(window.db, 'progetti', metadati.id);
-    window.fsSetDoc(docRef, {
+    // update (come nei Mod. 1, 2, 4): sostituisce la mappa, così un campo svuotato
+    // a mano sparisce davvero. Il set con merge la fondeva e lo lasciava su Firestore.
+    window.fsUpdateDoc(docRef, {
       dati_responsabile: dati,
-      stato: { ultimo_aggiornamento: window.fsTimestamp() }
-    }, { merge: true }).then(function() {
+      'stato.ultimo_aggiornamento': window.fsTimestamp()
+    }).then(function() {
       mostraNotificaSalvataggio('Salvato ✓');
     }).catch(function(e) {
-      console.warn('Errore salvataggio Responsabile:', e);
+      window.fsSetDoc(docRef, { dati_responsabile: dati, metadati: metadati }, { merge: true });
     });
   }, 2000); // salva 2 secondi dopo l'ultima modifica
 }
