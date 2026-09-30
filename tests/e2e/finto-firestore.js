@@ -78,7 +78,7 @@
   }
 
   function erroreNonTrovato(col, id) {
-    var e = new Error('No document to update: progetti/' + id);
+    var e = new Error('No document to update: ' + col + '/' + id);
     e.code = 'not-found';
     return e;
   }
@@ -90,6 +90,20 @@
     this._dati = dati === undefined ? undefined : copia(dati);
   }
   Istantanea.prototype.data = function() { return this._dati === undefined ? undefined : copia(this._dati); };
+
+  // Controlli che il Firestore vero fa prima di scrivere (errore "invalid-argument"):
+  // niente valori undefined; FieldValue.delete() solo nei set con merge e, negli
+  // update, solo come valore diretto di un campo (non dentro una mappa).
+  function erroreArgomento(msg) { var e = new Error(msg); e.code = 'invalid-argument'; return e; }
+  function valida(v, eliminaAmmesso, percorso) {
+    if (v === undefined) throw erroreArgomento('Unsupported field value: undefined (campo ' + percorso + ')');
+    if (v === ELIMINA) { if (!eliminaAmmesso) throw erroreArgomento('FieldValue.delete() non ammesso in ' + percorso); return; }
+    if (Array.isArray(v)) { v.forEach(function(x, i) { valida(x, false, percorso + '[' + i + ']'); }); return; }
+    if (eMappa(v)) Object.keys(v).forEach(function(k) { valida(v[k], eliminaAmmesso, percorso ? percorso + '.' + k : k); });
+  }
+
+  function validaSet(dati, opzioni) { valida(dati, !!(opzioni && opzioni.merge), ''); }
+  function validaUpdate(campi) { Object.keys(campi).forEach(function(k) { valida(campi[k], campi[k] === ELIMINA, k); }); }
 
   // Operazioni sincrone sul "database"; i metodi pubblici le avvolgono in Promise.
   var op = {
@@ -117,8 +131,9 @@
 
   function RiferimentoDoc(col, id) { this.col = col; this.id = id; }
   RiferimentoDoc.prototype.get = function() { var r = this; return asincrono(function() { return new Istantanea(r.col, r.id); }); };
-  RiferimentoDoc.prototype.set = function(dati, opzioni) { var r = this; return asincrono(function() { op.set(r.col, r.id, dati, opzioni); }); };
-  RiferimentoDoc.prototype.update = function(campi) { var r = this; return asincrono(function() { op.update(r.col, r.id, campi); }); };
+  // Gli errori di formato escono subito (come nell'SDK vero), "documento inesistente" come promessa rifiutata.
+  RiferimentoDoc.prototype.set = function(dati, opzioni) { validaSet(dati, opzioni); var r = this; return asincrono(function() { op.set(r.col, r.id, dati, opzioni); }); };
+  RiferimentoDoc.prototype.update = function(campi) { validaUpdate(campi); var r = this; return asincrono(function() { op.update(r.col, r.id, campi); }); };
   RiferimentoDoc.prototype.delete = function() { var r = this; return asincrono(function() { op.elimina(r.col, r.id); }); };
 
   function RiferimentoCollezione(col) { this.col = col; }
@@ -134,8 +149,8 @@
   // Transazioni: le operazioni si eseguono una dopo l'altra, senza concorrenza.
   function Transazione() {}
   Transazione.prototype.get = function(ref) { return Promise.resolve(new Istantanea(ref.col, ref.id)); };
-  Transazione.prototype.set = function(ref, dati, opzioni) { op.set(ref.col, ref.id, dati, opzioni); return this; };
-  Transazione.prototype.update = function(ref, campi) { op.update(ref.col, ref.id, campi); return this; };
+  Transazione.prototype.set = function(ref, dati, opzioni) { validaSet(dati, opzioni); op.set(ref.col, ref.id, dati, opzioni); return this; };
+  Transazione.prototype.update = function(ref, campi) { validaUpdate(campi); op.update(ref.col, ref.id, campi); return this; };
   Transazione.prototype.delete = function(ref) { op.elimina(ref.col, ref.id); return this; };
 
   var db = {
