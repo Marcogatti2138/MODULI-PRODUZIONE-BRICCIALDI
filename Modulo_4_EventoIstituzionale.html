@@ -3211,6 +3211,8 @@ function rinumeraDopoModificaRighe(containerId, prefix, campi, labelPrefix) {
   if (prefix === 'prova') proveCount = righe.length;
   if (prefix === 'esec') esecutoriCount = righe.length;
   if (prefix === 'collo') colliCount = righe.length;
+  if (prefix === 'programma') programmaCount = righe.length;
+  if (prefix === 'relatore') relatoriCount = righe.length;
   if (prefix === 'spartito') spartitiCount = righe.length;
   if (prefix === 'brano') braniCount = righe.length;
   if (prefix === 'doc') docentiCount = righe.length;
@@ -3268,9 +3270,9 @@ function addCollo() {
   var tr = document.createElement('tr');
   tr.setAttribute('data-riga', 'collo');
   tr.innerHTML =
-    '<td style="padding:4px"><input type="text" data-f="materiale" name="collo_' + colliCount + '" placeholder="Es. Banner istituzionale, targa commemorativa, faldoni documenti..." style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 6px;font-family:inherit;font-size:12px;outline:none"></td>' +
+    '<td style="padding:4px"><input type="text" data-f="" name="collo_' + colliCount + '" placeholder="Es. Banner istituzionale, targa commemorativa, faldoni documenti..." style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 6px;font-family:inherit;font-size:12px;outline:none"></td>' +
     '<td style="padding:4px"><input type="text" data-f="dest" name="collo_dest_' + colliCount + '" placeholder="Luogo evento (default)" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 6px;font-family:inherit;font-size:12px;outline:none"></td>' +
-    '<td style="padding:4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'colli-body\',\'collo\',[\'materiale\',\'dest\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'colli-body\',\'collo\',[\'materiale\',\'dest\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'colli-body\',\'collo\',[\'materiale\',\'dest\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;">✕</button></td>';
+    '<td style="padding:4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'colli-body\',\'collo\',[\'\',\'dest\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'colli-body\',\'collo\',[\'\',\'dest\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'colli-body\',\'collo\',[\'\',\'dest\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;">✕</button></td>';
   document.getElementById('colli-body').appendChild(tr);
 }
 addCollo(); // una riga iniziale
@@ -6310,14 +6312,14 @@ var esecutoriCount = 0;
 function addProgramma() {
   programmaCount++;
   var tr = document.createElement('tr');
-  tr.setAttribute('data-riga', 'prog');
+  tr.setAttribute('data-riga', 'programma');
   tr.style.borderBottom = '1px solid #D0D7E3';
   if (programmaCount % 2 === 0) tr.style.background = '#F4F7FC';
   tr.innerHTML =
     '<td style="padding:3px 4px"><input type="text" data-f="orario" name="programma_orario_' + programmaCount + '" onblur="formattaOraItaliana(this)" placeholder="__:__" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
     '<td style="padding:3px 4px"><textarea data-f="descrizione" name="programma_descrizione_' + programmaCount + '" placeholder="es. Saluti istituzionali / Intervento / Pausa caffè" rows="2" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none;resize:vertical"></textarea></td>' +
     '<td style="padding:3px 4px"><input type="text" data-f="relatore" name="programma_relatore_' + programmaCount + '" placeholder="es. M° Rossi" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
-    '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'prog\',[\'orario\',\'descrizione\',\'relatore\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'prog\',[\'orario\',\'descrizione\',\'relatore\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'programma-tbody\',\'prog\',[\'orario\',\'descrizione\',\'relatore\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
+    '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'programma\',[\'orario\',\'descrizione\',\'relatore\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'programma\',[\'orario\',\'descrizione\',\'relatore\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'programma-tbody\',\'programma\',[\'orario\',\'descrizione\',\'relatore\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
   document.getElementById('programma-tbody').appendChild(tr);
   var elCont = document.getElementById('programma-contatore');
   if (elCont) elCont.textContent = programmaCount + (programmaCount === 1 ? ' voce inserita' : ' voci inserite');
@@ -6328,13 +6330,13 @@ for (var pg = 0; pg < 3; pg++) addProgramma();
 function addRelatore() {
   relatoriCount++;
   var tr = document.createElement('tr');
-  tr.setAttribute('data-riga', 'relat');
+  tr.setAttribute('data-riga', 'relatore');
   tr.style.borderBottom = '1px solid #D0D7E3';
   if (relatoriCount % 2 === 0) tr.style.background = '#F4F7FC';
   tr.innerHTML =
     '<td style="padding:3px 4px"><input type="text" data-f="nome" name="relatore_nome_' + relatoriCount + '" placeholder="Cognome Nome" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
     '<td style="padding:3px 4px"><input type="text" data-f="qualifica" name="relatore_qualifica_' + relatoriCount + '" placeholder="es. Docente di Storia della Musica, Università di Perugia" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
-    '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'relatori-tbody\',\'relat\',[\'nome\',\'qualifica\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'relatori-tbody\',\'relat\',[\'nome\',\'qualifica\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'relatori-tbody\',\'relat\',[\'nome\',\'qualifica\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
+    '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'relatori-tbody\',\'relatore\',[\'nome\',\'qualifica\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'relatori-tbody\',\'relatore\',[\'nome\',\'qualifica\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'relatori-tbody\',\'relatore\',[\'nome\',\'qualifica\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
   document.getElementById('relatori-tbody').appendChild(tr);
   var elCont = document.getElementById('relatori-contatore');
   if (elCont) elCont.textContent = relatoriCount + (relatoriCount === 1 ? ' relatore inserito' : ' relatori inseriti');
