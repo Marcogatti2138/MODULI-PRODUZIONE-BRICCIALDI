@@ -334,6 +334,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="importi.js"></script>
 <script src="determina-legale.js"></script>
 <script>
   var firebaseConfig = {
@@ -939,13 +940,6 @@
       }
     });
     return out;
-  }
-
-  function parseImportoIt(s) {
-    if (!s) return NaN;
-    var pulito = String(s).trim().replace(/[€\s]/g, '');
-    if (pulito.indexOf(',') !== -1) pulito = pulito.replace(/\./g, '').replace(',', '.');
-    return parseFloat(pulito);
   }
 
   // Formulazione singolare/plurale per le Determine e richieste cumulative: un solo

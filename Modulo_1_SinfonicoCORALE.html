@@ -496,6 +496,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+<script src="importi.js"></script>
 <script src="determina-legale.js"></script>
 <script src="coerenza-date.js"></script>
 <script>
@@ -6337,13 +6338,6 @@ function gestisciSceltaPreventivo(cb, tbodyId) {
   document.querySelectorAll('#' + tbodyId + ' input[data-f="scelto"]').forEach(function(other) {
     if (other !== cb) other.checked = false;
   });
-}
-
-function parseImportoIt(s) {
-  if (!s) return NaN;
-  var pulito = String(s).trim().replace(/[€\s]/g, '');
-  if (pulito.indexOf(',') !== -1) pulito = pulito.replace(/\./g, '').replace(',', '.');
-  return parseFloat(pulito);
 }
 
 // Converte un numero (es. 1037.4) nel formato italiano "1.037,40"
