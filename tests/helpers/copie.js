@@ -48,4 +48,8 @@ function funzioneDellaPagina(file, nome, condivisi, contesto) {
   throw new Error(file + ': nessuna ' + nome + ' disponibile');
 }
 
-module.exports = { suOgniCopia, dataFissa, campo, funzioneDellaPagina };
+// Copia "normale" di un valore creato nel contesto isolato (liste e oggetti), per
+// confrontarlo con deepEqual: valori uguali ma nati in contesti diversi non risultano identici.
+function normale(valore) { return JSON.parse(JSON.stringify(valore)); }
+
+module.exports = { suOgniCopia, dataFissa, campo, funzioneDellaPagina, normale };
