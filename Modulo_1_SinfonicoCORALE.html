@@ -6835,9 +6835,9 @@ function copiaTestoDeterminaNoleggio() {
   try { document.execCommand('copy'); document.getElementById('copia-confirm-determina-noleggio').style.display = 'block'; } catch(e) {}
 }
 function apriMailDeterminaNoleggio() {
-  var testo = document.getElementById('testo-determina-noleggio').value;
-  var sogg = encodeURIComponent('[Bozza Determina] Noleggio/Service — ' + (metadati.titolo || 'Progetto'));
-  window.location.href = 'mailto:?subject=' + sogg + '&body=' + encodeURIComponent(testo);
+  var sogg = encodeURIComponent('[Bozza Determina Noleggio/Service] ' + (metadati.titolo || 'Progetto'));
+  var corpo = encodeURIComponent(document.getElementById('testo-determina-noleggio').value);
+  window.location.href = 'mailto:direttoreamministrativo@briccialditerni.it?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
 }
 
 async function generaDOCXDeterminaNoleggio() {
