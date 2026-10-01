@@ -39,8 +39,10 @@ function costruisciTestoDeterminaTrasporti(cfg) {
   var protRichiesta = cfg.protRichiesta;
   var scadenzaOraRichiesta = cfg.scadenzaOraRichiesta;
   var scadenzaDataRichiesta = cfg.scadenzaDataRichiesta;
-  var ivaCalcolata = isNaN(importoScelto) ? NaN : importoScelto * 0.22;
-  var totaleConIva = isNaN(importoScelto) ? NaN : importoScelto * 1.22;
+  // IVA arrotondata al centesimo una volta sola; totale = imponibile + IVA (importi.js)
+  var importiIva = calcolaIva22(importoScelto);
+  var ivaCalcolata = importiIva.iva;
+  var totaleConIva = importiIva.totale;
   var lines = [];
   lines.push('Amministrazione');
   lines.push('');
@@ -260,8 +262,10 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   var protRichiesta = cfg.protRichiesta;
   var scadenzaOraRichiesta = cfg.scadenzaOraRichiesta;
   var scadenzaDataRichiesta = cfg.scadenzaDataRichiesta;
-  var ivaCalcolata = isNaN(importoScelto) ? NaN : importoScelto * 0.22;
-  var totaleConIva = isNaN(importoScelto) ? NaN : importoScelto * 1.22;
+  // IVA arrotondata al centesimo una volta sola; totale = imponibile + IVA (importi.js)
+  var importiIva = calcolaIva22(importoScelto);
+  var ivaCalcolata = importiIva.iva;
+  var totaleConIva = importiIva.totale;
   var lines = [];
   lines.push('Amministrazione');
   lines.push('');
@@ -941,8 +945,10 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   var luogoEventoTesto = cfg.luogoEventoTesto;
   var altreOfferte = preventivi.filter(function(p) { return p !== scelto; });
   var unicoOfferente = preventivi.length === 1;
-  var ivaCalcolata = isNaN(importoScelto) ? NaN : importoScelto * 0.22;
-  var totaleConIva = isNaN(importoScelto) ? NaN : importoScelto * 1.22;
+  // IVA arrotondata al centesimo una volta sola; totale = imponibile + IVA (importi.js)
+  var importiIva = calcolaIva22(importoScelto);
+  var ivaCalcolata = importiIva.iva;
+  var totaleConIva = importiIva.totale;
   var lines = [];
   lines.push('Amministrazione');
   lines.push('');

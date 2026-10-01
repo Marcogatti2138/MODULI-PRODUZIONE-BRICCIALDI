@@ -5,21 +5,7 @@
 const assert = require('node:assert/strict');
 const { suOgniCopia, dataFissa, campo } = require('../helpers/copie');
 
-// ── Importi ──────────────────────────────────────────────────────────────────
-
-suOgniCopia('formattaImportoIt: separatore delle migliaia e due decimali', ['formattaImportoIt'], f => {
-  const casi = [[0, '0,00'], [5, '5,00'], [850, '850,00'], [1464, '1.464,00'], [12000, '12.000,00'],
-    [14640, '14.640,00'], [1234567.89, '1.234.567,89'], [0.5, '0,50'], [-1500, '-1.500,00']];
-  for (const [n, atteso] of casi) assert.equal(f.formattaImportoIt(n), atteso, String(n));
-  assert.equal(f.formattaImportoIt(NaN), '[___ importo ___]');
-});
-
-suOgniCopia('formattaImportoIt: IVA e totale arrotondati al centesimo (metà per eccesso)', ['formattaImportoIt'], f => {
-  // 2,25 € × 22% = 0,495 → 0,50; 1,25 € × 1,22 = 1,525 → 1,53
-  assert.equal(f.formattaImportoIt(2.25 * 0.22), '0,50');
-  assert.equal(f.formattaImportoIt(1.25 * 1.22), '1,53');
-  assert.equal(f.formattaImportoIt(1462.25 * 0.22), '321,70');
-}, null, { todo: 'BUG segnalato 01/10/2026: toFixed(2) arrotonda per difetto i valori come 0,495 (1% circa degli importi)' });
+// Importi: formattaImportoIt e calcolaIva22 sono provati in importi.test.js.
 
 // ── Orari ────────────────────────────────────────────────────────────────────
 

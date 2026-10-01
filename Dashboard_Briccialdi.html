@@ -957,14 +957,6 @@
     return count === 1 ? ' per il progetto: ' : ' per i progetti: ';
   }
 
-  function formattaImportoIt(n) {
-    if (isNaN(n)) return '[___ importo ___]';
-    // Separatore migliaia fatto a mano: toLocaleString('it-IT') in Chrome non lo
-    // mette sotto i 10.000 (es. "1464,00" invece di "1.464,00").
-    var parti = Math.abs(n).toFixed(2).split('.');
-    return (n < 0 ? '-' : '') + parti[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + parti[1];
-  }
-
   // ── Determina Trasporti/Noleggio cumulativa — un solo fornitore/contratto
   // per più progetti insieme, con un unico importo complessivo. Riusa il
   // testo legale invariato già in determina-legale.js (premesse, soglie

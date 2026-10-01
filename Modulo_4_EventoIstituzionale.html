@@ -3254,15 +3254,6 @@ function gestisciSceltaPreventivoGenerico(cb) {
   });
 }
 
-// Converte un numero (es. 1037.4) nel formato italiano "1.037,40"
-function formattaImportoIt(n) {
-  if (isNaN(n)) return '[___ importo ___]';
-  // Separatore migliaia fatto a mano: toLocaleString('it-IT') in Chrome non lo
-  // mette sotto i 10.000 (es. "1464,00" invece di "1.464,00").
-  var parti = Math.abs(n).toFixed(2).split('.');
-  return (n < 0 ? '-' : '') + parti[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + parti[1];
-}
-
 // ── Colli / materiale da trasportare ──
 var colliCount = 0;
 function addCollo() {
@@ -4917,8 +4908,10 @@ function generaBozzaDeterminaTrasportoPersone() {
   var scadenzaDataRichiesta = getField('determina_trper_scadenza_data') || '[___ data scadenza offerte ___]';
   var dataEventoTesto = getField('data_evento') || '';
   var luogoEventoTesto = getField('luogo_concerto') || '';
-  var ivaCalcolata = isNaN(importoScelto) ? NaN : importoScelto * 0.22;
-  var totaleConIva = isNaN(importoScelto) ? NaN : importoScelto * 1.22;
+  // IVA arrotondata al centesimo una volta sola; totale = imponibile + IVA (importi.js)
+  var importiIva = calcolaIva22(importoScelto);
+  var ivaCalcolata = importiIva.iva;
+  var totaleConIva = importiIva.totale;
 
   var lines = [];
   lines.push('Amministrazione');
@@ -5392,8 +5385,10 @@ function generaBozzaDeterminaTrasporti(istanza) {
   var scadenzaDataRichiesta = getField('determina_trasp_scadenza_data' + suf) || '[___ data scadenza offerte ___]';
   var dataEventoTesto = getField('data_evento') || '';
   var luogoEventoTesto = getField('luogo_concerto') || getField('dest_trasferta') || '';
-  var ivaCalcolata = isNaN(importoScelto) ? NaN : importoScelto * 0.22;
-  var totaleConIva = isNaN(importoScelto) ? NaN : importoScelto * 1.22;
+  // IVA arrotondata al centesimo una volta sola; totale = imponibile + IVA (importi.js)
+  var importiIva = calcolaIva22(importoScelto);
+  var ivaCalcolata = importiIva.iva;
+  var totaleConIva = importiIva.totale;
 
   var lines = [];
   lines.push('Amministrazione');
