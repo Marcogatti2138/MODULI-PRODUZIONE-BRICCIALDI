@@ -4484,13 +4484,17 @@ function generaRichiestaDatiAnagrafici(btn) {
   var chiaveTracciamento = 'dati_anagrafici_' + slugPersona(nome);
   if (!registraRichiestaGenerata(chiaveTracciamento, 'Dati Anagrafici — ' + nome)) return;
   var link = 'https://drive.google.com/file/d/1dW6hFiFeh8PGYifgl8YZHJCmadYX81qZ/view?usp=drivesdk';
-  var sogg = encodeURIComponent('Richiesta dati anagrafici e fiscali - ' + (metadati.titolo || 'Progetto'));
+  var sogg = encodeURIComponent('Dati per l\'incarico e biografia artistica - ' + (metadati.titolo || 'Progetto'));
   var corpo = encodeURIComponent(
     'Gentile ' + nome + ',\n\n' +
-    'per procedere con la stipula del contratto di collaborazione per il progetto "' + (metadati.titolo || '') + '", La invitiamo a compilare il modulo di autocertificazione dati anagrafici e fiscali disponibile al seguente link:\n\n' +
+    'con la presente Le confermiamo l\'incarico di collaborazione con il Conservatorio Statale di Musica "G. Briccialdi" di Terni per il progetto "' + (metadati.titolo || '') + '", e Le scriviamo per raccogliere due elementi, entrambi necessari per completare la pratica.\n\n' +
+    '1) MODULO DATI (obbligatorio)\n' +
+    'La invitiamo a compilare il modulo di autocertificazione dati anagrafici e fiscali disponibile al seguente link:\n\n' +
     link + '\n\n' +
     'Una volta compilato, La preghiamo di inviarlo a ufficiopersonale@briccialditerni.it (in copia a questa email).\n\n' +
-    'Cordiali saluti,\nUfficio Produzione\nConservatorio «G. Briccialdi» - Terni\n\n' +
+    '2) BIOGRAFIA ARTISTICA (obbligatoria, senza dati sensibili)\n' +
+    'Le chiediamo inoltre una breve biografia artistica, necessaria per l\'anagrafe delle prestazioni artistiche — non deve contenere alcun dato personale sensibile, solo il Suo profilo professionale. La utilizzeremo anche per il programma di sala e per la comunicazione dell\'evento. Può incollarla direttamente nel corpo della risposta, oppure allegarla come file separato: quello che Le è più comodo.\n\n' +
+    'Cordiali saluti,\nMarco Gatti\nResponsabile della Produzione\nConservatorio «G. Briccialdi» - Terni\n\n' +
     '---\n' +
     'Riferimenti collaboratore (per Ufficio Personale):\n' +
     'Nome: ' + nome + '\n' +
