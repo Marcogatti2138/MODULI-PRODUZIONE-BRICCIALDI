@@ -5866,14 +5866,18 @@ function aggiornaVerificaMateriali() {
 function costruisciTabellaDotazioneDisp() {
   var tbody = document.getElementById('dotazione-disp-tbody');
   if (!tbody) return;
+  // Le voci della Dotazione del Mod. 4 (Sezione 6), come in Prestito, struttura,
+  // Noleggio e Centralino. Prima c'erano leggii/leggii illuminati/podio del Mod. 1,
+  // che qui non esistono, e mancavano le ultime quattro (bug G).
   var voci = [
     ['sedie', 'Sedie'],
-    ['leggii', 'Leggii'],
-    ['leggii_lum', 'Leggii illuminati'],
-    ['podio', 'Podio'],
     ['piano', 'Pianoforte'],
     ['audio', 'Impianto audio / PA'],
     ['luci', 'Impianto luci'],
+    ['leggio_relatore', 'Podio/leggio relatore'],
+    ['videoproiettore', 'Videoproiettore e schermo'],
+    ['computer', 'Computer'],
+    ['wifi', 'Connessione Wi-Fi/rete'],
     ['service', 'Service esterno richiesto'],
     ['altro', 'Altra dotazione tecnica']
   ];

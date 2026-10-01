@@ -61,7 +61,7 @@ function aggiungiRigheResponsabile() {
 // L'ordine delle regole conta (la prima che corrisponde vince).
 function compilaCampiVuoti(sigla) {
   const pick = (el, pref) => { const ops = [...el.options].map(o => o.value).filter(Boolean); for (const p of pref || []) { const f = ops.find(o => o.startsWith(p)); if (f) return f; } return ops[0]; };
-  const DISP = { sedie: 'Già disponibile', leggii: 'Prestito', podio: 'Prestito', piano: 'Disponibile nella struttura', audio: 'Da acquistare', luci: 'Da acquistare', service: 'Da acquistare', altro: 'Da acquistare', leggii_lum: 'Già disponibile', leggio_relatore: 'Prestito' };
+  const DISP = { sedie: 'Già disponibile', leggii: 'Prestito', podio: 'Prestito', piano: 'Disponibile nella struttura', audio: 'Da acquistare', luci: 'Da acquistare', service: 'Da acquistare', altro: 'Da acquistare', leggii_lum: 'Già disponibile', leggio_relatore: 'Prestito', videoproiettore: 'Da acquistare', computer: 'Già disponibile', wifi: 'Disponibile nella struttura' };
   function valore(el) {
     const n = el.name, m = /_(\d+)$/.exec(n), i = m ? +m[1] : 1, ph = el.placeholder || '';
     if (el.tagName === 'SELECT') {
