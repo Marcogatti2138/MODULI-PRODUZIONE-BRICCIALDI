@@ -191,6 +191,11 @@
     "ass_av_richiesto": true
   },
   "dati_responsabile": {
+    "spazio_concerto": "Teatro Secci",
+    "spazio_replica_1": "Altro",
+    "spazio_replica_2": "Altro",
+    "spazio_replica_1_altro": "Sede Prova Replica 1",
+    "spazio_replica_2_altro": "Sede Prova Replica 2",
     "dot_disp_sedie": "Già disponibile (Conservatorio)",
     "dot_disp_piano": "Disponibile nella struttura",
     "dot_disp_audio": "Da acquistare/noleggiare",

@@ -2,7 +2,7 @@
 // riapro il progetto. Il campo deve restare vuoto (pagina e Firestore), anche
 // dopo un ulteriore salvataggio: le cache dei dati salvati (valoreSpazioSalvato)
 // non devono farlo ricomparire. Campi del Responsabile in Spazi, Dotazione e
-// Trasferta persone; nel M4 la tabella Spazi non c'è nella pagina.
+// Trasferta persone (nel M4 la tabella Spazi c'è dal bug H).
 // Parte dai progetti di prova completi. "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -15,7 +15,7 @@ const MODULI = [
   { sigla: 'M1', file: 'Modulo_1_SinfonicoCORALE.html', progetto: require('../progetti-prova/completo-m1.json'),
     campi: { 'Spazi': ['spazio_concerto', 'Sala Orologio'], 'Dotazione': ['dot_struttura_nota_piano', 'Nota struttura modificata'], 'Trasferta persone': ['trasp_pers_note_replica_1', 'Nota trasferta modificata'] } },
   { sigla: 'M4', file: 'Modulo_4_EventoIstituzionale.html', progetto: require('../progetti-prova/completo-m4.json'),
-    campi: { 'Dotazione': ['dot_struttura_nota_piano', 'Nota struttura modificata'], 'Trasferta persone': ['trasp_pers_note_replica_1', 'Nota trasferta modificata'] } }
+    campi: { 'Spazi': ['spazio_concerto', 'Sala Orologio'], 'Dotazione': ['dot_struttura_nota_piano', 'Nota struttura modificata'], 'Trasferta persone': ['trasp_pers_note_replica_1', 'Nota trasferta modificata'] } }
 ];
 
 async function attendiCaricamento(page, m) {

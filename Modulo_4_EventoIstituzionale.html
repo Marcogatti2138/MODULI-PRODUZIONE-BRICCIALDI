@@ -716,6 +716,7 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
       <span class="toggle">▾</span>
     </div>
     <div class="section-body">
+      <div id="avviso-spazi-modificati" style="display:none;margin-bottom:12px"></div>
       <details style="margin:0 0 14px;border:1px solid var(--bordo);border-radius:6px;background:#F8FAFC">
         <summary style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--blu);cursor:pointer">❓ Come si compila questa sezione</summary>
         <div style="padding:0 12px 10px;font-size:11px;color:var(--muted);line-height:1.5">
@@ -1211,7 +1212,26 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
       <details style="margin-bottom:10px"><summary style="background:var(--blu-light);color:var(--blu);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;border-radius:5px;cursor:pointer">① Verifica disponibilità</summary>
       <div style="padding:10px 2px 2px">
 
-      <div style="padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--blu-mid)">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:4px">Elenca automaticamente evento e repliche inseriti dal Referente. Assegna lo spazio per ciascuno.<a href="javascript:void(0)" onclick="vaiASezione('sezione-1')" style="float:right;font-size:10px;font-weight:600;color:#1A3C6B;text-decoration:none">→ Vedi Sezione 1</a></p>
+      <button class="btn-add" onclick="costruisciTabellaSpazi()" style="margin-bottom:10px">🔄 Aggiorna vista (rilegge i dati del Referente)</button>
+      <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table style="width:100%;min-width:720px;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:var(--blu)">
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px">Appuntamento</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px">Data</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px">Orario</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px">Luogo indicato dal Referente</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:20%">Spazio assegnato</th>
+          </tr>
+        </thead>
+        <tbody id="spazi-tbody">
+          <tr><td colspan="5" style="padding:12px;text-align:center;color:var(--muted);font-style:italic">Premi "Aggiorna vista" per generare l'elenco</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--blu-mid)">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blu-mid);margin-bottom:8px;font-weight:700">👥 Trasporto Persone<a href="javascript:void(0)" onclick="vaiASezione('sezione-6')" style="float:right;font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;color:#1A3C6B;text-decoration:none">→ Vedi Sezione 6</a></div>
         <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Se è stata segnalata una trasferta (Sezione 6), qui puoi decidere la modalità.</p>
         <button class="btn-add" onclick="aggiornaListaColli(); costruisciTabellaTrasportoPersone();" style="margin-bottom:10px">🔄 Aggiorna vista</button>
@@ -1294,11 +1314,17 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
       <details style="margin:22px 0 10px"><summary style="background:var(--blu-light);color:var(--blu);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;border-radius:5px;cursor:pointer">③ Richieste operative</summary>
       <div style="padding:10px 2px 2px">
 
-
       <div style="padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--blu-mid)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blu-mid);margin-bottom:8px;font-weight:700">📤 Spazi<a href="javascript:void(0)" onclick="vaiASezione('sezione-1')" style="float:right;font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;color:#1A3C6B;text-decoration:none">→ Vedi Sezione 1</a></div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Conferma gli spazi assegnati in Blocco ① qui sopra.</p>
+        <button class="btn btn-primary" onclick="generaRichiestaSpazi()">📤 Genera richiesta Spazi <span id="stato-richiesta-spazi"></span></button>
+        <button class="btn btn-secondary" onclick="generaNotificaSpaziReferente()" style="margin-top:8px">📧 Notifica Referente — Spazi assegnati <span id="stato-richiesta-notifica_spazi_referente"></span></button>
+      </div>
+
+      <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid var(--blu-mid)">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blu-mid);margin-bottom:8px;font-weight:700">📤 Dotazione/Materiale<a href="javascript:void(0)" onclick="vaiASezione('sezione-6')" style="float:right;font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;color:#1A3C6B;text-decoration:none">→ Vedi Sezione 6</a></div>
         <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Conferma quanto verificato in Blocco ① qui sopra.</p>
-        <button class="btn btn-primary" onclick="generaRichiestaDotazioneMateriale()">📤 Genera richiesta Dotazione/Materiale <span id="stato-richiesta-spazi"></span></button>
+        <button class="btn btn-primary" onclick="generaRichiestaDotazioneMateriale()">📤 Genera richiesta Dotazione/Materiale <span id="stato-richiesta-dotazione_materiale"></span></button>
       </div>
 
       <div style="margin-top:16px;padding:14px 16px;background:#F8F9FA;border-radius:8px;border:1px solid var(--bordo);border-left:4px solid #2E7D32">
@@ -1565,20 +1591,56 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
     </div>
 
     <!-- Modal richiesta dotazione/materiale -->
-    <div id="modal-spazi" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+    <div id="modal-dotazione-materiale" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
       <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
           <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Richiesta Dotazione/Materiale — Ufficio Produzione</h2>
+          <button onclick="chiudiModalDotazioneMateriale()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
+        </div>
+        <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
+        <textarea id="testo-dotazione-materiale" style="width:100%;height:220px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <button onclick="copiaTestoDotazioneMateriale()" class="btn btn-primary" style="flex:1">Copia testo</button>
+          <button onclick="apriMailDotazioneMateriale()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
+          <button onclick="chiudiModalDotazioneMateriale()" class="btn btn-secondary" style="flex:1">Chiudi</button>
+        </div>
+        <p id="copia-confirm-dotazione-materiale" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
+      </div>
+    </div>
+
+    <!-- Modal richiesta spazi -->
+    <div id="modal-spazi" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+      <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Conferma spazi — Ufficio Produzione</h2>
           <button onclick="chiudiModalSpazi()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
         </div>
         <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
-        <textarea id="testo-spazi" style="width:100%;height:220px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+        <textarea id="testo-spazi" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
         <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
           <button onclick="copiaTestoSpazi()" class="btn btn-primary" style="flex:1">Copia testo</button>
           <button onclick="apriMailSpazi()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
           <button onclick="chiudiModalSpazi()" class="btn btn-secondary" style="flex:1">Chiudi</button>
         </div>
         <p id="copia-confirm-spazi" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
+      </div>
+    </div>
+
+    <!-- Modal notifica spazi al Referente -->
+    <div id="modal-notifica-spazi-referente" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;padding:20px;overflow-y:auto">
+      <div style="background:white;border-radius:12px;max-width:680px;margin:40px auto;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="font-family:Georgia,serif;font-size:18px;color:#1A3C6B">Notifica Referente — Spazi assegnati</h2>
+          <button onclick="chiudiModalNotificaSpaziReferente()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666">✕</button>
+        </div>
+        <p style="font-size:12px;color:#6B7280;margin-bottom:10px">Copia il testo e invialo, oppure apri direttamente in Mail.</p>
+        <textarea id="testo-notifica-spazi-referente" style="width:100%;height:280px;font-family:monospace;font-size:12px;border:1px solid #D0D7E3;border-radius:6px;padding:12px;resize:vertical" readonly></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <button onclick="copiaTestoNotificaSpaziReferente()" class="btn btn-primary" style="flex:1">Copia testo</button>
+          <button onclick="apriMailNotificaSpaziReferente()" class="btn btn-primary" style="flex:1">Apri in Mail</button>
+          <button onclick="chiudiModalNotificaSpaziReferente()" class="btn btn-secondary" style="flex:1">Chiudi</button>
+        </div>
+        <p id="copia-confirm-notifica-spazi-referente" style="display:none;color:#2E7D32;font-size:12px;margin-top:8px;text-align:center">✓ Testo copiato!</p>
       </div>
     </div>
 
@@ -2837,7 +2899,8 @@ function impostaFiltroLogRichieste(valore) {
 }
 
 var ETICHETTE_RICHIESTE = {
-  spazi: 'Dotazione/Materiale',
+  spazi: 'Spazi',
+  dotazione_materiale: 'Dotazione/Materiale',
   trasporti: 'Trasporti Materiale',
   trasferta_persone: 'Trasferta Persone',
   noleggio: 'Noleggio/Service',
@@ -2846,6 +2909,7 @@ var ETICHETTE_RICHIESTE = {
   determina_noleggio: 'Determina Noleggio/Service',
   assistenza_studenti: 'Assistenza Studenti',
   comunicazione: 'Pacchetto Comunicazione',
+  notifica_spazi_referente: 'Notifica Spazi al Referente',
   sollecito: 'Sollecito Referente',
   centralino_unificata: 'Centralino (mail unica)'
 };
@@ -4139,28 +4203,35 @@ function costruisciListaAssistenza() {
   tbody.innerHTML = html;
 }
 
+// ═══ SPAZI — come nel Mod. 1 (bug H): tabella in Blocco ①, Richiesta Spazi e Notifica al
+// Referente in Blocco ③, avviso al Referente se lo spazio assegnato è diverso da quello proposto.
+// Orario per l'Ufficio Produzione: inizio evento + durata + smontaggio (durate.js), come Mod. 1-2.
+// Etichetta "Evento" (come Assistenza e Trasporti del modulo); la chiave resta spazio_concerto. ═══
 function costruisciTabellaSpazi() {
   var tbody = document.getElementById('spazi-tbody');
   if (!tbody) return;
   aggiornaListaColli();
-  aggiornaListaSpartiti();
+  if (typeof aggiornaListaSpartiti === 'function') aggiornaListaSpartiti(); // nel Mod. 4 non c'è l'elenco spartiti
   costruisciTabellaTrasportoPersone();
   costruisciTabellaDotazioneDisp();
   var righe = [];
 
-  // Concerto principale
   var dataC = getField('data_evento'), oraC = normalizzaOra(getField('ora_evento')) || getField('ora_evento'), luogoC = getField('luogo_concerto');
-  if (dataC || oraC || luogoC) righe.push({ tipo: 'Concerto', data: dataC, ora: oraC, luogo: luogoC, key: 'concerto' });
+  if (dataC || oraC || luogoC) {
+    var estesoC = calcolaOrarioEsteso('Evento', oraC);
+    righe.push({ tipo: 'Evento', data: dataC, ora: estesoC ? estesoC.esteso : oraC, luogo: luogoC, key: 'concerto' });
+  }
 
-  // Repliche
   var r = 1;
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var dR = getField('replica_data_' + r), oR = normalizzaOra(getField('replica_ora_' + r)) || getField('replica_ora_' + r), lR = getField('replica_luogo_' + r);
-    if (dR || oR || lR) righe.push({ tipo: 'Replica ' + r, data: dR, ora: oR, luogo: lR || luogoC, key: 'replica_' + r });
+    if (dR || oR || lR) {
+      var estesoR = calcolaOrarioEsteso('Replica ' + r, oR);
+      righe.push({ tipo: 'Replica ' + r, data: dR, ora: estesoR ? estesoR.esteso : oR, luogo: lR || luogoC, key: 'replica_' + r });
+    }
     r++;
   }
 
-  // Prove
   var p = 1;
   while (document.querySelector('[name="prova_data_' + p + '"]')) {
     var dP = getField('prova_data_' + p), oP1 = getField('prova_inizio_' + p), oP2 = getField('prova_fine_' + p), lP = getField('prova_luogo_' + p);
@@ -4180,15 +4251,219 @@ function costruisciTabellaSpazi() {
     var bg = idx % 2 === 0 ? 'white' : '#F4F7FC';
     var valoreEsistente = valoreSpazioSalvato('spazio_' + riga.key);
     var valoreAltro = valoreSpazioSalvato('spazio_' + riga.key + '_altro');
+    // Se il Responsabile ha assegnato uno spazio diverso da quello proposto dal
+    // Referente (riga.luogo), il Referente deve poterlo vedere chiaramente
+    // quando riapre il modulo — senza dover andare a controllare Verifica e richieste.
+    var spazioEffettivo = (valoreEsistente === 'Altro' ? valoreAltro : valoreEsistente) || '';
+    var luogoProposto = (riga.luogo || '').trim();
+    var divergente = spazioEffettivo && luogoProposto && spazioEffettivo.trim().toLowerCase() !== luogoProposto.toLowerCase();
+    var avvisoDivergenza = divergente ? '<div style="margin-top:3px;font-size:10px;color:#B85C00;background:#FFF3E0;border-radius:3px;padding:2px 5px;display:inline-block">⚠ Assegnato: ' + spazioEffettivo + ' (diverso da quanto proposto)</div>' : '';
     html += '<tr style="background:' + bg + ';border-bottom:1px solid #E8ECF3">' +
       '<td style="padding:6px 10px;font-weight:600">' + riga.tipo + '</td>' +
       '<td style="padding:6px 10px">' + (riga.data || '—') + '</td>' +
       '<td style="padding:6px 10px">' + (riga.ora || '—') + '</td>' +
-      '<td style="padding:6px 10px;color:#6B7280">' + (riga.luogo || '—') + '</td>' +
+      '<td style="padding:6px 10px;color:#6B7280">' + (riga.luogo || '—') + avvisoDivergenza + '</td>' +
       '<td style="padding:4px 6px">' + creaSelectSpazio('spazio_' + riga.key, valoreEsistente, valoreAltro) + '</td>' +
       '</tr>';
   });
   tbody.innerHTML = html;
+}
+
+function minutiAOra(mins) {
+  mins = ((mins % 1440) + 1440) % 1440;
+  var hh = Math.floor(mins / 60), mm = mins % 60;
+  return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+}
+
+function calcolaOrarioEsteso(tipo, oraStr) {
+  if (!oraStr) return null;
+  if (tipo.indexOf('Prova') === 0) {
+    var parti = oraStr.split(/\s*–\s*/);
+    var inizio = oraAMinuti(parti[0]);
+    var fine = parti[1] ? oraAMinuti(parti[1]) : null;
+    if (inizio === null || fine === null) return null;
+    return { esteso: minutiAOra(inizio - 30) + '–' + minutiAOra(fine + 30), nota: 'prova ' + oraStr };
+  }
+  // Concerto o Replica: un solo orario. Inizia esattamente all'ora indicata
+  // (nessun margine prima — l'eventuale prova/assestamento la gestisce già il
+  // Referente come riga a parte in Piano Prove). Dopo, durata + smontaggio
+  // (MINUTI_SMONTAGGIO_CONCERTO in durate.js: 45').
+  var inizioC = oraAMinuti(oraStr);
+  if (inizioC === null) return null;
+  var durataMin = estraiDurataMinuti(getField('durata'));
+  if (durataMin === null) return null;
+  return { esteso: minutiAOra(inizioC) + '–' + minutiAOra(inizioC + durataMin + MINUTI_SMONTAGGIO_CONCERTO), nota: 'inizio ore ' + oraStr + ', durata ' + durataMin + '\'' };
+}
+
+function generaRichiestaSpazi() {
+  var righe = document.querySelectorAll('#spazi-tbody tr');
+  var lines = [];
+  lines.push('Gentile Ufficio Produzione,');
+  lines.push('');
+  lines.push('si confermano gli spazi assegnati per il progetto "' + (metadati.titolo || '') + '" (ID ' + (metadati.id || '') + '):');
+  lines.push('');
+  var count = 0;
+  righe.forEach(function(tr) {
+    var celle = tr.querySelectorAll('td');
+    if (celle.length < 5) return;
+    var tipo = celle[0].textContent.trim();
+    var data = celle[1].textContent.trim();
+    var ora = celle[2].textContent.trim();
+    var sel = tr.querySelector('select');
+    var altroInput = tr.querySelector('input[type="text"]');
+    var spazio = sel ? sel.value : '';
+    if (spazio === 'Altro' && altroInput && altroInput.value.trim()) spazio = altroInput.value.trim();
+    if (!spazio) spazio = '(da assegnare)';
+    var esteso = calcolaOrarioEsteso(tipo, ora);
+    var oraRiga = esteso ? (esteso.esteso + ' — con margine di preparazione, ' + esteso.nota) : ora;
+    lines.push('- ' + tipo + ' — ' + data + ' ore ' + oraRiga + ' — Spazio: ' + spazio);
+    count++;
+  });
+  if (count === 0) {
+    alert('Nessun appuntamento ancora presente. Premi prima "🔄 Aggiorna vista".');
+    return;
+  }
+  lines.push('');
+  lines.push('Si prega di confermare e preparare quanto necessario.');
+  var vociStrutturaSpazi = (typeof elencoVociDisponibiliInStruttura === 'function') ? elencoVociDisponibiliInStruttura() : [];
+  if (vociStrutturaSpazi.length) {
+    lines.push('');
+    lines.push('Risulta inoltre già disponibile presso la struttura ospitante:');
+    vociStrutturaSpazi.forEach(function(s) {
+      lines.push('- ' + s.label + ': ' + s.qta + (s.dettaglio ? ' — ' + s.dettaglio : ''));
+    });
+    lines.push('Si prega di confermare quanto sopra.');
+  }
+  lines.push('');
+  lines.push('Cordiali saluti,');
+  lines.push('Ufficio Produzione');
+  document.getElementById('testo-spazi').value = lines.join('\n');
+  autoResizeTextarea(document.getElementById('testo-spazi'));
+  if (!registraRichiestaGenerata('spazi', 'Spazi')) return;
+  document.getElementById('modal-spazi').style.display = 'block';
+}
+function chiudiModalSpazi() { document.getElementById('modal-spazi').style.display = 'none'; }
+function copiaTestoSpazi() {
+  var ta = document.getElementById('testo-spazi');
+  ta.select();
+  try { document.execCommand('copy'); document.getElementById('copia-confirm-spazi').style.display = 'block'; } catch(e) {}
+}
+function apriMailSpazi() {
+  var sogg = encodeURIComponent('[Conferma spazi] ' + (metadati.titolo || 'Progetto'));
+  var corpo = encodeURIComponent(document.getElementById('testo-spazi').value);
+  window.location.href = 'mailto:produzione@briccialditerni.it?subject=' + sogg + '&body=' + corpo;
+}
+
+function generaNotificaSpaziReferente() {
+  var righe = [];
+  var dataC = getField('data_evento'), oraC = normalizzaOra(getField('ora_evento')) || getField('ora_evento'), luogoC = getField('luogo_concerto');
+  if (dataC || oraC || luogoC) {
+    var estesoC = calcolaOrarioEsteso('Evento', oraC);
+    righe.push({ tipo: 'Evento', data: dataC, ora: estesoC ? estesoC.esteso : oraC, luogo: luogoC, key: 'concerto' });
+  }
+  var r = 1;
+  while (document.querySelector('[name="replica_data_' + r + '"]')) {
+    var dR = getField('replica_data_' + r), oR = normalizzaOra(getField('replica_ora_' + r)) || getField('replica_ora_' + r), lR = getField('replica_luogo_' + r);
+    if (dR || oR || lR) {
+      var estesoR = calcolaOrarioEsteso('Replica ' + r, oR);
+      righe.push({ tipo: 'Replica ' + r, data: dR, ora: estesoR ? estesoR.esteso : oR, luogo: lR || luogoC, key: 'replica_' + r });
+    }
+    r++;
+  }
+  var p = 1;
+  while (document.querySelector('[name="prova_data_' + p + '"]')) {
+    var dP = getField('prova_data_' + p), oP1 = getField('prova_inizio_' + p), oP2 = getField('prova_fine_' + p), lP = getField('prova_luogo_' + p);
+    if (dP || lP) righe.push({ tipo: 'Prova ' + p, data: dP, ora: (oP1 || '—') + (oP2 ? ' – ' + oP2 : ''), luogo: lP, key: 'prova_' + p });
+    p++;
+  }
+  ordinaRigheCronologicamente(righe);
+
+  if (righe.length === 0) {
+    alert('Nessun appuntamento ancora presente. Premi prima "🔄 Aggiorna vista" in Blocco ①.');
+    return;
+  }
+
+  var lines = [];
+  lines.push('Gentile Referente,');
+  lines.push('');
+  lines.push('Le confermiamo gli spazi assegnati per il progetto "' + (metadati.titolo || '') + '", con la proposta iniziale a confronto:');
+  lines.push('');
+  righe.forEach(function(riga) {
+    var valoreEsistente = valoreSpazioSalvato('spazio_' + riga.key);
+    var valoreAltro = valoreSpazioSalvato('spazio_' + riga.key + '_altro');
+    var spazioEffettivo = (valoreEsistente === 'Altro' ? valoreAltro : valoreEsistente) || '(da assegnare)';
+    var proposta = (riga.luogo || '').trim() || '(nessuna proposta indicata)';
+    lines.push('- ' + riga.tipo + ' — ' + (riga.data || 'data da definire') + (riga.ora ? ' ore ' + riga.ora : ''));
+    lines.push('  Spazio assegnato: ' + spazioEffettivo + ' — Proposta iniziale: ' + proposta);
+  });
+  lines.push('');
+  lines.push('Cordiali saluti,');
+  lines.push('Ufficio Produzione');
+  document.getElementById('testo-notifica-spazi-referente').value = lines.join('\n');
+  if (typeof autoResizeTextarea === 'function') autoResizeTextarea(document.getElementById('testo-notifica-spazi-referente'));
+  if (!registraRichiestaGenerata('notifica_spazi_referente', 'Notifica Spazi al Referente')) return;
+  document.getElementById('modal-notifica-spazi-referente').style.display = 'block';
+}
+function chiudiModalNotificaSpaziReferente() {
+  document.getElementById('modal-notifica-spazi-referente').style.display = 'none';
+}
+function copiaTestoNotificaSpaziReferente() {
+  var ta = document.getElementById('testo-notifica-spazi-referente');
+  ta.focus(); ta.select();
+  try {
+    document.execCommand('copy');
+    document.getElementById('copia-confirm-notifica-spazi-referente').style.display = 'block';
+  } catch (e) {}
+}
+function apriMailNotificaSpaziReferente() {
+  var sogg = encodeURIComponent('[' + (metadati.titolo || 'Progetto') + '] Conferma spazi assegnati');
+  var corpo = encodeURIComponent(document.getElementById('testo-notifica-spazi-referente').value);
+  var emailReferente = emailReferenteDocenti();
+  window.location.href = 'mailto:' + emailReferente + '?cc=produzione@briccialditerni.it&subject=' + sogg + '&body=' + corpo;
+}
+
+function aggiornaAvvisoSpaziModificati() {
+  var el = document.getElementById('avviso-spazi-modificati');
+  if (!el) return;
+  var righe = [];
+
+  var dataC = getField('data_evento'), luogoC = getField('luogo_concerto');
+  if (dataC || luogoC) righe.push({ tipo: 'Evento', luogo: luogoC, key: 'concerto' });
+
+  var r = 1;
+  while (document.querySelector('[name="replica_data_' + r + '"]')) {
+    var dR = getField('replica_data_' + r), lR = getField('replica_luogo_' + r);
+    if (dR || lR) righe.push({ tipo: 'Replica ' + r, luogo: lR || luogoC, key: 'replica_' + r });
+    r++;
+  }
+
+  var p = 1;
+  while (document.querySelector('[name="prova_data_' + p + '"]')) {
+    var dP = getField('prova_data_' + p), lP = getField('prova_luogo_' + p);
+    if (dP || lP) righe.push({ tipo: 'Prova ' + p, luogo: lP, key: 'prova_' + p });
+    p++;
+  }
+
+  var divergenze = [];
+  righe.forEach(function(riga) {
+    var valoreEsistente = valoreSpazioSalvato('spazio_' + riga.key);
+    var valoreAltro = valoreSpazioSalvato('spazio_' + riga.key + '_altro');
+    var spazioEffettivo = (valoreEsistente === 'Altro' ? valoreAltro : valoreEsistente) || '';
+    var luogoProposto = (riga.luogo || '').trim();
+    if (spazioEffettivo && luogoProposto && spazioEffettivo.trim().toLowerCase() !== luogoProposto.toLowerCase()) {
+      divergenze.push(riga.tipo + ': assegnato "' + spazioEffettivo + '" (avevi proposto "' + luogoProposto + '")');
+    }
+  });
+
+  if (divergenze.length === 0) {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'block';
+  el.innerHTML = '<div style="background:#FFF3E0;border:1px solid #FFCC80;border-radius:6px;padding:10px 14px;font-size:12px;color:#8B4A00">' +
+    '<strong>⚠ Il Responsabile ha assegnato spazi diversi da quelli proposti:</strong>' +
+    '<ul style="margin:6px 0 0 18px;padding:0">' + divergenze.map(function(d) { return '<li>' + d + '</li>'; }).join('') + '</ul>' +
+    '</div>';
 }
 
 // ═══ RICHIESTA DOTAZIONE/MATERIALE — Ufficio Produzione ═══
@@ -4219,20 +4494,20 @@ function generaRichiestaDotazioneMateriale() {
   lines.push('');
   lines.push('Cordiali saluti,');
   lines.push('Ufficio Produzione');
-  document.getElementById('testo-spazi').value = lines.join('\n');
-  autoResizeTextarea(document.getElementById('testo-spazi'));
-  if (!registraRichiestaGenerata('spazi', 'Dotazione/Materiale')) return;
-  document.getElementById('modal-spazi').style.display = 'block';
+  document.getElementById('testo-dotazione-materiale').value = lines.join('\n');
+  autoResizeTextarea(document.getElementById('testo-dotazione-materiale'));
+  if (!registraRichiestaGenerata('dotazione_materiale', 'Dotazione/Materiale')) return;
+  document.getElementById('modal-dotazione-materiale').style.display = 'block';
 }
-function chiudiModalSpazi() { document.getElementById('modal-spazi').style.display = 'none'; }
-function copiaTestoSpazi() {
-  var ta = document.getElementById('testo-spazi');
+function chiudiModalDotazioneMateriale() { document.getElementById('modal-dotazione-materiale').style.display = 'none'; }
+function copiaTestoDotazioneMateriale() {
+  var ta = document.getElementById('testo-dotazione-materiale');
   ta.select();
-  try { document.execCommand('copy'); document.getElementById('copia-confirm-spazi').style.display = 'block'; } catch(e) {}
+  try { document.execCommand('copy'); document.getElementById('copia-confirm-dotazione-materiale').style.display = 'block'; } catch(e) {}
 }
-function apriMailSpazi() {
+function apriMailDotazioneMateriale() {
   var sogg = encodeURIComponent('[Richiesta dotazione/materiale] ' + (metadati.titolo || 'Progetto'));
-  var corpo = encodeURIComponent(document.getElementById('testo-spazi').value);
+  var corpo = encodeURIComponent(document.getElementById('testo-dotazione-materiale').value);
   window.location.href = 'mailto:produzione@briccialditerni.it?subject=' + sogg + '&body=' + corpo;
 }
 
@@ -6568,7 +6843,9 @@ function caricaDaFirestore(id) {
         aggiornaListaColli();
         costruisciTabellaTrasportoPersone();
         costruisciTabellaDotazioneDisp();
+        costruisciTabellaSpazi();
         costruisciListaAssistenza();
+        aggiornaAvvisoSpaziModificati();
         // Stesso problema: Sintesi e Pacchetto Comunicazione leggono i campi giusti ma non
         // venivano mai richiamate dopo il ripristino dati da Firestore, restando bloccate
         // sullo stato "mancante" della prima apertura pagina vuota.
