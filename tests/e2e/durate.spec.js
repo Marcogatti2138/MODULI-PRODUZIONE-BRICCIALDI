@@ -1,6 +1,6 @@
 // Bug B nella pagina vera: la durata "2 ore" arriva giusta all'orario di occupazione
-// della sala nella tabella Spazi (inizio → inizio + durata + 30' di smontaggio).
-// Prima veniva letta come 2 minuti (20:30–21:02). Dati inventati.
+// della sala nella tabella Spazi (inizio → inizio + durata + 45' di smontaggio,
+// MINUTI_SMONTAGGIO_CONCERTO in durate.js). Prima veniva letta come 2 minuti. Dati inventati.
 
 const { test, expect } = require('./ambiente');
 
@@ -19,12 +19,12 @@ for (const m of MODULI) {
       dati_responsabile: {}
     } } } });
 
-    test('tabella Spazi: durata "2 ore" → occupazione 20:30–23:00', async ({ page, ambiente }) => {
+    test('tabella Spazi: durata "2 ore" → occupazione 20:30–23:15', async ({ page, ambiente }) => {
       await page.goto('/' + m.file + '?id=' + ID + '&ruolo=responsabile');
       await expect(page.locator('[name="durata"]')).toHaveValue('2 ore', { timeout: 15000 });
       await page.waitForTimeout(1200);
       await page.evaluate(() => costruisciTabellaSpazi());
-      await expect(page.locator('#spazi-tbody')).toContainText('20:30–23:00');
+      await expect(page.locator('#spazi-tbody')).toContainText('20:30–23:15');
       expect(ambiente.eccezioni).toEqual([]);
     });
   });

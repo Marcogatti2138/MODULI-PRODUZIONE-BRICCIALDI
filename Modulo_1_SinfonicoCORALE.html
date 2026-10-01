@@ -5743,12 +5743,13 @@ function calcolaOrarioEsteso(tipo, oraStr) {
   }
   // Concerto o Replica: un solo orario. Inizia esattamente all'ora indicata
   // (nessun margine prima — l'eventuale prova/assestamento la gestisce già il
-  // Referente come riga a parte in Piano Prove). Dopo, solo durata + 60' per lo smontaggio.
+  // Referente come riga a parte in Piano Prove). Dopo, durata + smontaggio
+  // (MINUTI_SMONTAGGIO_CONCERTO in durate.js: 45').
   var inizioC = oraAMinuti(oraStr);
   if (inizioC === null) return null;
   var durataMin = estraiDurataMinuti(getField('durata'));
   if (durataMin === null) return null;
-  return { esteso: minutiAOra(inizioC) + '–' + minutiAOra(inizioC + durataMin + 30), nota: 'inizio ore ' + oraStr + ', durata ' + durataMin + '\'' };
+  return { esteso: minutiAOra(inizioC) + '–' + minutiAOra(inizioC + durataMin + MINUTI_SMONTAGGIO_CONCERTO), nota: 'inizio ore ' + oraStr + ', durata ' + durataMin + '\'' };
 }
 
 function generaRichiestaSpazi() {

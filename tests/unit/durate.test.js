@@ -59,3 +59,24 @@ test('Una sola copia: i Mod. 1-4 caricano durate.js e nessuna pagina definisce p
     assert.deepEqual(['estraiDurataMinuti', 'calcolaOraFineDaDurata', 'leggiDurataMinuti'].filter(n => f[n]), [], sigla + ': copia interna rimasta');
   }
 });
+
+// Smontaggio dopo il concerto (Mod. 1 e 2): un solo valore, 45 minuti, in durate.js.
+test('MINUTI_SMONTAGGIO_CONCERTO vale 45 ed è definito solo in durate.js', () => {
+  assert.equal(caricaFile('durate.js').MINUTI_SMONTAGGIO_CONCERTO, 45);
+  for (const [sigla, file] of Object.entries(PAGINE)) assert.doesNotMatch(leggi(file), /var MINUTI_SMONTAGGIO_CONCERTO/, sigla);
+});
+
+for (const sigla of ['M1', 'M2']) {
+  test(sigla + ' — calcolaOrarioEsteso: concerto = inizio → inizio + durata + 45\' di smontaggio; prova ±30\'', () => {
+    const { caricaFunzioni } = require('../helpers/estrai-funzioni');
+    const durate = caricaFile('durate.js');
+    const campi = { durata: '90 minuti' };
+    const ctx = { getField: n => campi[n] || '', estraiDurataMinuti: durate.estraiDurataMinuti, MINUTI_SMONTAGGIO_CONCERTO: durate.MINUTI_SMONTAGGIO_CONCERTO };
+    const f = caricaFunzioni(PAGINE[sigla], ['calcolaOrarioEsteso', 'oraAMinuti', 'minutiAOra'], ctx);
+    assert.equal(f.calcolaOrarioEsteso('Concerto', '20:30').esteso, '20:30–22:45');
+    assert.equal(f.calcolaOrarioEsteso('Replica 1', '23:00').esteso, '23:00–01:15');
+    assert.equal(f.calcolaOrarioEsteso('Prova 1', '15:00 – 18:00').esteso, '14:30–18:30');
+    campi.durata = '';
+    assert.equal(f.calcolaOrarioEsteso('Concerto', '20:30'), null, 'senza durata nessun orario inventato');
+  });
+}

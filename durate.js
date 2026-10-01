@@ -3,6 +3,10 @@
 // l'unica lettura: la usano la tabella Trasporti e gli orari degli Spazi
 // (estraiDurataMinuti) e il Calendario PDF (calcolaOraFineDaDurata).
 
+// Minuti di smontaggio dopo concerto o replica, aggiunti all'orario di occupazione
+// della sala (calcolaOrarioEsteso, Mod. 1 e 2). Valore deciso da Marco il 01/10/2026.
+var MINUTI_SMONTAGGIO_CONCERTO = 45;
+
 // Minuti indicati nel testo, oppure null se non c'è una durata riconoscibile.
 //   "90 minuti", "90 min", "90'", "90"     → 90  (un numero da solo vale minuti)
 //   "2 ore", "2h"                          → 120
