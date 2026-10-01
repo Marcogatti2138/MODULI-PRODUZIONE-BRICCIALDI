@@ -11,7 +11,7 @@ const { dataFissa } = require('../helpers/copie');
 function dashboard(progetti) {
   const elementi = {};
   const document = { getElementById: id => (elementi[id] = elementi[id] || { innerHTML: '', textContent: '' }) };
-  const f = caricaFunzioni(PAGINE.D, ['renderScadenze', 'aggiornaStrisciaNumeri', 'classificaStatoProgetto', 'giorniMancanti',
+  const f = caricaFunzioni(PAGINE.D, ['calcolaScadenze', 'renderScadenze', 'aggiornaStrisciaNumeri', 'classificaStatoProgetto', 'giorniMancanti',
     'parseDataIT', 'formatDataIT', 'escapeHtml'], { document, tuttiIProgetti: progetti, Date: dataFissa(2031, 3, 15, 10) });
   return { f, elementi };
 }
@@ -98,11 +98,34 @@ test('Contatori: "Progetti attivi" e "In scadenza 30gg" (da oggi a 30 giorni com
   assert.equal(elementi['num-scadenza'].textContent, 3);   // oggi, 30gg, prevista
 });
 
-test('Contatore "In scadenza 30gg" coerente con l\'elenco Scadenze', { todo: 'Da decidere con Marco (01/10/2026): con la scadenza Referente passata da tempo e l\'evento entro 30 giorni, l\'elenco mostra l\'evento ma il contatore non conta il progetto' }, () => {
+// Il contatore conta i progetti dell'elenco Scadenze che hanno almeno una data da oggi a +30
+// giorni (decisione di Marco, 01/10/2026): elenco e contatore vengono dalla stessa funzione.
+test('Contatore "In scadenza 30gg": scadenza Referente passata da tempo ed evento entro 30 giorni → contato', () => {
   const progetti = [p('Z', { meta: { scadenza: '20/02/2031' }, dr: { data_evento: '25/03/2031' } })];
   const { f, elementi } = dashboard(progetti);
   f.renderScadenze(progetti);
   assert.match(elementi['scadenze-body'].innerHTML, /Data evento — 25\/03\/2031/);
   f.aggiornaStrisciaNumeri();
   assert.equal(elementi['num-scadenza'].textContent, 1);
+});
+
+test('Contatore "In scadenza 30gg" = progetti dell\'elenco Scadenze con una data entro 30 giorni', () => {
+  const progetti = [
+    p('A', { dr: { data_evento: '20/03/2031' } }),                                  // entro 30gg
+    p('B', { dr: { data_evento: '20/06/2031' } }),                                  // nell'elenco, oltre 30gg
+    p('C', { meta: { scadenza: '14/03/2031' }, dr: { data_evento: '25/03/2031' } }), // prima data ieri, evento entro 30gg
+    p('D', { meta: { scadenza: '14/03/2031' } }),                                  // solo ieri
+    p('E', { meta: { scadenza: '01/03/2031' }, dr: { data_evento: '10/04/2031' } }), // scadenza passata, evento entro 30gg
+    p('F', { meta: { data_evento_prevista: '14/04/2031' } }),                       // prevista, al limite dei 30gg
+    p('G', { dr: { data_evento: '20/03/2031' }, stato: { rimandato: true } })        // escluso ovunque
+  ];
+  const { f, elementi } = dashboard(progetti);
+  f.renderScadenze(progetti);
+  f.aggiornaStrisciaNumeri();
+  // Righe dell'elenco con almeno una data tra oggi (15/03/2031) e +30 giorni (14/04/2031)
+  const righe = elementi['scadenze-body'].innerHTML.split('class="scadenza-item"').slice(1);
+  const entro30 = righe.filter(r => [...r.matchAll(/\((oggi|domani|tra (\d+) giorni)\)/g)].some(m => !m[2] || Number(m[2]) <= 30));
+  assert.equal(righe.length, 6);
+  assert.equal(entro30.length, 4);                                  // A, C, E, F
+  assert.equal(elementi['num-scadenza'].textContent, entro30.length);
 });

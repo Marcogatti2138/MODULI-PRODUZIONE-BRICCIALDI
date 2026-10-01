@@ -513,7 +513,9 @@
     sel.focus();
   }
 
-  function renderScadenze(progetti) {
+  // Progetti dell'elenco Scadenze: date future (o di ieri) dei progetti non chiusi,
+  // ordinati per prima data. Unica fonte per l'elenco e per il contatore "In scadenza 30gg".
+  function calcolaScadenze(progetti) {
     var raggruppati = [];
     progetti.forEach(function(p) {
       if (p.stato && (p.stato.rimandato || p.stato.completato || p.stato.annullato)) return; // stati "terminali" — non sono più una scadenza attiva
@@ -531,7 +533,11 @@
       raggruppati.push({ id: p.id, titolo: titolo, voci: voci, primaData: voci[0].data, tipologia: p.meta.tipologia });
     });
     raggruppati.sort(function(a, b) { return a.primaData - b.primaData; });
+    return raggruppati;
+  }
 
+  function renderScadenze(progetti) {
+    var raggruppati = calcolaScadenze(progetti);
     var el = document.getElementById('scadenze-body');
     if (raggruppati.length === 0) { el.innerHTML = '<div class="empty-msg">Nessuna scadenza imminente.</div>'; return; }
 
@@ -1418,19 +1424,10 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPIA
 
   function aggiornaStrisciaNumeri() {
     var numAttivi = tuttiIProgetti.filter(function(p) { return classificaStatoProgetto(p) === 'attivi'; }).length;
-    var numScadenza = 0;
-    tuttiIProgetti.forEach(function(p) {
-      if (p.stato && (p.stato.rimandato || p.stato.completato || p.stato.annullato)) return;
-      var date = [];
-      var dataEvento = parseDataIT(p.dr.data_evento) || parseDataIT(p.meta.data_evento_prevista); // come in renderScadenze
-      var scadenza = parseDataIT(p.meta.scadenza);
-      if (dataEvento) date.push(dataEvento);
-      if (scadenza && !(p.stato && p.stato.referente_completato_il)) date.push(scadenza);
-      if (date.length === 0) return;
-      var primaData = date.sort(function(a, b) { return a - b; })[0];
-      var gg = giorniMancanti(primaData);
-      if (gg >= 0 && gg <= 30) numScadenza++;
-    });
+    // Progetti dell'elenco Scadenze con almeno una data da oggi a +30 giorni
+    var numScadenza = calcolaScadenze(tuttiIProgetti).filter(function(r) {
+      return r.voci.some(function(v) { var gg = giorniMancanti(v.data); return gg >= 0 && gg <= 30; });
+    }).length;
     document.getElementById('num-attivi').textContent = numAttivi;
     document.getElementById('num-scadenza').textContent = numScadenza;
   }
