@@ -4,6 +4,8 @@
 // potevano essere classificate né andare in Prestito o Noleggio.
 // Qui ognuna delle 4 voci ha una disponibilità diversa e si controllano la
 // tabella, la riapertura e i documenti che leggono la disponibilità.
+// (Leggii, leggii illuminati e podio sono tornati nel M4 con l'intervento B,
+// come voci richieste dal Referente: vedi m4-dotazione-leggii.spec.js.)
 // Parte dal progetto di prova M4. "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -35,13 +37,12 @@ async function apri(page) {
 test.describe('M4 — Disponibilità della Dotazione con le voci del modulo (bug G)', () => {
   test.use({ datiIniziali: { progetti: { [ID]: progetto } } });
 
-  test('la tabella elenca le voci del M4 (non quelle del M1), ognuna con le 4 disponibilità', async ({ page, ambiente }) => {
+  test('la tabella elenca le voci del M4, ognuna con le 4 disponibilità', async ({ page, ambiente }) => {
     await apri(page);
     for (const key of ['leggio_relatore', 'videoproiettore', 'computer', 'wifi']) {
       const opzioni = await page.locator('#dotazione-disp-tbody select[name="dot_disp_' + key + '"] option').evaluateAll(os => os.map(o => o.value).filter(Boolean));
       expect(opzioni, 'disponibilità di ' + key).toEqual(OPZIONI);
     }
-    for (const key of ['leggii', 'leggii_lum', 'podio']) await expect(page.locator('[name="dot_disp_' + key + '"]')).toHaveCount(0);
     expect(ambiente.eccezioni).toEqual([]);
   });
 

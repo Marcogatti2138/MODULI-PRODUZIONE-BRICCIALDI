@@ -954,6 +954,9 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
         <thead><tr><th style="width:35%">Materiale</th><th style="width:18%">Quantità</th><th>Note / Specifiche</th></tr></thead>
         <tbody>
           <tr><td class="pre">Sedie</td><td><input type="text" name="dot_sedie"></td><td><textarea name="dot_sedie_n" rows="1"></textarea></td></tr>
+          <tr><td class="pre">Leggii</td><td><input type="text" name="dot_leggii"></td><td><textarea name="dot_leggii_n" rows="1" placeholder="Per l'intervento musicale, se serve"></textarea></td></tr>
+          <tr><td class="pre">Leggii illuminati</td><td><input type="text" name="dot_leggii_lum"></td><td><textarea name="dot_leggii_lum_n" rows="1"></textarea></td></tr>
+          <tr><td class="pre">Podio direttore</td><td><input type="text" name="dot_podio"></td><td><textarea name="dot_podio_n" rows="1"></textarea></td></tr>
           <tr><td class="pre">Pianoforte</td><td><input type="text" name="dot_piano"></td><td><textarea name="dot_piano_n" rows="1" placeholder="Specificare: verticale / mezza coda / coda"></textarea></td></tr>
           <tr><td class="pre">Impianto audio / PA</td><td><input type="text" name="dot_audio"></td><td><textarea name="dot_audio_n" rows="1" placeholder="Microfoni, diffusori, mixer..."></textarea></td></tr>
           <tr><td class="pre">Impianto luci</td><td><input type="text" name="dot_luci"></td><td><textarea name="dot_luci_n" rows="1"></textarea></td></tr>
@@ -3546,7 +3549,7 @@ function aggiornaSintesiCompleta() {
   }
 
   // Dotazione tecnica
-  var dotLabels = { dot_sedie: 'Sedie', dot_piano: 'Pianoforte', dot_audio: 'Impianto audio/PA', dot_luci: 'Impianto luci', dot_leggio_relatore: 'Podio/leggio relatore', dot_videoproiettore: 'Videoproiettore e schermo', dot_computer: 'Computer', dot_wifi: 'Connessione Wi-Fi/rete', dot_service: 'Service esterno', dot_altro: 'Altra dotazione tecnica' };
+  var dotLabels = { dot_sedie: 'Sedie', dot_leggii: 'Leggii', dot_leggii_lum: 'Leggii illuminati', dot_podio: 'Podio direttore', dot_piano: 'Pianoforte', dot_audio: 'Impianto audio/PA', dot_luci: 'Impianto luci', dot_leggio_relatore: 'Podio/leggio relatore', dot_videoproiettore: 'Videoproiettore e schermo', dot_computer: 'Computer', dot_wifi: 'Connessione Wi-Fi/rete', dot_service: 'Service esterno', dot_altro: 'Altra dotazione tecnica' };
   var dotVoci = [];
   Object.keys(dotLabels).forEach(function(key) {
     var v = getField(key);
@@ -4643,6 +4646,9 @@ function generaRichiestaTrasporti() {
   // Materiale disponibile in Conservatorio (da 3A, classificato dal Responsabile) — deve viaggiare con la trasferta
   var vociDot = [
     ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie'],
+    ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
+    ['dot_leggii_lum', 'dot_leggii_lum_n', 'leggii_lum', 'Leggii illuminati'],
+    ['dot_podio', 'dot_podio_n', 'podio', 'Podio direttore'],
     ['dot_piano', 'dot_piano_n', 'piano', 'Pianoforte'],
     ['dot_audio', 'dot_audio_n', 'audio', 'Impianto audio / PA'],
     ['dot_luci', 'dot_luci_n', 'luci', 'Impianto luci'],
@@ -4906,6 +4912,9 @@ function aggiungiIstanzaDetermina(finKey, istanzaForzata, silenzioso) {
 // aggiornaAssegnazioneVociNoleggio() e generaBozzaDeterminaNoleggio().
 var VOCI_DOTAZIONE_NOLEGGIO = [
   ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie'],
+  ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
+  ['dot_leggii_lum', 'dot_leggii_lum_n', 'leggii_lum', 'Leggii illuminati'],
+  ['dot_podio', 'dot_podio_n', 'podio', 'Podio direttore'],
   ['dot_piano', 'dot_piano_n', 'piano', 'Pianoforte'],
   ['dot_audio', 'dot_audio_n', 'audio', 'Impianto audio / PA'],
   ['dot_luci', 'dot_luci_n', 'luci', 'Impianto luci'],
@@ -6153,9 +6162,13 @@ function costruisciTabellaDotazioneDisp() {
   if (!tbody) return;
   // Le voci della Dotazione del Mod. 4 (Sezione 6), come in Prestito, struttura,
   // Noleggio e Centralino. Prima c'erano leggii/leggii illuminati/podio del Mod. 1,
-  // che qui non esistono, e mancavano le ultime quattro (bug G).
+  // che il Referente non poteva chiedere, e mancavano le ultime quattro (bug G).
+  // Leggii, leggii illuminati e podio ora sono anche nella Sezione 6 (intervento B).
   var voci = [
     ['sedie', 'Sedie'],
+    ['leggii', 'Leggii'],
+    ['leggii_lum', 'Leggii illuminati'],
+    ['podio', 'Podio direttore'],
     ['piano', 'Pianoforte'],
     ['audio', 'Impianto audio / PA'],
     ['luci', 'Impianto luci'],
@@ -6233,6 +6246,9 @@ function toggleCampiStruttura(key, valore) {
 function elencoVociInPrestito() {
   var voci = [
     ['dot_sedie', 'sedie', 'Sedie'],
+    ['dot_leggii', 'leggii', 'Leggii'],
+    ['dot_leggii_lum', 'leggii_lum', 'Leggii illuminati'],
+    ['dot_podio', 'podio', 'Podio direttore'],
     ['dot_piano', 'piano', 'Pianoforte'],
     ['dot_audio', 'audio', 'Impianto audio / PA'],
     ['dot_luci', 'luci', 'Impianto luci'],
@@ -6265,6 +6281,9 @@ function elencoVociInPrestito() {
 function elencoVociDisponibiliInStruttura() {
   var voci = [
     ['dot_sedie', 'sedie', 'Sedie'],
+    ['dot_leggii', 'leggii', 'Leggii'],
+    ['dot_leggii_lum', 'leggii_lum', 'Leggii illuminati'],
+    ['dot_podio', 'podio', 'Podio direttore'],
     ['dot_piano', 'piano', 'Pianoforte'],
     ['dot_audio', 'audio', 'Impianto audio / PA'],
     ['dot_luci', 'luci', 'Impianto luci'],
@@ -6330,6 +6349,9 @@ function elencoTrasportoPersone() {
 function generaRichiestaNoleggio() {
   var voci = [
     ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie'],
+    ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
+    ['dot_leggii_lum', 'dot_leggii_lum_n', 'leggii_lum', 'Leggii illuminati'],
+    ['dot_podio', 'dot_podio_n', 'podio', 'Podio direttore'],
     ['dot_piano', 'dot_piano_n', 'piano', 'Pianoforte'],
     ['dot_audio', 'dot_audio_n', 'audio', 'Impianto audio / PA'],
     ['dot_luci', 'dot_luci_n', 'luci', 'Impianto luci'],
@@ -6417,6 +6439,9 @@ function apriMailNoleggio() {
 function costruisciTestoCentralino() {
   var voci = [
     ['dot_sedie', 'dot_sedie_n', 'sedie', 'Sedie'],
+    ['dot_leggii', 'dot_leggii_n', 'leggii', 'Leggii'],
+    ['dot_leggii_lum', 'dot_leggii_lum_n', 'leggii_lum', 'Leggii illuminati'],
+    ['dot_podio', 'dot_podio_n', 'podio', 'Podio direttore'],
     ['dot_piano', 'dot_piano_n', 'piano', 'Pianoforte'],
     ['dot_audio', 'dot_audio_n', 'audio', 'Impianto audio / PA'],
     ['dot_luci', 'dot_luci_n', 'luci', 'Impianto luci'],
