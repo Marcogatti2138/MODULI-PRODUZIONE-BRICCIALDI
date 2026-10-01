@@ -88,7 +88,8 @@ test.describe('M4 — Spazi come nel Mod. 1 (bug H)', () => {
     await page.evaluate(() => aggiornaSintesiCompleta());
     await expect(page.locator('#sint_luogo')).toHaveText('Sala Orologio');
     const centralino = await page.evaluate(() => (costruisciTestoCentralino().lines || []).join('\n'));
-    expect(centralino).toContain('Data evento: 15/03/2031 — Sala Orologio');
+    // il progetto di prova ha 3 date: dall'intervento C il Centralino le elenca tutte, una per riga
+    expect(centralino).toContain('Date evento:\n- 15/03/2031 — Sala Orologio\n');
   });
 
   test('la Richiesta Dotazione/Materiale resta separata dalla Richiesta Spazi', async ({ page }) => {

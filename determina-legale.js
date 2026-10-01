@@ -18,6 +18,11 @@
 //   Mod.3: { sezioneDotazione: 'Sezione 6A', sezioneTrasporti: 'Sezione 6C' }
 //   Mod.4: { sezioneDotazione: 'Sezione 3' }  (solo Noleggio)
 //
+// Eventi di più giorni: se il modulo definisce giorniEventoPerDocumenti()
+// (oggi solo il Mod. 4), la Determina Noleggio elenca tutti i giorni e i
+// luoghi (dateEventoPiuGiorni). Gli altri moduli non la definiscono e i loro
+// testi restano quelli di sempre, con la data unica.
+//
 // Richiede che il file chiamante definisca già: getField, escapeHTML,
 // formattaDataItaliana, metadati, dati_referente, dati_responsabile,
 // elencoVociInPrestito, costruisciTratteConPrestito, leggiRigheTrasportoSelezionate
@@ -30,6 +35,38 @@
 //     e "...preventivo per la fornitura del servizio di trasporto
 //     materiale didattico...")
 // ═══════════════════════════════════════════════════════════════════
+
+// "a", "a e b", "a, b e c".
+function elencoConE(voci) {
+  if (voci.length <= 1) return voci[0] || '';
+  return voci.slice(0, -1).join(', ') + ' e ' + voci[voci.length - 1];
+}
+
+// Date e luoghi di un evento di più giorni, già pronti per le frasi dei
+// documenti, senza ripetizioni:
+//   date          "15/03/2031, 16/03/2031 e 17/03/2031"
+//   dateConLuoghi ogni giorno col suo luogo, giorni raggruppati per luogo:
+//                 "15/03/2031 presso Sala A; 16/03/2031 e 17/03/2031 presso Sala B"
+//                 (un solo luogo: "15/03/2031, 16/03/2031 e 17/03/2031 presso Sala A")
+//   luoghi        i luoghi, "Sala A e Sala B" ('' se nessun giorno ha il luogo)
+// null se il modulo non ha giorniEventoPerDocumenti() o se l'evento ha una
+// sola data: il chiamante resta allora sulla data unica di sempre.
+function dateEventoPiuGiorni() {
+  if (typeof giorniEventoPerDocumenti !== 'function') return null;
+  var date = [], luoghi = [], gruppi = [];
+  giorniEventoPerDocumenti().forEach(function(g) {
+    if (!g.data) return;
+    if (date.indexOf(g.data) === -1) date.push(g.data);
+    var luogo = g.luogo || '';
+    if (luogo && luoghi.indexOf(luogo) === -1) luoghi.push(luogo);
+    var gruppo = gruppi.filter(function(x) { return x.luogo === luogo; })[0];
+    if (!gruppo) gruppi.push(gruppo = { luogo: luogo, date: [] });
+    if (gruppo.date.indexOf(g.data) === -1) gruppo.date.push(g.data);
+  });
+  if (date.length < 2) return null;
+  var dateConLuoghi = gruppi.map(function(x) { return elencoConE(x.date) + (x.luogo ? ' presso ' + x.luogo : ''); }).join('; ');
+  return { date: elencoConE(date), dateConLuoghi: dateConLuoghi, luoghi: elencoConE(luoghi) };
+}
 
 function costruisciTestoDeterminaTrasporti(cfg) {
   var scelto = cfg.scelto;
@@ -445,14 +482,23 @@ function generaBozzaDeterminaNoleggio(istanza, cfgSezioni) {
   var scadenzaDataRichiesta = getField('determina_nol_scadenza_data' + suf) || '[___ data scadenza offerte ___]';
   var dataEventoTesto = getField('dataconcerto_data_1') || getField('data_evento') || '';
   var luogoEventoTesto = getField('luogo_concerto') || getField('dest_trasferta') || '';
+  // Evento di più giorni (Mod. 4): ogni giorno col suo luogo ("15/03/2031 presso
+  // Sala A; 16/03/2031 presso Sala B"); il dispositivo finale, senza luogo, solo le date
+  var dataFinaleTesto = dataEventoTesto;
+  var piuGiorni = dateEventoPiuGiorni();
+  if (piuGiorni) {
+    dataEventoTesto = piuGiorni.dateConLuoghi;
+    dataFinaleTesto = piuGiorni.date;
+    if (piuGiorni.luoghi) luogoEventoTesto = '';
+  }
   var cfg = {
-    fraseOggetto: (metadati.titolo ? 'del progetto "' + metadati.titolo + '"' : 'dell\'evento') + (dataEventoTesto ? ' del giorno ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : ''),
-    frasePremesso: (metadati.titolo ? '"' + metadati.titolo + '"' : 'l\'evento in oggetto') + (dataEventoTesto ? ', in programma il giorno ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : ''),
+    fraseOggetto: (metadati.titolo ? 'del progetto "' + metadati.titolo + '"' : 'dell\'evento') + (dataEventoTesto ? (piuGiorni ? ' dei giorni ' : ' del giorno ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : ''),
+    frasePremesso: (metadati.titolo ? '"' + metadati.titolo + '"' : 'l\'evento in oggetto') + (dataEventoTesto ? (piuGiorni ? ', in programma nei giorni ' : ', in programma il giorno ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : ''),
     approvazioneEventoTxt: 'dell\'evento',
     eventoRichiamatoTxt: 'dell\'evento richiamato',
     realizzazioneEventoTxt: 'dell\'evento',
-    fraseFornitura: (dataEventoTesto ? ' del ' + dataEventoTesto : '') + (metadati.titolo ? ' in occasione di "' + metadati.titolo + '"' : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : ''),
-    fraseDeterminaFinale: (dataEventoTesto ? ' del ' + dataEventoTesto : '') + (metadati.titolo ? ' in occasione di "' + metadati.titolo + '"' : ''),
+    fraseFornitura: (dataEventoTesto ? (piuGiorni ? ' dei giorni ' : ' del ') + dataEventoTesto : '') + (metadati.titolo ? ' in occasione di "' + metadati.titolo + '"' : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : ''),
+    fraseDeterminaFinale: (dataFinaleTesto ? (piuGiorni ? ' dei giorni ' : ' del ') + dataFinaleTesto : '') + (metadati.titolo ? ' in occasione di "' + metadati.titolo + '"' : ''),
     delibera: metadati.delibera,
     dataDelibera: metadati.data_delibera,
     protRichiesta: protRichiesta,

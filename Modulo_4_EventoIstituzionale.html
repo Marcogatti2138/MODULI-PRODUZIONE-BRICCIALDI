@@ -3408,6 +3408,14 @@ function aggiornaSintesiEvento() {
   // proposta del Referente (stesso criterio già usato altrove nel modulo).
   var elLuogoSint = document.getElementById('sint_luogo');
   if (elLuogoSint) elLuogoSint.textContent = spazioEffettivoOLuogo('concerto', getField('luogo_concerto'));
+  // Ulteriori date: elencate con lo spazio (assegnato o proposto), non solo contate.
+  // Senza ulteriori date con la data resta il testo di sempre.
+  var elRepSint = document.getElementById('sint_repliche');
+  var ulterioriSint = giorniEventoPerDocumenti().filter(function(g) { return g.key !== 'concerto'; }).map(function(g) {
+    var sp = spazioEffettivoOLuogo(g.key, g.luogo);
+    return g.data + (sp !== '—' ? ' — ' + sp : '');
+  });
+  if (elRepSint && ulterioriSint.length) elRepSint.textContent = ulterioriSint.join('; ');
   // Descrizione progetto — Sintesi + pannello in cima al Responsabile
   var elDescr = document.querySelector('[name="descrizione_progetto"]');
   var descrVal = elDescr ? elDescr.value.trim() : '';
@@ -4072,6 +4080,31 @@ function spazioEffettivoOLuogo(key, luogoProposto) {
   var effettivo = (v === 'Altro' ? vAltro : v) || '';
   return effettivo || luogoProposto || '—';
 }
+// Giorni dell'evento per i documenti (data principale + ulteriori date con la data),
+// in ordine di data, ognuno con il luogo indicato dal Referente e la chiave degli
+// spazi (concerto, replica_N). La legge anche determina-legale.js
+// (dateEventoPiuGiorni) per la Determina Acquisti.
+function giorniEventoPerDocumenti() {
+  var giorni = [];
+  var dataC = getField('data_evento'), luogoC = getField('luogo_concerto') || getField('dest_trasferta');
+  if (dataC) giorni.push({ data: dataC, ora: getField('ora_evento'), luogo: luogoC, key: 'concerto' });
+  var r = 1;
+  while (document.querySelector('[name="replica_data_' + r + '"]')) {
+    var dR = getField('replica_data_' + r);
+    if (dR) giorni.push({ data: dR, ora: getField('replica_ora_' + r), luogo: getField('replica_luogo_' + r) || luogoC, key: 'replica_' + r });
+    r++;
+  }
+  ordinaRigheCronologicamente(giorni);
+  return giorni;
+}
+// Righe "- data — luogo" di un evento di più giorni; [] con una sola data.
+// luogoDi(giorno) sceglie il luogo da mostrare (proposto o spazio assegnato).
+function righeGiorniEvento(luogoDi) {
+  var giorni = giorniEventoPerDocumenti();
+  if (!dateEventoPiuGiorni()) return [];
+  return giorni.map(function(g) { var l = luogoDi(g); return '- ' + g.data + (l ? ' — ' + l : ''); });
+}
+
 function elencoCalendarioEventi() {
   var righe = [];
   var dataC = getField('data_evento'), oraC = getField('ora_evento'), luogoC = getField('luogo_concerto') || getField('dest_trasferta');
@@ -4503,6 +4536,13 @@ function generaRichiestaDotazioneMateriale() {
   lines.push('');
   lines = lines.concat(colli);
   lines.push('');
+  // Evento di più giorni: le date, ognuna con il luogo indicato dal Referente
+  var giorniRDM = righeGiorniEvento(function(g) { return g.luogo; });
+  if (giorniRDM.length) {
+    lines.push('Date evento:');
+    lines = lines.concat(giorniRDM);
+    lines.push('');
+  }
   lines.push('Si prega di confermare e preparare quanto necessario.');
   lines.push('');
   lines.push('Cordiali saluti,');
@@ -5010,6 +5050,7 @@ function generaPDFRichiestaPreventivoTrasportoPersone() {
   var scadenzaData = getField('determina_trper_scadenza_data') || '[___ Data scadenza ___]';
   var scadenzaOra = getField('determina_trper_scadenza_ora') || '[___ Ora scadenza ___]';
   var dataEventoRP = getField('data_evento') || '';
+  var piuGiorniRP = dateEventoPiuGiorni(); // evento di più giorni: tutte le date
   var oggi = new Date();
   var dataOggi = ('0' + oggi.getDate()).slice(-2) + '/' + ('0' + (oggi.getMonth() + 1)).slice(-2) + '/' + oggi.getFullYear();
 
@@ -5072,7 +5113,7 @@ function generaPDFRichiestaPreventivoTrasportoPersone() {
   });
   y += 6;
 
-  scriviParagrafo('Il Conservatorio di Musica "G. Briccialdi" di Terni necessita di un servizio di trasferta persone in occasione della produzione ' + (metadati.titolo || '[___ Titolo progetto ___]') + (dataEventoRP ? ', in programma il ' + dataEventoRP : '') + ', per il trasporto di esecutori/accompagnatori verso le sedi indicate.');
+  scriviParagrafo('Il Conservatorio di Musica "G. Briccialdi" di Terni necessita di un servizio di trasferta persone in occasione della produzione ' + (metadati.titolo || '[___ Titolo progetto ___]') + (dataEventoRP ? (piuGiorniRP ? ', in programma nei giorni ' + piuGiorniRP.date : ', in programma il ' + dataEventoRP) : '') + ', per il trasporto di esecutori/accompagnatori verso le sedi indicate.');
   y += 2;
   scriviParagrafo('L\'affidamento avviene in modalità diretta ai sensi dell\'art. 50, comma 1, lett. b), del D.Lgs. 36/2023 (Codice dei contratti pubblici), trattandosi di servizio di importo inferiore alla soglia di € 140.000. La valutazione di congruità del costo sarà condotta dall\'ufficio sulla base dei prezzi unitari dichiarati in offerta e del raffronto con i valori di mercato.');
   y += 4;
@@ -5193,6 +5234,12 @@ function generaBozzaDeterminaTrasportoPersone() {
   var scadenzaDataRichiesta = getField('determina_trper_scadenza_data') || '[___ data scadenza offerte ___]';
   var dataEventoTesto = getField('data_evento') || '';
   var luogoEventoTesto = getField('luogo_concerto') || '';
+  // Evento di più giorni: ogni giorno col suo luogo (dateEventoPiuGiorni, determina-legale.js)
+  var piuGiorni = dateEventoPiuGiorni();
+  if (piuGiorni) {
+    dataEventoTesto = piuGiorni.dateConLuoghi;
+    if (piuGiorni.luoghi) luogoEventoTesto = '';
+  }
   // IVA arrotondata al centesimo una volta sola; totale = imponibile + IVA (importi.js)
   var importiIva = calcolaIva22(importoScelto);
   var ivaCalcolata = importiIva.iva;
@@ -5205,7 +5252,7 @@ function generaBozzaDeterminaTrasportoPersone() {
   lines.push('');
   lines.push('Determina n. [___ N. Determina ___]/[___ anno ___]');
   lines.push('');
-  lines.push('OGGETTO: Decisione a contrarre, impegno di spesa e contestuale affidamento diretto per il servizio di trasferta persone (pullman/bus) in occasione ' + (metadati.titolo ? 'del progetto "' + metadati.titolo + '"' : 'dell\'evento') + (dataEventoTesto ? ' del giorno ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + '.');
+  lines.push('OGGETTO: Decisione a contrarre, impegno di spesa e contestuale affidamento diretto per il servizio di trasferta persone (pullman/bus) in occasione ' + (metadati.titolo ? 'del progetto "' + metadati.titolo + '"' : 'dell\'evento') + (dataEventoTesto ? (piuGiorni ? ' dei giorni ' : ' del giorno ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + '.');
   lines.push('');
   lines.push('CIG [___ CIG ___]');
   lines.push('');
@@ -5213,7 +5260,7 @@ function generaBozzaDeterminaTrasportoPersone() {
   lines.push('');
   lines.push('PREMESSO che');
   lines.push('');
-  lines.push('il Conservatorio Statale di Musica "Giulio Briccialdi" di Terni organizza, nell\'ambito della propria missione istituzionale di promozione e diffusione della cultura musicale, ' + (metadati.titolo ? '"' + metadati.titolo + '"' : 'l\'evento in oggetto') + (dataEventoTesto ? ', in programma il giorno ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ';');
+  lines.push('il Conservatorio Statale di Musica "Giulio Briccialdi" di Terni organizza, nell\'ambito della propria missione istituzionale di promozione e diffusione della cultura musicale, ' + (metadati.titolo ? '"' + metadati.titolo + '"' : 'l\'evento in oggetto') + (dataEventoTesto ? (piuGiorni ? ', in programma nei giorni ' : ', in programma il giorno ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ';');
   lines.push('');
   lines.push('l\'obiettivo principale è promuovere la cultura musicale e il ruolo del Conservatorio quale istituzione di alta formazione artistica sul territorio;');
   lines.push('');
@@ -5291,7 +5338,7 @@ function generaBozzaDeterminaTrasportoPersone() {
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasferta persone (pullman/bus)' + (dataEventoTesto ? ' per l\'evento del ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
+  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasferta persone (pullman/bus)' + (dataEventoTesto ? (piuGiorni ? ' per l\'evento dei giorni ' : ' per l\'evento del ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
   lines.push('');
   lines.push('di impegnare la somma complessiva di € ' + formattaImportoIt(totaleConIva) + ', di cui € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment, dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica;');
   lines.push('');
@@ -5670,6 +5717,12 @@ function generaBozzaDeterminaTrasporti(istanza) {
   var scadenzaDataRichiesta = getField('determina_trasp_scadenza_data' + suf) || '[___ data scadenza offerte ___]';
   var dataEventoTesto = getField('data_evento') || '';
   var luogoEventoTesto = getField('luogo_concerto') || getField('dest_trasferta') || '';
+  // Evento di più giorni: ogni giorno col suo luogo (dateEventoPiuGiorni, determina-legale.js)
+  var piuGiorni = dateEventoPiuGiorni();
+  if (piuGiorni) {
+    dataEventoTesto = piuGiorni.dateConLuoghi;
+    if (piuGiorni.luoghi) luogoEventoTesto = '';
+  }
   // IVA arrotondata al centesimo una volta sola; totale = imponibile + IVA (importi.js)
   var importiIva = calcolaIva22(importoScelto);
   var ivaCalcolata = importiIva.iva;
@@ -5682,7 +5735,7 @@ function generaBozzaDeterminaTrasporti(istanza) {
   lines.push('');
   lines.push('Determina n. [___ N. Determina ___]/[___ anno ___]');
   lines.push('');
-  lines.push('OGGETTO: Decisione a contrarre, impegno di spesa e contestuale affidamento diretto per il servizio di trasporto materiale in occasione ' + (metadati.titolo ? 'del progetto "' + metadati.titolo + '"' : 'dell\'evento') + (dataEventoTesto ? ' del giorno ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + '.');
+  lines.push('OGGETTO: Decisione a contrarre, impegno di spesa e contestuale affidamento diretto per il servizio di trasporto materiale in occasione ' + (metadati.titolo ? 'del progetto "' + metadati.titolo + '"' : 'dell\'evento') + (dataEventoTesto ? (piuGiorni ? ' dei giorni ' : ' del giorno ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + '.');
   lines.push('');
   lines.push('CIG [___ CIG ___]');
   lines.push('');
@@ -5690,7 +5743,7 @@ function generaBozzaDeterminaTrasporti(istanza) {
   lines.push('');
   lines.push('PREMESSO che');
   lines.push('');
-  lines.push('il Conservatorio Statale di Musica "Giulio Briccialdi" di Terni organizza, nell\'ambito della propria missione istituzionale di promozione e diffusione della cultura musicale, ' + (metadati.titolo ? '"' + metadati.titolo + '"' : 'l\'evento in oggetto') + (dataEventoTesto ? ', in programma il giorno ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ';');
+  lines.push('il Conservatorio Statale di Musica "Giulio Briccialdi" di Terni organizza, nell\'ambito della propria missione istituzionale di promozione e diffusione della cultura musicale, ' + (metadati.titolo ? '"' + metadati.titolo + '"' : 'l\'evento in oggetto') + (dataEventoTesto ? (piuGiorni ? ', in programma nei giorni ' : ', in programma il giorno ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ';');
   lines.push('');
   lines.push('l\'obiettivo principale è promuovere la cultura musicale e il ruolo del Conservatorio quale istituzione di alta formazione artistica sul territorio;');
   lines.push('');
@@ -5779,7 +5832,7 @@ function generaBozzaDeterminaTrasporti(istanza) {
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasporto materiale' + (dataEventoTesto ? ' per l\'evento del ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
+  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasporto materiale' + (dataEventoTesto ? (piuGiorni ? ' per l\'evento dei giorni ' : ' per l\'evento del ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
   lines.push('');
   lines.push('di impegnare la somma complessiva di € ' + formattaImportoIt(totaleConIva) + ', di cui € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment, dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica;');
   lines.push('');
@@ -5939,12 +5992,13 @@ function generaPDFRichiestaPreventivoNoleggio(istanza, cfgSezioni) {
   }
 
   var dataEvento = getField('dataconcerto_data_1') || getField('data_evento') || '';
+  var piuGiorniPN = dateEventoPiuGiorni(); // evento di più giorni: tutte le date
   var scadenzaData = getField('determina_nol_scadenza_data') || '[___ Data scadenza ___]';
   var scadenzaOra = getField('determina_nol_scadenza_ora') || '[___ Ora scadenza ___]';
   var oggi = new Date();
   var dataOggi = ('0' + oggi.getDate()).slice(-2) + '/' + ('0' + (oggi.getMonth() + 1)).slice(-2) + '/' + oggi.getFullYear();
   var cfg = {
-    introFrase: 'Il Conservatorio di Musica "G. Briccialdi" di Terni necessita della fornitura di beni e/o servizi in occasione della produzione ' + (metadati.titolo || '[___ Titolo progetto ___]') + (dataEvento ? ', in programma il ' + dataEvento : '') + ', comprensivo di consegna, allestimento e ritiro a fine manifestazione.',
+    introFrase: 'Il Conservatorio di Musica "G. Briccialdi" di Terni necessita della fornitura di beni e/o servizi in occasione della produzione ' + (metadati.titolo || '[___ Titolo progetto ___]') + (dataEvento ? (piuGiorniPN ? ', in programma nei giorni ' + piuGiorniPN.date : ', in programma il ' + dataEvento) : '') + ', comprensivo di consegna, allestimento e ritiro a fine manifestazione.',
     elencoNoleggio: elencoNoleggio,
     scadenzaData: scadenzaData,
     scadenzaOra: scadenzaOra,
@@ -6367,7 +6421,9 @@ function generaRichiestaNoleggio() {
   lines.push('');
   lines.push('si richiede il noleggio/service del seguente materiale (non disponibile in Conservatorio) per il progetto "' + (metadati.titolo || '') + '" (ID ' + (metadati.id || '') + '):');
   var dataEvN = getField('data_evento');
-  if (dataEvN) lines.push('Data evento: ' + dataEvN);
+  var piuGiorniN = dateEventoPiuGiorni(); // evento di più giorni: tutte le date
+  if (piuGiorniN) lines.push('Date evento: ' + piuGiorniN.date);
+  else if (dataEvN) lines.push('Data evento: ' + dataEvN);
   var trasfN = getField('trasferta'), destN = getField('dest_trasferta');
   if (destN) lines.push('Luogo di consegna: ' + destN);
   else if (trasfN) lines.push('Luogo di consegna: Conservatorio "G. Briccialdi", Terni');
@@ -6473,7 +6529,12 @@ function costruisciTestoCentralino() {
   lines = lines.concat(righeMateriale);
   lines.push('');
   var dataEvC = getField('data_evento');
-  if (dataEvC) {
+  // Evento di più giorni: un giorno per riga, ognuno con il suo spazio
+  var giorniC = righeGiorniEvento(function(g) { var sp = spazioEffettivoOLuogo(g.key, ''); return sp !== '—' ? sp : '[spazio non ancora assegnato]'; });
+  if (giorniC.length) {
+    lines.push('Date evento:');
+    lines = lines.concat(giorniC);
+  } else if (dataEvC) {
     var spazioEvC = spazioEffettivoOLuogo('concerto', '');
     lines.push('Data evento: ' + dataEvC + ' — ' + (spazioEvC !== '—' ? spazioEvC : '[spazio non ancora assegnato]'));
   }
