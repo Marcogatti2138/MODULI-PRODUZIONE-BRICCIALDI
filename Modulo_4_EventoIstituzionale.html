@@ -816,17 +816,18 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
       <details style="margin:0 0 14px;border:1px solid var(--bordo);border-radius:6px;background:#F8FAFC">
         <summary style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--blu);cursor:pointer">❓ Come si compila questa sezione</summary>
         <div style="padding:0 12px 10px;font-size:11px;color:var(--muted);line-height:1.5">
-          Facoltativa: utile per convegni con più interventi da ordinare nel tempo, meno per un evento con un solo momento. Una riga per ogni voce della scaletta — un intervento, una pausa, i saluti iniziali, la moderazione. Non serve incastrare gli orari al minuto: anche solo l'ordine, senza orario preciso, va bene.
+          Facoltativa: utile per convegni con più interventi da ordinare nel tempo, meno per un evento con un solo momento. Una riga per ogni voce della scaletta — un intervento, una pausa, i saluti iniziali, la moderazione. Se l'evento dura più giorni, indica la data di ogni voce. Non serve incastrare gli orari al minuto: anche solo l'ordine, senza orario preciso, va bene.
         </div>
       </details>
 
       <div style="overflow-x:auto;margin-top:6px">
-      <table style="width:100%;min-width:460px;border-collapse:collapse;font-size:12px">
+      <table style="width:100%;min-width:560px;border-collapse:collapse;font-size:12px">
         <thead>
           <tr style="background:var(--blu)">
-            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:20%">Orario</th>
-            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:50%">Descrizione</th>
-            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:30%">Relatore/Moderatore</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:16%">Data</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:12%">Orario</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:42%">Descrizione</th>
+            <th style="padding:7px 10px;text-align:left;color:white;font-size:11px;width:20%">Relatore/Moderatore</th>
             <th style="padding:7px 10px;text-align:center;color:white;font-size:11px;width:10%"></th>
           </tr>
         </thead>
@@ -1801,6 +1802,7 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
         <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed">
           <thead>
             <tr style="background:var(--blu-light)">
+              <th id="sint_programma_th_data" style="display:none;padding:6px 10px;text-align:left;color:var(--blu);font-size:11px;width:84px">Data</th>
               <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px;width:70px">Orario</th>
               <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px;width:50%">Descrizione</th>
               <th style="padding:6px 10px;text-align:left;color:var(--blu);font-size:11px">Relatore/Moderatore</th>
@@ -3504,14 +3506,22 @@ function aggiornaSintesiCompleta() {
     elAbstract.style.display = abstractVal ? 'block' : 'none';
   }
 
-  // Programma / Scaletta
-  var programmaRows = [];
+  // Programma / Scaletta — la colonna Data compare solo se almeno una voce ha la
+  // data (convegno di più giorni); senza date la tabella resta quella di sempre.
+  var programmaVoci = [];
   var pp = 1;
   while (document.querySelector('[name="programma_orario_' + pp + '"]')) {
-    var pOra = getField('programma_orario_' + pp), pDescr = getField('programma_descrizione_' + pp), pRel = getField('programma_relatore_' + pp);
-    if (pDescr) programmaRows.push('<tr><td style="padding:5px 10px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal">' + escapeHTML(pOra || '—') + '</td><td style="padding:5px 10px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal">' + escapeHTML(pDescr) + '</td><td style="padding:5px 10px;color:#6B7280;word-wrap:break-word;overflow-wrap:break-word;white-space:normal">' + escapeHTML(pRel || '—') + '</td></tr>');
+    var pData = getField('programma_data_' + pp), pOra = getField('programma_orario_' + pp), pDescr = getField('programma_descrizione_' + pp), pRel = getField('programma_relatore_' + pp);
+    if (pDescr) programmaVoci.push({ data: pData, ora: pOra, descr: pDescr, rel: pRel });
     pp++;
   }
+  var programmaConData = programmaVoci.some(function(v) { return v.data; });
+  var cellaProg = '<td style="padding:5px 10px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal">';
+  var programmaRows = programmaVoci.map(function(v) {
+    return '<tr>' + (programmaConData ? cellaProg + escapeHTML(v.data || '—') + '</td>' : '') + cellaProg + escapeHTML(v.ora || '—') + '</td>' + cellaProg + escapeHTML(v.descr) + '</td><td style="padding:5px 10px;color:#6B7280;word-wrap:break-word;overflow-wrap:break-word;white-space:normal">' + escapeHTML(v.rel || '—') + '</td></tr>';
+  });
+  var elProgThData = document.getElementById('sint_programma_th_data');
+  if (elProgThData) elProgThData.style.display = programmaConData ? '' : 'none';
   var elProg = document.getElementById('sint_programma_rows');
   if (elProg) elProg.innerHTML = programmaRows.length ? programmaRows.join('') : '<tr><td colspan="3" style="padding:8px 10px;color:#6B7280;font-style:italic;font-size:12px">Nessuna voce di programma inserita</td></tr>';
 
@@ -6585,10 +6595,11 @@ function addProgramma() {
   tr.style.borderBottom = '1px solid #D0D7E3';
   if (programmaCount % 2 === 0) tr.style.background = '#F4F7FC';
   tr.innerHTML =
+    '<td style="padding:3px 4px"><input type="text" data-f="data" name="programma_data_' + programmaCount + '" onblur="formattaDataItaliana(this)" placeholder="GG/MM/AAAA" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
     '<td style="padding:3px 4px"><input type="text" data-f="orario" name="programma_orario_' + programmaCount + '" onblur="formattaOraItaliana(this)" placeholder="__:__" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
     '<td style="padding:3px 4px"><textarea data-f="descrizione" name="programma_descrizione_' + programmaCount + '" placeholder="es. Saluti istituzionali / Intervento / Pausa caffè" rows="2" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none;resize:vertical"></textarea></td>' +
     '<td style="padding:3px 4px"><input type="text" data-f="relatore" name="programma_relatore_' + programmaCount + '" placeholder="es. M° Rossi" style="width:100%;border:1px solid #D0D7E3;border-radius:4px;padding:5px 7px;font-family:inherit;font-size:12px;outline:none"></td>' +
-    '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'programma\',[\'orario\',\'descrizione\',\'relatore\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'programma\',[\'orario\',\'descrizione\',\'relatore\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'programma-tbody\',\'programma\',[\'orario\',\'descrizione\',\'relatore\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
+    '<td style="padding:3px 4px;text-align:center"><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'programma\',[\'data\',\'orario\',\'descrizione\',\'relatore\'],null,\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▲</button><button type="button" onclick="spostaRiga(this,\'programma-tbody\',\'programma\',[\'data\',\'orario\',\'descrizione\',\'relatore\'],null,\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;margin-right:2px">▼</button><button type="button" onclick="eliminaRiga(this,\'programma-tbody\',\'programma\',[\'data\',\'orario\',\'descrizione\',\'relatore\'],null)" title="Elimina" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1;">✕</button></td>';
   document.getElementById('programma-tbody').appendChild(tr);
   var elCont = document.getElementById('programma-contatore');
   if (elCont) elCont.textContent = programmaCount + (programmaCount === 1 ? ' voce inserita' : ' voci inserite');
@@ -6736,7 +6747,7 @@ function importaEsecutoriIncollati() {
 // (Nel Mod. 4 le tabelle Prove e Brani non sono nella pagina: niente righe da ricreare.)
 var RIGHE_DINAMICHE_REFERENTE = [
   { campi: ['replica_data_', 'replica_ora_', 'replica_luogo_', 'replica_confermata_', 'replica_trasporto_', 'replica_trasporto_note_', 'replica_vitto_', 'replica_alloggio_'], conta: function() { return replicheCount; }, aggiungi: addReplica },
-  { campi: ['programma_orario_', 'programma_descrizione_', 'programma_relatore_'], conta: function() { return programmaCount; }, aggiungi: addProgramma },
+  { campi: ['programma_data_', 'programma_orario_', 'programma_descrizione_', 'programma_relatore_'], conta: function() { return programmaCount; }, aggiungi: addProgramma },
   { campi: ['relatore_nome_', 'relatore_qualifica_'], conta: function() { return relatoriCount; }, aggiungi: addRelatore },
   { campi: ['esec_nome_', 'esec_ruolo_', 'esec_qual_', 'esec_modalita_', 'esec_email_', 'esec_tel_'], conta: function() { return esecutoriCount; }, aggiungi: addEsecutore },
   { campi: ['collo_', 'collo_dest_'], conta: function() { return colliCount; }, aggiungi: addCollo },

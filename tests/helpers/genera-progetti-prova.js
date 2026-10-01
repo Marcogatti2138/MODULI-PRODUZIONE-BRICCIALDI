@@ -105,6 +105,7 @@ function compilaCampiVuoti(sigla) {
     if (/^replica_rientro_data_/.test(n)) return (16 + 7 * i) + '/03/2031';
     if (/^replica_rientro_ora_/.test(n)) return '12:00';
     if (/^replica_(data|partenza_data)_/.test(n)) return (15 + 7 * i) + '/03/2031';
+    if (/^programma_data_/.test(n)) return i <= 3 ? '15/03/2031' : '22/03/2031'; // evento e prima replica
     if (/^dot_prestito_luogo_/.test(n)) return 'Sede Prestito Prova ' + n.slice(19);
     if (/^dot_struttura_nota_/.test(n)) return 'Già presente nella struttura di prova';
     if (/^determina_voce_/.test(n)) return 'Voce determina prova ' + i;
