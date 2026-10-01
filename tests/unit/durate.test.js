@@ -80,3 +80,15 @@ for (const sigla of ['M1', 'M2']) {
     assert.equal(f.calcolaOrarioEsteso('Concerto', '20:30'), null, 'senza durata nessun orario inventato');
   });
 }
+
+// Mod. 3: niente campo durata, quindi niente orario esteso per i concerti (ramo tolto il
+// 01/10/2026 perché non poteva mai produrre un orario). Le lezioni restano a ±30'.
+test('M3 — calcolaOrarioEsteso: lezioni ±30\', concerti senza orario esteso, nessuna lettura della durata', () => {
+  const { caricaFunzioni, funzioniDelFile } = require('../helpers/estrai-funzioni');
+  assert.doesNotMatch(leggi(PAGINE.M3), /name="durata"/, 'il Mod. 3 non ha il campo durata');
+  const sorgente = funzioniDelFile(PAGINE.M3).calcolaOrarioEsteso;
+  assert.doesNotMatch(sorgente, /getField\('durata'\)|estraiDurataMinuti/, 'ramo concerto con la durata ancora presente');
+  const f = caricaFunzioni(PAGINE.M3, ['calcolaOrarioEsteso', 'oraAMinuti', 'minutiAOra'], { getField: () => '' });
+  assert.equal(f.calcolaOrarioEsteso('Lezione 1', '10:00 – 13:00').esteso, '09:30–13:30');
+  assert.equal(f.calcolaOrarioEsteso('Concerto', '20:30'), null);
+});

@@ -5253,14 +5253,9 @@ function calcolaOrarioEsteso(tipo, oraStr) {
     if (inizio === null || fine === null) return null;
     return { esteso: minutiAOra(inizio - 30) + '–' + minutiAOra(fine + 30), nota: 'lezione ' + oraStr };
   }
-  // Concerto: un solo orario. Inizia esattamente all'ora indicata,
-  // dopo solo durata + 30' per lo smontaggio (se manca "durata" in questo
-  // modulo, resta l'orario secco — nessun calcolo inventato).
-  var inizioC = oraAMinuti(oraStr);
-  if (inizioC === null) return null;
-  var durataMin = estraiDurataMinuti(getField('durata'));
-  if (durataMin === null) return null;
-  return { esteso: minutiAOra(inizioC) + '–' + minutiAOra(inizioC + durataMin + 30), nota: 'inizio ore ' + oraStr + ', durata ' + durataMin + '\'' };
+  // Concerto: il Mod. 3 non ha il campo durata, quindi nessun orario esteso —
+  // resta l'orario secco indicato dal Referente (nessun calcolo inventato).
+  return null;
 }
 
 // Costruisce il testo della sezione per la Mail Centralino: { lines } se c'è
