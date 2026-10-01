@@ -498,6 +498,7 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
 <script src="importi.js"></script>
+<script src="durate.js"></script>
 <script src="determina-legale.js"></script>
 <script src="coerenza-date.js"></script>
 <script src="righe-dinamiche.js"></script>
@@ -5242,10 +5243,6 @@ function minutiAOra(mins) {
   mins = ((mins % 1440) + 1440) % 1440;
   var hh = Math.floor(mins / 60), mm = mins % 60;
   return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
-}
-function estraiDurataMinuti(durataStr) {
-  var m = /(\d+)/.exec(durataStr || '');
-  return m ? parseInt(m[1], 10) : null;
 }
 function calcolaOrarioEsteso(tipo, oraStr) {
   if (!oraStr) return null;

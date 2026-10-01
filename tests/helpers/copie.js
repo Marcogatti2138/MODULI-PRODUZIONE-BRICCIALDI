@@ -1,6 +1,6 @@
 // Strumenti comuni agli unit test del livello 1.
 const test = require('node:test');
-const { PAGINE, funzioniDelFile, caricaFunzioni } = require('./estrai-funzioni');
+const { PAGINE, leggi, funzioniDelFile, caricaFunzioni, caricaFile } = require('./estrai-funzioni');
 
 // Esegue `verifica(funzioni, sigla)` su ogni pagina che contiene TUTTE le funzioni
 // richieste: lo stesso test gira su ogni copia (Dashboard, Mod. 1-4), così una copia
@@ -35,4 +35,17 @@ function dataFissa(anno, mese, giorno, ora) {
 // Finto campo di input per le funzioni che formattano "this" (onblur).
 function campo(valore) { return { value: valore }; }
 
-module.exports = { suOgniCopia, dataFissa, campo };
+// La funzione `nome` che una pagina usa davvero: la sua copia interna se c'è,
+// altrimenti quella di un file condiviso che la pagina carica (<script src="...">).
+function funzioneDellaPagina(file, nome, condivisi, contesto) {
+  if (funzioniDelFile(file)[nome]) return caricaFunzioni(file, [nome], contesto)[nome];
+  for (const c of condivisi) {
+    if (leggi(file).includes('<script src="' + c + '"></script>')) {
+      const f = caricaFile(c, contesto)[nome];
+      if (f) return f;
+    }
+  }
+  throw new Error(file + ': nessuna ' + nome + ' disponibile');
+}
+
+module.exports = { suOgniCopia, dataFissa, campo, funzioneDellaPagina };

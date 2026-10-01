@@ -49,27 +49,7 @@ suOgniCopia('estraiMinutiOra (Dashboard): orari senza i due punti', ['estraiMinu
   assert.equal(f.estraiMinutiOra('1430'), 870);
 }, null, { solo: ['D'], todo: 'Differenza segnalata 01/10/2026: la copia della Dashboard non riconosce "21" o "1430" (i moduli sì); impatto basso, i moduli salvano già "21:00"' });
 
-// ── Durata ───────────────────────────────────────────────────────────────────
-
-suOgniCopia('calcolaOraFineDaDurata: ora di fine dalla durata scritta in ore e minuti', ['calcolaOraFineDaDurata'], f => {
-  assert.equal(f.calcolaOraFineDaDurata('20:30', '90 minuti'), '22:00');
-  assert.equal(f.calcolaOraFineDaDurata('20:30', '90 minuti, con intervallo'), '22:00');
-  assert.equal(f.calcolaOraFineDaDurata('20:30', '2 ore'), '22:30');
-  assert.equal(f.calcolaOraFineDaDurata('20:30', '1 ora e 30 minuti'), '22:00');
-  assert.equal(f.calcolaOraFineDaDurata('23:00', '2 ore'), '01:00');
-  assert.equal(f.calcolaOraFineDaDurata('', '90 minuti'), '');
-  assert.equal(f.calcolaOraFineDaDurata('20:30', 'da definire'), '');
-});
-
-suOgniCopia('calcolaOraFineDaDurata: ore con i decimali', ['calcolaOraFineDaDurata'], f => {
-  assert.equal(f.calcolaOraFineDaDurata('20:30', 'circa 1,5 ore'), '22:00');
-}, null, { todo: 'BUG segnalato 01/10/2026: "1,5 ore" viene letto come 5 ore (fine alle 01:30)' });
-
-suOgniCopia('estraiDurataMinuti: durata in minuti, anche se scritta in ore', ['estraiDurataMinuti'], f => {
-  assert.equal(f.estraiDurataMinuti('90 minuti'), 90);
-  assert.equal(f.estraiDurataMinuti('2 ore'), 120);
-  assert.equal(f.estraiDurataMinuti('1 ora e 30 minuti'), 90);
-}, null, { todo: 'BUG segnalato 01/10/2026: prende solo il primo numero ("2 ore" = 2 minuti); usata da tabella Trasporti e orari Spazi' });
+// Durate: calcolaOraFineDaDurata ed estraiDurataMinuti sono provate in durate.test.js.
 
 // ── Date ─────────────────────────────────────────────────────────────────────
 

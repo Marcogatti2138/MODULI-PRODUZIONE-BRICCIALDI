@@ -498,6 +498,7 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
 <script src="importi.js"></script>
+<script src="durate.js"></script>
 <script src="determina-legale.js"></script>
 <script src="coerenza-date.js"></script>
 <script src="righe-dinamiche.js"></script>
@@ -3980,20 +3981,6 @@ function ordinaRigheCronologicamente(righe) {
 // ═══ CALENDARIO EVENTO/REPLICHE — Scheda di Sintesi ═══
 // Aggrega cronologicamente Evento principale + Repliche. Mod.4 (Evento
 // Istituzionale) non ha Piano Prove — è un modulo volutamente più leggero.
-// Prova a calcolare l'orario di fine da inizio + durata (campo testo libero,
-// es. "90 minuti", "1 ora e 30 minuti") — se non riconoscibile, resta vuoto.
-function calcolaOraFineDaDurata(oraInizio, durataTesto) {
-  var mIn = /(\d{1,2}):(\d{2})/.exec(oraInizio || '');
-  if (!mIn) return '';
-  var minutiInizio = parseInt(mIn[1], 10) * 60 + parseInt(mIn[2], 10);
-  var testo = (durataTesto || '').toLowerCase();
-  var mOre = /(\d+)\s*(ore|ora|h)\b/.exec(testo);
-  var mMin = /(\d+)\s*(minuti|min)\b/.exec(testo);
-  var extra = (mOre ? parseInt(mOre[1], 10) * 60 : 0) + (mMin ? parseInt(mMin[1], 10) : 0);
-  if (extra === 0) return '';
-  var totMin = (minutiInizio + extra) % 1440;
-  return ('0' + Math.floor(totMin / 60)).slice(-2) + ':' + ('0' + (totMin % 60)).slice(-2);
-}
 // Lo spazio "assegnato" (Blocco ① Spazi, pannello Responsabile) è la fonte
 // autorevole per il calendario — il luogo scritto dal Referente resta solo
 // una proposta iniziale, che può essere stata cambiata in fase di
