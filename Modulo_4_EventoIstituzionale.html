@@ -3850,9 +3850,13 @@ function valoreSpazioSalvato(chiave) {
   // ma i campi di dettaglio (luogo/ritiro/riconsegna) apparivano vuoti/nascosti finché non si
   // riselezionava manualmente "Prestito" — i dati non si perdevano (erano su Firestore), ma non
   // venivano proposti in automatico alla riapertura.
+  // Assistenza logistica (ass_log_studenti_/ass_log_orario_) invece è del Referente: un campo
+  // ancora vuoto nella pagina non basta, si guardano entrambe le cache, come nel Modulo 1.
+  // Prima studenti e orario sparivano alla riapertura e il salvataggio li cancellava (bug F).
   var el = document.querySelector('[name="' + chiave + '"]');
-  if (el) return el.value || '';
+  if (el && el.value) return el.value;
   if (window._datiResponsabileCache && window._datiResponsabileCache[chiave] !== undefined) return window._datiResponsabileCache[chiave];
+  if (window._datiReferenteCache && window._datiReferenteCache[chiave] !== undefined) return window._datiReferenteCache[chiave];
   return '';
 }
 

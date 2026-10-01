@@ -17,18 +17,12 @@ const MODULI = [
 // Campi che restano vuoti di proposito anche in un progetto completo.
 const VUOTI_AMMESSI = /^spazio_concerto_altro$/;
 
-// Bug noti, segnalati e non ancora corretti: i loro campi sono esclusi dai
-// controlli generali e coperti da un test dedicato (test.fail) più sotto.
-// Bug F — M4, Assistenza logistica: alla riapertura studenti e orario scritti
-// dal Referente spariscono (valoreSpazioSalvato del M4 legge solo i dati del
-// Responsabile) e il primo salvataggio li cancella da Firestore.
-// Campi del M4 esclusi per il bug F dai tre controlli generali (riapertura,
-// completezza, risalvataggio) — da rimettere quando F sarà corretto:
-//   ass_log_studenti_concerto, ass_log_orario_concerto,
-//   ass_log_studenti_replica_1, ass_log_orario_replica_1,
-//   ass_log_studenti_replica_2, ass_log_orario_replica_2
-// (ass_log_check_* non sono esclusi: le spunte si ripristinano correttamente).
-const BUG_NOTI = { M4: /^ass_log_(studenti|orario)_/ };
+// Bug noti, segnalati e non ancora corretti: per modulo, i campi da escludere
+// dai controlli generali (con un test dedicato test.fail che li copre e che
+// diventa rosso quando il bug viene corretto). Oggi nessuno.
+// Storico: bug F (M4, Assistenza logistica) escludeva ass_log_studenti_* e
+// ass_log_orario_*; corretto, campi rimessi, test di regressione in fondo.
+const BUG_NOTI = {};
 
 function senzaBugNoti(m, dati) {
   const re = BUG_NOTI[m.sigla];
@@ -99,16 +93,22 @@ for (const m of MODULI) {
   });
 }
 
-// Bug F (M4) — fallimento atteso finché il bug è aperto: quando verrà corretto
-// questo test "passerà per sbaglio" e Playwright lo segnalerà; a quel punto
-// togliere test.fail e la voce M4 da BUG_NOTI.
-test.describe('M4 — Bug F, Assistenza logistica alla riapertura', () => {
+// Bug F (M4), corretto: alla riapertura studenti e orario dell'Assistenza
+// logistica, salvati dal Referente, sparivano (valoreSpazioSalvato leggeva solo
+// i dati del Responsabile) e il primo salvataggio li cancellava da Firestore.
+test.describe('M4 — Assistenza logistica alla riapertura (bug F)', () => {
   const m = MODULI[3];
+  const atteso = Object.fromEntries(Object.entries(m.progetto.dati_referente).filter(([k]) => /^ass_log_(studenti|orario)_/.test(k)));
   test.use({ datiIniziali: { progetti: { [m.progetto.metadati.id]: m.progetto } } });
-  test('studenti e orario scritti dal Referente ricompaiono', async ({ page }) => {
-    test.fail(true, 'Bug F aperto: segnalato a Marco, non ancora corretto');
+
+  test('studenti e orario scritti dal Referente ricompaiono e restano su Firestore dopo un salvataggio', async ({ page }) => {
+    expect(Object.keys(atteso).length, 'il progetto di prova ha i campi da controllare').toBe(6);
     await apri(page, m);
-    const atteso = Object.fromEntries(Object.entries(m.progetto.dati_referente).filter(([k]) => BUG_NOTI.M4.test(k)));
     expect(await campiDiversi(page, atteso)).toEqual([]);
+    const prima = await page.evaluate(() => window.__fintoDb.scritture().length);
+    await page.evaluate(() => salvaReferenteSuFirestore());
+    await expect.poll(() => page.evaluate(() => window.__fintoDb.scritture().length), { timeout: 8000 }).toBeGreaterThan(prima);
+    const salvati = await page.evaluate(id => window.__fintoDb.documento('progetti', id).dati_referente, m.progetto.metadati.id);
+    expect(Object.fromEntries(Object.keys(atteso).map(k => [k, salvati[k]]))).toEqual(atteso);
   });
 });

@@ -30,12 +30,9 @@ const MODULI = {
   M4: { file: 'Modulo_4_EventoIstituzionale.html', tipologia: 'evento-istituzionale', id: '9204' }
 };
 
-// Bug F (M4, Assistenza logistica): la pagina perde studenti e orario alla
-// riapertura, quindi il generatore non riesce a salvarli. Si scrivono a mano i
-// valori voluti. Quando F sarà corretto questo blocco non servirà più.
-const CORREZIONI_BUG_NOTI = {
-  M4: { ass_log_studenti_concerto: '3', ass_log_orario_concerto: '14:00 – 19:00', ass_log_studenti_replica_1: '3', ass_log_studenti_replica_2: '3' }
-};
+// Valori scritti a mano dopo la generazione, per i campi che un bug noto non
+// lascia salvare alla pagina (vedi BUG_NOTI in e2e/progetti-prova.spec.js). Oggi nessuno.
+const CORREZIONI_BUG_NOTI = {};
 
 function metadatiDiProva(sigla, m) {
   return {
