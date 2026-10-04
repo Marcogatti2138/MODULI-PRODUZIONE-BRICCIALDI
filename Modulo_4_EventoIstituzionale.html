@@ -3142,9 +3142,9 @@ function addReplica() {
   div.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
     '<div data-label style="font-size:13px;font-weight:700;color:#1A3C6B">Replica ' + replicheCount + '</div>' +
-    '<button type="button" onclick="spostaRiga(this,\'repliche-body\',\'replica\',[\'data\',\'ora\',\'luogo\',\'confermata\',\'trasporto\',\'trasporto_note\',\'vitto\',\'alloggio\'],\'Replica\',\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;flex-shrink:0">▲</button>' +
-    '<button type="button" onclick="spostaRiga(this,\'repliche-body\',\'replica\',[\'data\',\'ora\',\'luogo\',\'confermata\',\'trasporto\',\'trasporto_note\',\'vitto\',\'alloggio\'],\'Replica\',\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;flex-shrink:0">▼</button>' +
-    '<button type="button" onclick="eliminaRiga(this,\'repliche-body\',\'replica\',[\'data\',\'ora\',\'luogo\',\'confermata\',\'trasporto\',\'trasporto_note\',\'vitto\',\'alloggio\'],\'Replica\')" title="Elimina questa replica" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;">✕</button>' +
+    '<button type="button" onclick="spostaRiga(this,\'repliche-body\',\'replica\',[\'data\',\'ora\',\'tipo\',\'durata\',\'luogo\',\'confermata\',\'trasporto\',\'trasporto_note\',\'vitto\',\'alloggio\'],\'Replica\',\'su\')" title="Sposta su" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;flex-shrink:0">▲</button>' +
+    '<button type="button" onclick="spostaRiga(this,\'repliche-body\',\'replica\',[\'data\',\'ora\',\'tipo\',\'durata\',\'luogo\',\'confermata\',\'trasporto\',\'trasporto_note\',\'vitto\',\'alloggio\'],\'Replica\',\'giu\')" title="Sposta giù" style="background:#F0F4F8;color:#546E7A;border:1px solid #D0D7E3;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;flex-shrink:0">▼</button>' +
+    '<button type="button" onclick="eliminaRiga(this,\'repliche-body\',\'replica\',[\'data\',\'ora\',\'tipo\',\'durata\',\'luogo\',\'confermata\',\'trasporto\',\'trasporto_note\',\'vitto\',\'alloggio\'],\'Replica\')" title="Elimina questa replica" style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;">✕</button>' +
     '</div>' +
 
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
@@ -3152,6 +3152,15 @@ function addReplica() {
     '<input type="text" data-f="data" name="replica_data_' + replicheCount + '" placeholder="GG/MM/AAAA" onblur="formattaDataItaliana(this)" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:14px;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;"></div>' +
     '<div><label style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Ora</label>' +
     '<input type="text" data-f="ora" name="replica_ora_' + replicheCount + '" placeholder="__:__" onblur="formattaOraItaliana(this)" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:14px;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;"></div>' +
+    '</div>' +
+
+    // Intervento D: tipo (vuoto = Sessione) e durata (vuota = durata della data principale)
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+    '<div><label style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Tipo</label>' +
+    '<select data-f="tipo" name="replica_tipo_' + replicheCount + '" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:14px;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;background:white"><option value="">Sessione</option><option value="Concerto">Concerto</option></select></div>' +
+    '<div><label style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px">Durata stimata</label>' +
+    '<input type="text" data-f="durata" name="replica_durata_' + replicheCount + '" placeholder="Se vuoto vale la durata della data principale" style="border:1px solid #D0D7E3;border-radius:5px;font-family:inherit;font-size:14px;padding:7px 8px;outline:none;width:100%;box-sizing:border-box;">' +
+    '<div style="font-size:10px;color:#6B7280;margin-top:3px;font-style:italic">es. 1h30 o 90 minuti</div></div>' +
     '</div>' +
 
     '<div style="margin-bottom:8px">' +
@@ -3413,7 +3422,7 @@ function aggiornaSintesiEvento() {
   var elRepSint = document.getElementById('sint_repliche');
   var ulterioriSint = giorniEventoPerDocumenti().filter(function(g) { return g.key !== 'concerto'; }).map(function(g) {
     var sp = spazioEffettivoOLuogo(g.key, g.luogo);
-    return g.data + (sp !== '—' ? ' — ' + sp : '');
+    return dataConTipo(g) + (sp !== '—' ? ' — ' + sp : '');
   });
   if (elRepSint && ulterioriSint.length) elRepSint.textContent = ulterioriSint.join('; ');
   // Descrizione progetto — Sintesi + pannello in cima al Responsabile
@@ -4084,6 +4093,7 @@ function spazioEffettivoOLuogo(key, luogoProposto) {
 // in ordine di data, ognuno con il luogo indicato dal Referente e la chiave degli
 // spazi (concerto, replica_N). La legge anche determina-legale.js
 // (dateEventoPiuGiorni) per la Determina Acquisti.
+// "concerto": la data aggiuntiva è di tipo Concerto (intervento D).
 function giorniEventoPerDocumenti() {
   var giorni = [];
   var dataC = getField('data_evento'), luogoC = getField('luogo_concerto') || getField('dest_trasferta');
@@ -4091,7 +4101,7 @@ function giorniEventoPerDocumenti() {
   var r = 1;
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var dR = getField('replica_data_' + r);
-    if (dR) giorni.push({ data: dR, ora: getField('replica_ora_' + r), luogo: getField('replica_luogo_' + r) || luogoC, key: 'replica_' + r });
+    if (dR) giorni.push({ data: dR, ora: getField('replica_ora_' + r), luogo: getField('replica_luogo_' + r) || luogoC, key: 'replica_' + r, concerto: replicaConcerto(r) });
     r++;
   }
   ordinaRigheCronologicamente(giorni);
@@ -4102,8 +4112,16 @@ function giorniEventoPerDocumenti() {
 function righeGiorniEvento(luogoDi) {
   var giorni = giorniEventoPerDocumenti();
   if (!dateEventoPiuGiorni()) return [];
-  return giorni.map(function(g) { var l = luogoDi(g); return '- ' + g.data + (l ? ' — ' + l : ''); });
+  return giorni.map(function(g) { var l = luogoDi(g); return '- ' + dataConTipo(g) + (l ? ' — ' + l : ''); });
 }
+// ═══ TIPO E DURATA DELLE DATE AGGIUNTIVE (intervento D) ═══
+// Tipo vuoto = Sessione: nessun segno nei testi (come prima di D). "Concerto" marca
+// la data. Durata vuota = durata della data principale (Spazi); il Calendario mostra
+// la FINE solo con la durata scritta. Le Determine non cambiano.
+function replicaConcerto(r) { return getField('replica_tipo_' + r) === 'Concerto'; }
+function etichettaReplica(r) { return 'Replica ' + r + (replicaConcerto(r) ? ' (Concerto)' : ''); }
+function durataReplica(r) { return getField('replica_durata_' + r) || getField('durata'); }
+function dataConTipo(g) { return g.data + (g.concerto ? ' (Concerto)' : ''); }
 
 function elencoCalendarioEventi() {
   var righe = [];
@@ -4112,7 +4130,7 @@ function elencoCalendarioEventi() {
   var r = 1;
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var dR = getField('replica_data_' + r);
-    if (dR || getField('replica_ora_' + r)) righe.push({ tipo: 'Replica ' + r, data: dR, ora: getField('replica_ora_' + r), oraFine: '', luogo: spazioEffettivoOLuogo('replica_' + r, getField('replica_luogo_' + r)), sezioni: 'Tutti' });
+    if (dR || getField('replica_ora_' + r)) righe.push({ tipo: etichettaReplica(r), data: dR, ora: getField('replica_ora_' + r), oraFine: calcolaOraFineDaDurata(getField('replica_ora_' + r), getField('replica_durata_' + r)), luogo: spazioEffettivoOLuogo('replica_' + r, getField('replica_luogo_' + r)), sezioni: 'Tutti' });
     r++;
   }
   return ordinaRigheCronologicamente(righe);
@@ -4217,7 +4235,7 @@ function costruisciListaAssistenza() {
   var r = 1;
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var dR = getField('replica_data_' + r), oR = getField('replica_ora_' + r), lR = getField('replica_luogo_' + r);
-    if (dR || oR) righe.push({ tipo: 'Replica ' + r, data: dR, ora: oR, luogo: lR || luogoC, key: 'replica_' + r });
+    if (dR || oR) righe.push({ tipo: etichettaReplica(r), data: dR, ora: oR, luogo: lR || luogoC, key: 'replica_' + r });
     r++;
   }
 
@@ -4272,8 +4290,8 @@ function costruisciTabellaSpazi() {
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var dR = getField('replica_data_' + r), oR = normalizzaOra(getField('replica_ora_' + r)) || getField('replica_ora_' + r), lR = getField('replica_luogo_' + r);
     if (dR || oR || lR) {
-      var estesoR = calcolaOrarioEsteso('Replica ' + r, oR);
-      righe.push({ tipo: 'Replica ' + r, data: dR, ora: estesoR ? estesoR.esteso : oR, luogo: lR || luogoC, key: 'replica_' + r });
+      var estesoR = calcolaOrarioEsteso('Replica ' + r, oR, durataReplica(r));
+      righe.push({ tipo: etichettaReplica(r), data: dR, ora: estesoR ? estesoR.esteso : oR, luogo: lR || luogoC, key: 'replica_' + r });
     }
     r++;
   }
@@ -4321,7 +4339,8 @@ function minutiAOra(mins) {
   return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
 }
 
-function calcolaOrarioEsteso(tipo, oraStr) {
+// durataTesto: durata della data aggiuntiva (durataReplica); se manca, quella della data principale.
+function calcolaOrarioEsteso(tipo, oraStr, durataTesto) {
   if (!oraStr) return null;
   if (tipo.indexOf('Prova') === 0) {
     var parti = oraStr.split(/\s*–\s*/);
@@ -4336,7 +4355,7 @@ function calcolaOrarioEsteso(tipo, oraStr) {
   // (MINUTI_SMONTAGGIO_CONCERTO in durate.js: 45').
   var inizioC = oraAMinuti(oraStr);
   if (inizioC === null) return null;
-  var durataMin = estraiDurataMinuti(getField('durata'));
+  var durataMin = estraiDurataMinuti(durataTesto === undefined ? getField('durata') : durataTesto);
   if (durataMin === null) return null;
   return { esteso: minutiAOra(inizioC) + '–' + minutiAOra(inizioC + durataMin + MINUTI_SMONTAGGIO_CONCERTO), nota: 'inizio ore ' + oraStr + ', durata ' + durataMin + '\'' };
 }
@@ -4360,7 +4379,8 @@ function generaRichiestaSpazi() {
     var spazio = sel ? sel.value : '';
     if (spazio === 'Altro' && altroInput && altroInput.value.trim()) spazio = altroInput.value.trim();
     if (!spazio) spazio = '(da assegnare)';
-    var esteso = calcolaOrarioEsteso(tipo, ora);
+    var nReplica = /^Replica (\d+)/.exec(tipo);
+    var esteso = calcolaOrarioEsteso(tipo, ora, nReplica ? durataReplica(nReplica[1]) : undefined);
     var oraRiga = esteso ? (esteso.esteso + ' — con margine di preparazione, ' + esteso.nota) : ora;
     lines.push('- ' + tipo + ' — ' + data + ' ore ' + oraRiga + ' — Spazio: ' + spazio);
     count++;
@@ -4411,8 +4431,8 @@ function generaNotificaSpaziReferente() {
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var dR = getField('replica_data_' + r), oR = normalizzaOra(getField('replica_ora_' + r)) || getField('replica_ora_' + r), lR = getField('replica_luogo_' + r);
     if (dR || oR || lR) {
-      var estesoR = calcolaOrarioEsteso('Replica ' + r, oR);
-      righe.push({ tipo: 'Replica ' + r, data: dR, ora: estesoR ? estesoR.esteso : oR, luogo: lR || luogoC, key: 'replica_' + r });
+      var estesoR = calcolaOrarioEsteso('Replica ' + r, oR, durataReplica(r));
+      righe.push({ tipo: etichettaReplica(r), data: dR, ora: estesoR ? estesoR.esteso : oR, luogo: lR || luogoC, key: 'replica_' + r });
     }
     r++;
   }
@@ -4479,7 +4499,7 @@ function aggiornaAvvisoSpaziModificati() {
   var r = 1;
   while (document.querySelector('[name="replica_data_' + r + '"]')) {
     var dR = getField('replica_data_' + r), lR = getField('replica_luogo_' + r);
-    if (dR || lR) righe.push({ tipo: 'Replica ' + r, luogo: lR || luogoC, key: 'replica_' + r });
+    if (dR || lR) righe.push({ tipo: etichettaReplica(r), luogo: lR || luogoC, key: 'replica_' + r });
     r++;
   }
 
@@ -6832,7 +6852,7 @@ function importaEsecutoriIncollati() {
 // ricreano quante ne servono (ricreaRigheDinamiche, in righe-dinamiche.js).
 // (Nel Mod. 4 le tabelle Prove e Brani non sono nella pagina: niente righe da ricreare.)
 var RIGHE_DINAMICHE_REFERENTE = [
-  { campi: ['replica_data_', 'replica_ora_', 'replica_luogo_', 'replica_confermata_', 'replica_trasporto_', 'replica_trasporto_note_', 'replica_vitto_', 'replica_alloggio_'], conta: function() { return replicheCount; }, aggiungi: addReplica },
+  { campi: ['replica_data_', 'replica_ora_', 'replica_tipo_', 'replica_durata_', 'replica_luogo_', 'replica_confermata_', 'replica_trasporto_', 'replica_trasporto_note_', 'replica_vitto_', 'replica_alloggio_'], conta: function() { return replicheCount; }, aggiungi: addReplica },
   { campi: ['programma_data_', 'programma_orario_', 'programma_descrizione_', 'programma_relatore_'], conta: function() { return programmaCount; }, aggiungi: addProgramma },
   { campi: ['relatore_nome_', 'relatore_qualifica_'], conta: function() { return relatoriCount; }, aggiungi: addRelatore },
   { campi: ['esec_nome_', 'esec_ruolo_', 'esec_qual_', 'esec_modalita_', 'esec_email_', 'esec_tel_'], conta: function() { return esecutoriCount; }, aggiungi: addEsecutore },

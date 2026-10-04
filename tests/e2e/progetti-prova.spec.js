@@ -15,7 +15,11 @@ const MODULI = [
 ];
 
 // Campi che restano vuoti di proposito anche in un progetto completo.
-const VUOTI_AMMESSI = /^spazio_concerto_altro$/;
+// Tipo e durata delle date aggiuntive (M4, intervento D): vuoti hanno un significato
+// (Sessione, durata della data principale) e il progetto di prova li lascia vuoti
+// per controllare che i testi restino quelli di prima (attesi/m4-progetto-di-prova.json);
+// compilati: m4-date-durata-tipo.spec.js.
+const VUOTI_AMMESSI = /^(spazio_concerto_altro|replica_tipo_\d+|replica_durata_\d+)$/;
 
 // Bug noti, segnalati e non ancora corretti: per modulo, i campi da escludere
 // dai controlli generali (con un test dedicato test.fail che li copre e che

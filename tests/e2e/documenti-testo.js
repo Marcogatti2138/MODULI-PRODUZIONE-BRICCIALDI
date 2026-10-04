@@ -27,15 +27,28 @@ function testiDocumenti({ quali, cfgDetermina }) {
     determinaTrasporti: () => { generaBozzaDeterminaTrasporti(1); return leggi('testo-determina-trasporti'); },
     pdfPreventivoNoleggio: () => pdf(() => generaPDFRichiestaPreventivoNoleggio(1, cfgDetermina)),
     pdfPreventivoTrasportoPersone: () => pdf(() => generaPDFRichiestaPreventivoTrasportoPersone()),
-    sintesiDate: () => { aggiornaSintesiCompleta(); return ['sint_data', 'sint_luogo', 'sint_repliche'].map(id => (document.getElementById(id) || {}).textContent).join(' | '); }
+    sintesiDate: () => { aggiornaSintesiCompleta(); return ['sint_data', 'sint_luogo', 'sint_repliche'].map(id => (document.getElementById(id) || {}).textContent).join(' | '); },
+    // Spazi, Assistenza e Calendario (intervento D): le righe delle tabelle con i valori dei campi
+    tabellaSpazi: () => { costruisciTabellaSpazi(); return righeTabella('spazi-tbody'); },
+    richiestaSpazi: () => { costruisciTabellaSpazi(); generaRichiestaSpazi(); return leggi('testo-spazi'); },
+    notificaSpaziReferente: () => { generaNotificaSpaziReferente(); return leggi('testo-notifica-spazi-referente'); },
+    tabellaAssistenza: () => { costruisciListaAssistenza(); return righeTabella('assistenza-logistica-tbody'); },
+    calendarioPDF: () => pdf(() => generaCalendarioPDF())
   };
+  function righeTabella(id) {
+    return Array.from(document.querySelectorAll('#' + id + ' tr')).map(tr => Array.from(tr.children).map(td => {
+      const campo = td.querySelector('input:not([type="checkbox"]), select');
+      return td.textContent.trim() + (campo ? '[' + campo.value + ']' : '');
+    }).join(' | ')).join('\n');
+  }
   const out = {};
   for (const nome of quali) out[nome] = DOCUMENTI[nome]();
   return out;
 }
 
 const DOCUMENTI_M4 = ['determinaAcquisti', 'richiestaNoleggio', 'centralino', 'dotazioneMateriale', 'determinaTrasportoPersone',
-  'determinaTrasporti', 'pdfPreventivoNoleggio', 'pdfPreventivoTrasportoPersone', 'sintesiDate'];
+  'determinaTrasporti', 'pdfPreventivoNoleggio', 'pdfPreventivoTrasportoPersone', 'sintesiDate',
+  'tabellaSpazi', 'richiestaSpazi', 'notificaSpaziReferente', 'tabellaAssistenza', 'calendarioPDF'];
 
 // Lo stesso progetto con la sola data principale: via repliche e date di concerto oltre la prima,
 // e i campi del Responsabile legati a loro (spazi, assistenza, trasporti delle repliche).

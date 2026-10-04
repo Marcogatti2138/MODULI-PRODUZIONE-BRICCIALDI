@@ -6,6 +6,10 @@
 // - Mod. 1-3: Determina Acquisti, sia col progetto di prova com'è (con repliche
 //   o più date di concerto) sia con una sola data;
 // - Mod. 4 con una sola data: tutti i documenti toccati da C.
+// Intervento D (durata e tipo di ogni data aggiuntiva): aggiunti Spazi, Assistenza
+// e Calendario PDF, e il Mod. 4 con più date com'è nel progetto di prova (senza
+// durata né tipo nelle date aggiuntive: tutto deve restare com'era). Testi
+// registrati dal codice del commit 0e1fb41, prima di D.
 // Per rigenerare i testi attesi (solo se un cambiamento è voluto e verificato):
 //   AGGIORNA_ATTESI=1 npx playwright test e2e/documenti-una-data.spec.js
 // "Oggi" = 15/01/2031. Dati inventati.
@@ -31,7 +35,8 @@ const CASI = [
   { nome: 'm2-una-data', sigla: 'M2', unaData: true, quali: ['determinaAcquisti'] },
   { nome: 'm3-progetto-di-prova', sigla: 'M3', unaData: false, quali: ['determinaAcquisti'] },
   { nome: 'm3-una-data', sigla: 'M3', unaData: true, quali: ['determinaAcquisti'] },
-  { nome: 'm4-una-data', sigla: 'M4', unaData: true, quali: DOCUMENTI_M4 }
+  { nome: 'm4-una-data', sigla: 'M4', unaData: true, quali: DOCUMENTI_M4 },
+  { nome: 'm4-progetto-di-prova', sigla: 'M4', unaData: false, quali: DOCUMENTI_M4 }
 ];
 
 for (const caso of CASI) {
