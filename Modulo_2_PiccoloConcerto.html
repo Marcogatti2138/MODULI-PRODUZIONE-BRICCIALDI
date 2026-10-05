@@ -7676,6 +7676,9 @@ function salvaResponsabileSuFirestore() {
     });
     // Metadati Richiesta Preventivo (protocollo, scadenza) — Trasporti/Noleggio/Personale
     document.querySelectorAll('input[name^="determina_trasp_"], input[name^="determina_nol_"], input[name^="determina_pers_"], input[name^="determina_trper_"]').forEach(function(el) {
+      // Caselle (es. deroga al principio di rotazione): spuntata sì/no, come nel Mod. 1 —
+      // el.value di una casella è sempre "on" e alla riapertura valeva "non spuntata".
+      if (el.type === 'checkbox') { dati[el.name] = el.checked; return; }
       if (el.value.trim()) dati[el.name] = el.value.trim();
     });
     // Spazi assegnati (Vista Spazi) — mancava, causava la perdita delle assegnazioni appena la tabella veniva ridisegnata

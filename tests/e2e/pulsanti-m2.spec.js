@@ -14,7 +14,7 @@
 // (Sezione 3) invece che dalla Distribuzione Organico.
 // I pulsanti si premono con un clic sull'elemento (anche se la sua sezione è chiusa):
 // parte lo stesso onclick che parte col mouse.
-// Bug trovati e non corretti: test.fail in fondo (K, L, N, O).
+// Bug trovati e non corretti: test.fail in fondo (K, L, O). Bug N corretto: test in fondo.
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -400,11 +400,25 @@ test.describe('M2 — bug noti dei pulsanti', () => {
     expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
   });
 
-  // Bug N: la casella "deroga al principio di rotazione" (Determina Personale
-  // Esterno) viene salvata con el.value, cioè sempre "on", spuntata o no; alla
-  // riapertura "on" vale "non spuntata" → la deroga si perde a ogni riapertura.
-  // Il Mod. 1 salva true/false; i Mod. 3 e 4 non hanno la casella.
-  test.fail('bug N — casella deroga rotazione: salvata true se spuntata, false se no', async ({ page }) => {
+  // Bug O: il Pacchetto Comunicazione del Mod. 2 non elenca le Repliche (il Mod. 1
+  // e il Mod. 4 sì, sezione "--- Repliche ---"): l'Ufficio Comunicazione non riceve
+  // le date delle repliche.
+  test.fail('bug O — Pacchetto Comunicazione con le Repliche', async ({ page, ambiente }) => {
+    const stato = await apri(page);
+    const comunicazione = await finestra(page, ambiente, stato, 'generaPacchettoComunicazione()', 'modal-comunicazione', 'Pacchetto Comunicazione — Ufficio Stampa');
+    expect(comunicazione).toContain('--- Repliche ---\n- 22/03/2031 — Sede Prova Replica 1\n- 29/03/2031 — Sede Prova Replica 2');
+  });
+});
+
+// Bug N (corretto): la casella "deroga al principio di rotazione" (Determina
+// Personale Esterno) veniva salvata con el.value, cioè sempre "on", spuntata o no,
+// e alla riapertura "on" valeva "non spuntata": la deroga si perdeva. Ora si salva
+// true/false come nel Mod. 1. I valori "on" già salvati restano "non spuntata"
+// (non si può sapere cosa fosse stato scelto): nessuna conversione automatica.
+test.describe('M2 — casella deroga rotazione (bug N)', () => {
+  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: PROGETTO } } });
+
+  test('salvata true se spuntata, false se tolta', async ({ page }) => {
     await apri(page);
     const ultimoValore = () => page.evaluate(() => {
       const s = window.__fintoDb.scritture().filter(s => s.dati && s.dati.dati_responsabile);
@@ -417,18 +431,22 @@ test.describe('M2 — bug noti dei pulsanti', () => {
     }, v);
     await imposta(true);
     await expect.poll(ultimoValore, { timeout: 8000 }).not.toBe('nessuna scrittura');
-    expect(await ultimoValore()).toBe(true);
+    await expect.poll(ultimoValore, { timeout: 8000 }).toBe(true);
     await imposta(false);
-    await page.waitForTimeout(3000);
-    expect(await ultimoValore()).toBe(false);
+    await expect.poll(ultimoValore, { timeout: 8000 }).toBe(false);
   });
+});
 
-  // Bug O: il Pacchetto Comunicazione del Mod. 2 non elenca le Repliche (il Mod. 1
-  // e il Mod. 4 sì, sezione "--- Repliche ---"): l'Ufficio Comunicazione non riceve
-  // le date delle repliche.
-  test.fail('bug O — Pacchetto Comunicazione con le Repliche', async ({ page, ambiente }) => {
-    const stato = await apri(page);
-    const comunicazione = await finestra(page, ambiente, stato, 'generaPacchettoComunicazione()', 'modal-comunicazione', 'Pacchetto Comunicazione — Ufficio Stampa');
-    expect(comunicazione).toContain('--- Repliche ---\n- 22/03/2031 — Sede Prova Replica 1\n- 29/03/2031 — Sede Prova Replica 2');
+test.describe('M2 — deroga rotazione salvata spuntata (bug N)', () => {
+  const progetto = JSON.parse(JSON.stringify(PROGETTO));
+  progetto.dati_responsabile.determina_pers_deroga_rotazione = true;
+  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: progetto } } });
+
+  test('si riapre spuntata e la Determina Personale riporta la deroga', async ({ page, ambiente }) => {
+    const stato = await apri(page, progetto);
+    expect(await page.locator('[name="determina_pers_deroga_rotazione"]').evaluate(c => c.checked)).toBe(true);
+    const bozza = await finestra(page, ambiente, stato, 'generaBozzaDeterminaPersonale()', 'modal-determina-personale', 'Bozza Determina — Personale Esterno');
+    expect(bozza).toContain('Della necessità di derogare al principio di rotazione');
+    expect(bozza).not.toContain('che l\'affidamento avviene nel rispetto del principio di rotazione');
   });
 });

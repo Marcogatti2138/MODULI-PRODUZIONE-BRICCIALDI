@@ -447,7 +447,7 @@
     "determina_pers_scadenza_data": "20/02/2031",
     "determina_pers_scadenza_ora": "12:00",
     "determina_pers_capitolo": "U.P.B. 1.1.2 art. 69 \"Collaborazione – Convenzione Orchestra – Corso Direzione d'Orchestra\"",
-    "determina_pers_deroga_rotazione": "on",
+    "determina_pers_deroga_rotazione": true,
     "determina_trper_prot_richiesta": "001/2031",
     "determina_trper_scadenza_data": "20/02/2031",
     "determina_trper_scadenza_ora": "12:00",
