@@ -1846,6 +1846,35 @@ var LOGO_BRICCIALDI_BASE64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD
         </table>
       </div>
 
+      <!-- Persone esterne — modalità (come nel Mod. 2; la riempie aggiornaSintesiCompleta) -->
+      <div class="sint-blocco" style="padding:16px 20px;border-bottom:1px solid var(--bordo);background:#FFF8E1">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--arancio);margin-bottom:10px">Persone Esterne da Reclutare <a href="javascript:void(0)" onclick="vaiASezione('sezione-5')" style="float:right;font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;color:#1A3C6B;text-decoration:none;cursor:pointer">→ Vai alla Sezione 5</a></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--rosso)" id="sint_pers_singolo">0</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px">Contratto<br>singolo</div>
+          </div>
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--rosso)" id="sint_pers_coop">0</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px">Cooperativa/<br>Preventivo</div>
+          </div>
+          <div style="background:var(--rosso);border-radius:7px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:white" id="sint_pers_tot">0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.85);margin-top:2px">TOTALE</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--arancio);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">📋 Dettaglio — Contratto singolo</div>
+            <div id="dettaglio-singolo" style="font-size:11px;color:var(--testo)">—</div>
+          </div>
+          <div style="background:white;border:1px solid var(--bordo);border-radius:7px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--arancio);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">📋 Dettaglio — Cooperativa/Preventivo</div>
+            <div id="dettaglio-coop" style="font-size:11px;color:var(--testo)">—</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Contatti -->
       <div class="sint-blocco" style="padding:16px 20px;border-bottom:1px solid var(--bordo)">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Contatti <a href="javascript:void(0)" onclick="vaiASezione('sezione-7')" style="float:right;font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;color:#1A3C6B;text-decoration:none;cursor:pointer">→ Vai alla Sezione 7</a></div>

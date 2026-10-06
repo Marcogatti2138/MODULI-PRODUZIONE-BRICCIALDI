@@ -12,8 +12,8 @@
 //   AGGIORNA_ATTESI=1 npx playwright test e2e/pulsanti-m4.spec.js
 // Differenze dal Mod. 1: niente Biblioteca né Personale esterno; Richiesta
 // Dotazione/Materiale; Trasporti senza tratte (elenco destinazioni; tratte del
-// prestito: backlog). Il pulsante "Richiedi dati" non compare (bug Q).
-// Bug trovati e non corretti: test.fail in fondo (K, L, Q, R).
+// prestito: backlog).
+// Bug trovati e non corretti: test.fail in fondo (K, L, R). Bug Q corretto: test in fondo.
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -377,19 +377,37 @@ test.describe('M4 — bug noti dei pulsanti', () => {
     expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
   });
 
-  // Bug Q: il pulsante "Richiedi dati" (mail Dati anagrafici) per gli esterni con
-  // Contratto singolo non compare mai nel Mod. 4: aggiornaSintesiCompleta lo
-  // prepara ma nella pagina manca il contenitore #dettaglio-singolo (c'è nei Mod. 1-3).
-  // Nel progetto di prova l'esecutore 5 è Collaboratore esterno con Contratto singolo.
-  test.fail('bug Q — pulsante "Richiedi dati" per l\'esecutore esterno con Contratto singolo', async ({ page }) => {
-    await apri(page, VARIANTE);
-    await expect(page.locator('button[onclick="generaRichiestaDatiAnagrafici(this)"]')).toHaveCount(1, { timeout: 2000 });
-  });
-
   // Bug R: Richiesta trasferta persone, refuso "confermare disponibilita" (senza accento). Solo Mod. 4.
   test.fail('bug R — Richiesta trasferta persone: "disponibilità" con l\'accento', async ({ page, ambiente }) => {
     const stato = await apri(page, VARIANTE);
     const richiesta = await finestra(page, ambiente, stato, 'generaRichiestaTrasfertaPersone()', 'modal-trasferta-persone', 'Richiesta trasferta persone — Ufficio Acquisti');
     expect(richiesta).toContain('Si prega di confermare disponibilità e procedere');
+  });
+});
+
+// Bug Q (corretto): nella Sintesi del Mod. 4 mancava il riquadro "Persone esterne"
+// (contatori e dettagli Contratto singolo / Cooperativa): aggiornaSintesiCompleta
+// lo riempiva ma non trovava dove scrivere, e il pulsante "Richiedi dati" (mail
+// Dati anagrafici) per gli esterni con Contratto singolo non compariva mai.
+// Nel progetto di prova solo l'esecutore 5 è Collaboratore esterno (Contratto singolo).
+test.describe('M4 — Persone esterne in Sintesi e Richiesta dati anagrafici (bug Q)', () => {
+  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: PROGETTO } } });
+
+  test('contatori, dettagli e pulsante "Richiedi dati" che apre la mail all\'esecutore esterno', async ({ page, ambiente }) => {
+    const stato = await apri(page);
+    expect(await page.evaluate(() => ['sint_pers_singolo', 'sint_pers_coop', 'sint_pers_tot'].map(id => (document.getElementById(id) || {}).textContent)))
+      .toEqual(['1', '0', '1']);
+    expect(await page.evaluate(() => (document.getElementById('dettaglio-coop') || {}).textContent)).toBe('Nessuno');
+    expect(await page.evaluate(() => (document.getElementById('dettaglio-singolo') || {}).textContent))
+      .toBe('• ' + R.esec_nome_5 + ' (' + R.esec_ruolo_5 + ') — ' + R.esec_email_5 + ' / ' + R.esec_tel_5 + ' 📤 Richiedi dati');
+    await expect(page.locator('button[onclick="generaRichiestaDatiAnagrafici(this)"]')).toHaveCount(1);
+
+    const anagrafici = await premi(page, ambiente, stato, 'generaRichiestaDatiAnagrafici(this)');
+    senzaProblemi(anagrafici, 'Richiedi dati');
+    expect(anagrafici.mail).toHaveLength(1);
+    expect(anagrafici.mail[0]).toMatchObject({ a: R.esec_email_5, cc: 'ufficiopersonale@briccialditerni.it', oggetto: 'Dati per l\'incarico e biografia artistica - ' + TITOLO });
+    for (const atteso of ['Gentile ' + R.esec_nome_5 + ' (' + R.esec_ruolo_5 + '),', 'Email: ' + R.esec_email_5, 'Cellulare: ' + R.esec_tel_5]) expect(anagrafici.mail[0].corpo).toContain(atteso);
+    confrontaConAttesi(ATTESI, 'datiAnagrafici', anagrafici.mail[0].corpo);
+    expect((await richiesteRegistrate(page)).some(k => k.startsWith('dati_anagrafici_nome_prova_esec_5'))).toBe(true);
   });
 });
