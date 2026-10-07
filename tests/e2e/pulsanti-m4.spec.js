@@ -13,8 +13,8 @@
 // Differenze dal Mod. 1: niente Biblioteca né Personale esterno; Richiesta
 // Dotazione/Materiale; Trasporti senza tratte (elenco destinazioni; tratte del
 // prestito: backlog).
-// Bug trovati e non corretti: test.fail in fondo (L, R). Bug Q corretto: test in fondo.
-// Bug K corretto: controllato nella variante (Richiesta Spazi).
+// Bug trovati e non corretti: test.fail in fondo (R). Bug Q corretto: test in fondo.
+// Bug K corretto: controllato nella variante (Richiesta Spazi). Bug L corretto: test del Centralino.
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -274,6 +274,12 @@ test.describe('M4 — pulsanti di generazione', () => {
     for (const v of ['- Leggii:', 'Podio']) expect(centralino).not.toContain(v);
     // La sezione Dotazione è quella registrata per l'intervento D (testo della richiesta singola).
     expect(centralino).toContain(ATTESI_D.centralino.split('\n').slice(2, -4).join('\n'));
+    // Una sola chiusura nella mail unita (bug L, corretto): "Grazie per la collaborazione." una
+    // volta, "Cordiali saluti," e firma "Ufficio Produzione"; via la firma "Responsabile Produzione".
+    expect(centralino.endsWith('Si prega di confermare disponibilità.\n\nGrazie per la collaborazione.\n\nCordiali saluti,\nUfficio Produzione')).toBe(true);
+    expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
+    expect(centralino.match(/Grazie per la collaborazione/g)).toHaveLength(1);
+    expect(centralino).not.toContain('Responsabile Produzione');
     confrontaConAttesi(ATTESI, 'centralino', centralino);
     await mail(page, ambiente, stato, 'apriMailCentralinoUnificata()', { a: 'centralino@briccialditerni.it', cc: 'produzione@briccialditerni.it', oggetto: '[Richiesta Centralino] ' + TITOLO }, centralino);
 
@@ -322,6 +328,12 @@ test.describe('M4 — variante: date aggiuntive Concerto con la loro durata', ()
     const centralino = await finestra(page, ambiente, stato, 'generaMailCentralino()', 'modal-centralino-unificata', 'Mail Centralino');
     for (const atteso of ['- 22/03/2031 (Concerto) — Sede Prova Replica 1', '- 29/03/2031 (Concerto) — Sede Prova Replica 2', '- Replica 1 (Concerto) — 22/03/2031 — Sede Prova Replica 1 — 3 studenti'])
       expect(centralino).toContain(atteso);
+    // Una sola chiusura nella mail unita (bug L, corretto): "Grazie per la collaborazione." una
+    // volta, "Cordiali saluti," e firma "Ufficio Produzione"; via la firma "Responsabile Produzione".
+    expect(centralino.endsWith('Si prega di confermare disponibilità.\n\nGrazie per la collaborazione.\n\nCordiali saluti,\nUfficio Produzione')).toBe(true);
+    expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
+    expect(centralino.match(/Grazie per la collaborazione/g)).toHaveLength(1);
+    expect(centralino).not.toContain('Responsabile Produzione');
     confrontaConAttesi(ATTESI, 'varianteCentralino', centralino);
     await chiudiFinestre(page);
 
@@ -361,13 +373,6 @@ test.describe('M4 — Sollecito con un dato mancante', () => {
 // corretto il test diventa rosso: togliere test.fail e aggiornare gli attesi.
 test.describe('M4 — bug noti dei pulsanti', () => {
   test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: VARIANTE } } });
-
-  // Bug L: Mail Centralino con Dotazione e Assistenza: due saluti finali. Mod. 1-4.
-  test.fail('bug L — Mail Centralino: un solo saluto finale', async ({ page, ambiente }) => {
-    const stato = await apri(page, VARIANTE);
-    const centralino = await finestra(page, ambiente, stato, 'generaMailCentralino()', 'modal-centralino-unificata', 'Mail Centralino');
-    expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
-  });
 
   // Bug R: Richiesta trasferta persone, refuso "confermare disponibilita" (senza accento). Solo Mod. 4.
   test.fail('bug R — Richiesta trasferta persone: "disponibilità" con l\'accento', async ({ page, ambiente }) => {

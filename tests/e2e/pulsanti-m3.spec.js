@@ -11,7 +11,7 @@
 // Mail Centralino), nessun Personale esterno, Dati anagrafici del docente esterno.
 // Nel progetto di prova i concerti non hanno trasporto materiale (casella non
 // spuntata): le tratte sono solo prestito, prima lezione, rientro.
-// Bug trovati e non corretti: test.fail in fondo (L). Bug P corretto (date ripetute nel
+// Bug corretti: L (test del Centralino e variante senza Assistenza in fondo), P (date ripetute nel
 // PDF Preventivo Trasporti): controllato nel test dei Trasporti.
 // "Oggi" = 15/01/2031. Dati inventati.
 
@@ -291,6 +291,12 @@ test.describe('M3 — pulsanti di generazione', () => {
       '- Sedie: 40', 'Periodo generale: dal 15/03/2031 al 17/03/2031', '· 18/03/2031 (21:00 — Concerto 2) — Teatro Secci',
       '📤 Prelievo (uscita dal Conservatorio): 15/03/2031', '- Lezione 1 — 15/03/2031 — capienza: 3 — 3 studenti — orario: 15:00 – 18:30']) expect(centralino).toContain(atteso);
     expect(centralino, 'i leggii arrivano in prestito').not.toContain('- Leggii:');
+    // Una sola chiusura nella mail unita (bug L, corretto): "Grazie per la collaborazione." una
+    // volta, "Cordiali saluti," e firma "Ufficio Produzione"; via la firma "Responsabile Produzione".
+    expect(centralino.endsWith('Si prega di confermare disponibilità.\n\nGrazie per la collaborazione.\n\nCordiali saluti,\nUfficio Produzione')).toBe(true);
+    expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
+    expect(centralino.match(/Grazie per la collaborazione/g)).toHaveLength(1);
+    expect(centralino).not.toContain('Responsabile Produzione');
     confrontaConAttesi(ATTESI, 'centralino', centralino);
     await mail(page, ambiente, stato, 'apriMailCentralinoUnificata()', { a: 'centralino@briccialditerni.it', cc: 'produzione@briccialditerni.it', oggetto: '[Richiesta Centralino] ' + TITOLO }, centralino);
     await chiudiFinestre(page);
@@ -319,19 +325,21 @@ test.describe('M3 — Sollecito con un dato mancante', () => {
   });
 });
 
-// Bug trovati con questi test, segnalati e NON corretti: test.fail = il test
-// descrive il comportamento giusto e oggi fallisce. Quando il bug viene
-// corretto il test diventa rosso: togliere test.fail e aggiornare gli attesi.
-// (Il bug K non riguarda il Mod. 3: gli orari di concerto non vengono estesi.)
-test.describe('M3 — bug noti dei pulsanti', () => {
-  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: PROGETTO } } });
+// Bug L, scelta (b) di Marco: nella mail Centralino unita "Grazie per la collaborazione."
+// compare solo se c'è la sezione Assistenza (veniva dalla sua chiusura). Variante senza
+// assistenza (logistica e video non richieste): la mail ha solo Spazi + Dotazione.
+test.describe('M3 — Mail Centralino senza Assistenza (bug L)', () => {
+  const progetto = JSON.parse(JSON.stringify(PROGETTO));
+  Object.assign(progetto.dati_referente, { ass_log_check_prova_1: false, ass_av_richiesto: false });
+  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: progetto } } });
 
-  // Bug L: Mail Centralino con più sezioni: la sezione Assistenza tiene la sua
-  // chiusura ("Cordiali saluti, / Responsabile Produzione") e la mail ha due
-  // saluti. Stesso codice nei Mod. 1, 2, 4.
-  test.fail('bug L — Mail Centralino: un solo saluto finale', async ({ page, ambiente }) => {
-    const stato = await apri(page);
+  test('Spazi + Dotazione: una sola chiusura, senza "Grazie per la collaborazione."', async ({ page, ambiente }) => {
+    const stato = await apri(page, progetto);
     const centralino = await finestra(page, ambiente, stato, 'generaMailCentralino()', 'modal-centralino-unificata', 'Mail Centralino');
+    expect(centralino.match(/^── [A-Z ]+ ──$/mg)).toEqual(['── SPAZI ──', '── DOTAZIONE TECNICA ──']);
+    expect(centralino.endsWith('Si prega di confermare la preparazione.\n\nSi prega di confermare disponibilità.\n\nCordiali saluti,\nUfficio Produzione')).toBe(true);
     expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
+    expect(centralino).not.toContain('Grazie per la collaborazione');
+    confrontaConAttesi(ATTESI, 'centralinoSenzaAssistenza', centralino);
   });
 });

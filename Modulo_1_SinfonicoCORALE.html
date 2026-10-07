@@ -7674,7 +7674,7 @@ function generaMailCentralino() {
       // resta solo il corpo specifico.
       var corpo = p.lines.join('\n')
         .replace(/^Gentile[^\n]*\n+/, '')
-        .replace(/\n*Cordiali saluti,\n*Ufficio Produzione\s*$/, '')
+        .replace(/\n*(Grazie per la collaborazione\.\s*)?Cordiali saluti,\n*(Ufficio|Responsabile) Produzione\s*$/, '') // anche la chiusura dell'Assistenza (bug L)
         .trim();
       lines.push('');
       lines.push('── ' + p.sezione.etichetta + ' ──');
@@ -7683,6 +7683,11 @@ function generaMailCentralino() {
     lines.push('');
     lines.push('Si prega di confermare disponibilità.');
     lines.push('');
+    // "Grazie per la collaborazione." solo se c'è l'Assistenza (era nella sua chiusura, tolta sopra).
+    if (piene.some(function(p) { return p.sezione.etichetta === 'ASSISTENZA STUDENTI'; })) {
+      lines.push('Grazie per la collaborazione.');
+      lines.push('');
+    }
     lines.push('Cordiali saluti,');
     lines.push('Ufficio Produzione');
     window._oggettoMailCentralino = '[Richiesta Centralino]';

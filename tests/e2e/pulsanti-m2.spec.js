@@ -14,7 +14,7 @@
 // (Sezione 3) invece che dalla Distribuzione Organico.
 // I pulsanti si premono con un clic sull'elemento (anche se la sua sezione è chiusa):
 // parte lo stesso onclick che parte col mouse.
-// Bug trovati e non corretti: test.fail in fondo (L). Bug K, N e O corretti (K: test degli Spazi; O: Repliche
+// Bug corretti: K, L, N, O, P (K: test degli Spazi; L: test del Centralino; N e P: in fondo; O: Repliche
 // nel Pacchetto Comunicazione, controllate nel test della Comunicazione).
 // "Oggi" = 15/01/2031. Dati inventati.
 
@@ -309,6 +309,12 @@ test.describe('M2 — pulsanti di generazione', () => {
       '- Prova 1 — 10/03/2031 — Sala Orologio — 3 studenti — orario: 15:00 – 18:30']) expect(centralino).toContain(atteso);
     // Leggii e podio arrivano in prestito: non li prepara il Centralino.
     for (const v of ['- Leggii:', 'Podio']) expect(centralino).not.toContain(v);
+    // Una sola chiusura nella mail unita (bug L, corretto): "Grazie per la collaborazione." una
+    // volta, "Cordiali saluti," e firma "Ufficio Produzione"; via la firma "Responsabile Produzione".
+    expect(centralino.endsWith('Si prega di confermare disponibilità.\n\nGrazie per la collaborazione.\n\nCordiali saluti,\nUfficio Produzione')).toBe(true);
+    expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
+    expect(centralino.match(/Grazie per la collaborazione/g)).toHaveLength(1);
+    expect(centralino).not.toContain('Responsabile Produzione');
     confrontaConAttesi(ATTESI, 'centralino', centralino);
     await mail(page, ambiente, stato, 'apriMailCentralinoUnificata()', { a: 'centralino@briccialditerni.it', cc: 'produzione@briccialditerni.it', oggetto: '[Richiesta Centralino] ' + TITOLO }, centralino);
     await chiudiFinestre(page);
@@ -375,23 +381,6 @@ test.describe('M2 — Sollecito con un dato mancante', () => {
     expect(sollecito).toContain('mancano ancora i seguenti dati:\n\n- Durata stimata\n\n');
     confrontaConAttesi(ATTESI, 'sollecitoDurataMancante', sollecito);
     await mail(page, ambiente, stato, 'apriMailSollecito()', { a: PROGETTO.dati_referente.doc_email_1, cc: 'produzione@briccialditerni.it', oggetto: '[' + TITOLO + '] Richiesta integrazione dati' }, sollecito);
-  });
-});
-
-// Bug trovati con questi test, segnalati e NON corretti: test.fail = il test
-// descrive il comportamento giusto e oggi fallisce. Quando il bug viene
-// corretto il test diventa rosso: togliere test.fail e aggiornare gli attesi.
-test.describe('M2 — bug noti dei pulsanti', () => {
-  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: PROGETTO } } });
-
-  // Bug L: Mail Centralino con Dotazione e Assistenza insieme: la sezione
-  // Assistenza tiene la sua chiusura ("Grazie per la collaborazione. / Cordiali
-  // saluti, / Responsabile Produzione") e la mail ha due saluti. Si toglie solo la
-  // firma "Ufficio Produzione". Stesso codice nei Mod. 1, 3, 4.
-  test.fail('bug L — Mail Centralino: un solo saluto finale', async ({ page, ambiente }) => {
-    const stato = await apri(page);
-    const centralino = await finestra(page, ambiente, stato, 'generaMailCentralino()', 'modal-centralino-unificata', 'Mail Centralino');
-    expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
   });
 });
 
