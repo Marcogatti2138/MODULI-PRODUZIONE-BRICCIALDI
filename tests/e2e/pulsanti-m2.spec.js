@@ -9,12 +9,13 @@
 //   prodotto dal codice del commit de5baf3). Per rigenerarlo, solo per cambi voluti:
 //     AGGIORNA_ATTESI=1 npx playwright test e2e/pulsanti-m2.spec.js
 // Stessi pulsanti del Mod. 1 (pulsanti-m1.spec.js) e, a parità di dati, stessi testi,
-// tranne: Comunicazione senza Repliche (bug O), PDF Preventivo Trasporto persone
+// tranne: PDF Preventivo Trasporto persone
 // scritto in una copia propria del modulo, Personale esterno preso dagli Esecutori
 // (Sezione 3) invece che dalla Distribuzione Organico.
 // I pulsanti si premono con un clic sull'elemento (anche se la sua sezione è chiusa):
 // parte lo stesso onclick che parte col mouse.
-// Bug trovati e non corretti: test.fail in fondo (K, L, O). Bug N corretto: test in fondo.
+// Bug trovati e non corretti: test.fail in fondo (K, L). Bug N e O corretti (O: Repliche
+// nel Pacchetto Comunicazione, controllate nel test della Comunicazione).
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -135,6 +136,7 @@ test.describe('M2 — pulsanti di generazione', () => {
 
     const comunicazione = await finestra(page, ambiente, stato, 'generaPacchettoComunicazione()', 'modal-comunicazione', 'Pacchetto Comunicazione — Ufficio Stampa');
     for (const atteso of ['Data: 15/03/2031', 'Ora: 21:00', 'Luogo: Teatro Secci',
+      '--- Repliche ---\n- 22/03/2031 — Sede Prova Replica 1\n- 29/03/2031 — Sede Prova Replica 2',
       PROGETTO.dati_referente.testo_descr, PROGETTO.dati_referente.bio_artisti, PROGETTO.dati_referente.locandina]) expect(comunicazione).toContain(atteso);
     confrontaConAttesi(ATTESI, 'comunicazione', comunicazione);
     await mail(page, ambiente, stato, 'apriMailComunicazione()', { a: 'ufficiocomunicazione@briccialditerni.it', cc: 'produzione@briccialditerni.it', oggetto: '[Materiale comunicazione] ' + TITOLO + ' — ID ' + ID }, comunicazione);
@@ -398,15 +400,6 @@ test.describe('M2 — bug noti dei pulsanti', () => {
     const stato = await apri(page);
     const centralino = await finestra(page, ambiente, stato, 'generaMailCentralino()', 'modal-centralino-unificata', 'Mail Centralino');
     expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
-  });
-
-  // Bug O: il Pacchetto Comunicazione del Mod. 2 non elenca le Repliche (il Mod. 1
-  // e il Mod. 4 sì, sezione "--- Repliche ---"): l'Ufficio Comunicazione non riceve
-  // le date delle repliche.
-  test.fail('bug O — Pacchetto Comunicazione con le Repliche', async ({ page, ambiente }) => {
-    const stato = await apri(page);
-    const comunicazione = await finestra(page, ambiente, stato, 'generaPacchettoComunicazione()', 'modal-comunicazione', 'Pacchetto Comunicazione — Ufficio Stampa');
-    expect(comunicazione).toContain('--- Repliche ---\n- 22/03/2031 — Sede Prova Replica 1\n- 29/03/2031 — Sede Prova Replica 2');
   });
 });
 

@@ -4518,6 +4518,20 @@ function generaPacchettoComunicazione() {
   if (oraC)   lines.push('Ora: ' + oraC);
   if (luogoC) lines.push('Luogo: ' + luogoC);
 
+  // Repliche (come nel Mod. 1): data e luogo, il luogo del concerto se la replica non ne ha uno.
+  var repliche = [];
+  var r = 1;
+  while (document.querySelector('[name="replica_data_' + r + '"]')) {
+    var dR = getField('replica_data_' + r), lR = getField('replica_luogo_' + r) || luogoC;
+    if (dR) repliche.push(dR + (lR ? ' — ' + lR : ''));
+    r++;
+  }
+  if (repliche.length > 0) {
+    lines.push('');
+    lines.push('--- Repliche ---');
+    repliche.forEach(function(v) { lines.push('- ' + v); });
+  }
+
   lines.push('');
   lines.push('--- Foto ---');
   if (getField('foto_ensemble')) lines.push('Foto ensemble/orchestra: ' + getField('foto_ensemble'));
