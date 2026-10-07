@@ -6206,14 +6206,14 @@ function generaPDFRichiestaPreventivoTrasporti(istanza) {
   var pp = 1;
   while (document.querySelector('[name="prova_data_' + pp + '"]')) {
     var dP = getField('prova_data_' + pp);
-    if (dP) dateProve.push(dP);
+    if (dP && dateProve.indexOf(dP) < 0) dateProve.push(dP); // ogni giorno una volta sola, anche con più prove/lezioni
     pp++;
   }
   var dateConcerti = [];
   var dcp = 1;
   while (document.querySelector('[name="dataconcerto_data_' + dcp + '"]')) {
     var dCp = getField('dataconcerto_data_' + dcp);
-    if (dCp) dateConcerti.push(dCp);
+    if (dCp && dateConcerti.indexOf(dCp) < 0) dateConcerti.push(dCp);
     dcp++;
   }
   var frasiDate = '';

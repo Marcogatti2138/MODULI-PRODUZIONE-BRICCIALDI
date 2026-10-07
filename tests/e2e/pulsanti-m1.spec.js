@@ -391,3 +391,18 @@ test.describe('M1 — bug noti dei pulsanti', () => {
     expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
   });
 });
+
+// Bug P (corretto): nel PDF Preventivo Trasporti la frase delle date elencava ogni
+// prova e ogni concerto/replica, anche con la stessa data ripetuta. Variante: la
+// prova 2 lo stesso giorno della prova 1, la replica 1 lo stesso giorno del concerto.
+test.describe('M1 — PDF Preventivo Trasporti con date ripetute (bug P)', () => {
+  const progetto = JSON.parse(JSON.stringify(PROGETTO));
+  Object.assign(progetto.dati_referente, { prova_data_2: progetto.dati_referente.prova_data_1, replica_data_1: progetto.dati_referente.data_evento });
+  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: progetto } } });
+
+  test('ogni giorno di prova e di concerto una volta sola', async ({ page, ambiente }) => {
+    const stato = await apri(page, progetto);
+    const preventivo = await pdf(page, ambiente, stato, 'generaPDFRichiestaPreventivoTrasporti()', 'Richiesta_Preventivo_Trasporti_Progetto_di_prova_completo_M1.pdf');
+    expect(unaRiga(preventivo)).toContain('con prove nei giorni 10/03/2031, 12/03/2031, 13/03/2031, 14/03/2031, 15/03/2031 e concerti nei giorni 15/03/2031, 29/03/2031, con successivo ritiro');
+  });
+});

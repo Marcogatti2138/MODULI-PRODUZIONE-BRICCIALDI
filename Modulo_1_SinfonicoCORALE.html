@@ -6529,7 +6529,7 @@ function generaPDFRichiestaPreventivoTrasporti(istanza) {
   var pp = 1;
   while (document.querySelector('[name="prova_data_' + pp + '"]')) {
     var dP = getField('prova_data_' + pp);
-    if (dP) dateProve.push(dP);
+    if (dP && dateProve.indexOf(dP) < 0) dateProve.push(dP); // ogni giorno una volta sola, anche con più prove/lezioni
     pp++;
   }
   // Concerto principale (Sezione 1) e Repliche: i campi dataconcerto_ esistono
@@ -6539,7 +6539,7 @@ function generaPDFRichiestaPreventivoTrasporti(istanza) {
   var rcp = 1;
   while (document.querySelector('[name="replica_data_' + rcp + '"]')) {
     var dRp = getField('replica_data_' + rcp);
-    if (dRp) dateConcerti.push(dRp);
+    if (dRp && dateConcerti.indexOf(dRp) < 0) dateConcerti.push(dRp); // replica nello stesso giorno del concerto: una volta sola
     rcp++;
   }
   var frasiDate = '';

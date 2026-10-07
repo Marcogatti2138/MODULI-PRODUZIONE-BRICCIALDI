@@ -11,7 +11,8 @@
 // Mail Centralino), nessun Personale esterno, Dati anagrafici del docente esterno.
 // Nel progetto di prova i concerti non hanno trasporto materiale (casella non
 // spuntata): le tratte sono solo prestito, prima lezione, rientro.
-// Bug trovati e non corretti: test.fail in fondo (L, P).
+// Bug trovati e non corretti: test.fail in fondo (L). Bug P corretto (date ripetute nel
+// PDF Preventivo Trasporti): controllato nel test dei Trasporti.
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -200,7 +201,8 @@ test.describe('M3 — pulsanti di generazione', () => {
     const preventivo = await pdf(page, ambiente, stato, 'generaPDFRichiestaPreventivoTrasporti()', 'Richiesta_Preventivo_Trasporti_Progetto_di_prova_completo_M3.pdf');
     inOrdine(unaRiga(preventivo), 'PDF Preventivo Trasporti');
     for (const atteso of ['RICHIESTA DI PREVENTIVO', 'Dott.ssa Alessandra Angelucci', 'Leggii: 28 — in prestito da Sede Prestito Prova leggii', 'entro le ore 12:00 del 20/02/2031',
-      'e concerti nei giorni 17/03/2031, 18/03/2031']) expect(unaRiga(preventivo)).toContain(atteso);
+      // ogni giorno una volta sola, anche con due lezioni lo stesso giorno (bug P, corretto)
+      'con lezioni nei giorni 15/03/2031, 16/03/2031, 17/03/2031 e concerti nei giorni 17/03/2031, 18/03/2031']) expect(unaRiga(preventivo)).toContain(atteso);
     anniCoerenti(preventivo, 'PDF Preventivo Trasporti');
     confrontaConAttesi(ATTESI, 'pdfPreventivoTrasporti', preventivo);
 
@@ -331,14 +333,5 @@ test.describe('M3 — bug noti dei pulsanti', () => {
     const stato = await apri(page);
     const centralino = await finestra(page, ambiente, stato, 'generaMailCentralino()', 'modal-centralino-unificata', 'Mail Centralino');
     expect(centralino.match(/Cordiali saluti/g)).toHaveLength(1);
-  });
-
-  // Bug P: PDF Preventivo Trasporti, frase delle date: una data per ogni lezione,
-  // anche ripetuta (due lezioni lo stesso giorno → "15/03/2031, 15/03/2031, ...").
-  // Stesso codice nei Mod. 1 e 2 (prove), dove si vede con due prove nello stesso giorno.
-  test.fail('bug P — PDF Preventivo Trasporti: ogni giorno di lezione una volta sola', async ({ page, ambiente }) => {
-    const stato = await apri(page);
-    const preventivo = await pdf(page, ambiente, stato, 'generaPDFRichiestaPreventivoTrasporti()', 'Richiesta_Preventivo_Trasporti_Progetto_di_prova_completo_M3.pdf');
-    expect(unaRiga(preventivo)).toContain('con lezioni nei giorni 15/03/2031, 16/03/2031, 17/03/2031 e concerti nei giorni 17/03/2031, 18/03/2031');
   });
 });
