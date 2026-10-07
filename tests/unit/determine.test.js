@@ -10,6 +10,7 @@ const { funzioniDelFile, caricaFile } = require('../helpers/estrai-funzioni');
 const importi = caricaFile('importi.js');
 const legale = caricaFile('determina-legale.js', {
   parseImportoIt: importi.parseImportoIt, formattaImportoIt: importi.formattaImportoIt, calcolaIva22: importi.calcolaIva22,
+  importoPerTesto: importi.importoPerTesto, importoInFormaChiara: importi.importoInFormaChiara,
   metadati: { id: '9601', titolo: 'Progetto di prova', delibera: '00', data_delibera: '01/01/2030' }
 });
 
@@ -123,5 +124,90 @@ for (const [nome, file, funzione] of COPIE_LOCALI) {
   test(nome + ' (copia locale) — stesse clausole, stessa regola RUP, IVA da importi.js', () => {
     const sorgente = funzioniDelFile(file)[funzione].replace(/\\'/g, '\'');
     for (const frase of FRASI) assert.ok(sorgente.includes(frase.replace(/\\'/g, '\'')), 'manca: ' + frase.slice(0, 70));
+  });
+}
+
+// Bug T — l'importo della ditta scelta e delle altre offerte era scritto com'era
+// digitato ("€ 12000"), mentre IVA e totale erano già riscritti all'italiana
+// ("14.640,00"). Decisione di Marco (07/10/2026): si riscrive l'importo solo se è
+// in una forma sicura (interi, migliaia col punto, decimali con virgola, un solo
+// punto con 1-2 decimali), con la stessa lettura già usata per IVA e totale;
+// le altre forme restano come scritte e la Determina mostra un avviso ⚠.
+// Nessun valore calcolato cambia.
+const CASI_T = [
+  // [scritto, come deve comparire nel testo (null = resta com'è scritto)]
+  ['12000', '12.000,00'],
+  ['1234,5', '1.234,50'],
+  ['1234.56', '1.234,56'],
+  ['1.234,50', '1.234,50'],
+  ['1.234', '1.234,00'],
+  ['12.000', '12.000,00'],
+  ['12,5', '12,50'],
+  ['1.50', '1,50'],
+  ['850', '850,00'],
+  ['€ 850', '850,00'],
+  ['1.234.567', '1.234.567,00'],
+  ['1,234', null],
+  ['1.234.56', null]
+];
+const AVVISO_NON_CHIARO = '⚠ Importo scritto in forma non chiara';
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// "€ 12,5" non deve comparire, ma "€ 12,50" sì: dopo l'importo niente cifre né separatori seguiti da cifre.
+const importoNelTesto = (t, s) => new RegExp('€ ' + escRe(s) + '(?![\\d]|[.,]\\d)').test(t);
+
+for (const f of FINALITA) {
+  test(f.nome + ' — bug T: importo della ditta scelta riscritto solo se in forma sicura, valori calcolati invariati', () => {
+    for (const [scritto, atteso] of CASI_T) {
+      const t = testo(f.costruttore, { importo: scritto }, [{ ditta: 'Ditta Prova Due', importo: '900,00', prot: '0002', data: '02/01/2030', indirizzo: 'Via Inventata 2', piva: '11111111111' }]);
+      const n = importi.parseImportoIt(scritto);
+      const iva = importi.calcolaIva22(n);
+      // IVA e totale: la stessa lettura di sempre
+      assert.ok(t.includes(importi.formattaImportoIt(iva.totale)), scritto + ': totale ' + importi.formattaImportoIt(iva.totale));
+      assert.ok(t.includes(importi.formattaImportoIt(iva.iva)), scritto + ': IVA ' + importi.formattaImportoIt(iva.iva));
+      if (atteso) {
+        assert.equal(importi.formattaImportoIt(n), atteso, scritto + ': stessa lettura di IVA e totale');
+        assert.ok(importoNelTesto(t, atteso), scritto + ': atteso € ' + atteso);
+        if (atteso !== scritto.replace('€ ', '')) assert.ok(!importoNelTesto(t, scritto.replace('€ ', '')), scritto + ': non deve restare com\'è scritto');
+        assert.ok(!t.includes(AVVISO_NON_CHIARO), scritto + ': nessun avviso');
+      } else {
+        assert.ok(importoNelTesto(t, scritto), scritto + ': resta com\'è scritto');
+        assert.ok(t.includes(AVVISO_NON_CHIARO + ': € ' + scritto + ' (Ditta Prova Uno)'), scritto + ': avviso');
+      }
+    }
+  });
+
+  test(f.nome + ' — bug T: importi delle altre offerte riscritti come quello scelto', () => {
+    for (const [scritto, atteso] of CASI_T) {
+      const t = testo(f.costruttore, {}, [{ ditta: 'Ditta Prova Due', importo: scritto, prot: '0002', data: '02/01/2030', indirizzo: 'Via Inventata 2', piva: '11111111111' }]);
+      const riga = t.split('\n').find(r => r.includes('Ditta Prova Due, con sede'));
+      assert.ok(riga, 'riga della seconda offerta');
+      if (atteso) {
+        assert.ok(riga.includes('per un importo di € ' + atteso + ' oltre IVA'), scritto + ': ' + riga);
+        assert.ok(!t.includes(AVVISO_NON_CHIARO), scritto + ': nessun avviso');
+      } else {
+        assert.ok(riga.includes('per un importo di € ' + scritto + ' oltre IVA'), scritto + ': resta com\'è scritto');
+        assert.ok(t.includes(AVVISO_NON_CHIARO + ': € ' + scritto + ' (Ditta Prova Due)'), scritto + ': avviso');
+      }
+    }
+  });
+}
+
+test('Bug T — importo non leggibile: resta com\'è scritto, solo l\'avviso di sempre', () => {
+  for (const f of FINALITA) {
+    const t = testo(f.costruttore, { importo: 'da definire' });
+    assert.match(t, /⚠ Importo non riconosciuto/);
+    assert.ok(t.includes('€ da definire'), f.nome);
+    assert.ok(!t.includes(AVVISO_NON_CHIARO), f.nome);
+  }
+});
+
+// Copie locali: nessun importo scritto com'è digitato, stessa riscrittura e stesso avviso.
+for (const [nome, file, funzione] of COPIE_LOCALI) {
+  test(nome + ' (copia locale) — bug T: importi riscritti con importoPerTesto e avviso per le forme non chiare', () => {
+    const sorgente = funzioniDelFile(file)[funzione];
+    assert.doesNotMatch(sorgente, /\+\s*(scelto|p)\.importo\b|(scelto|p)\.importo\s*\+/, 'importo scritto com\'è digitato');
+    assert.ok(sorgente.includes('importoPerTesto(scelto.importo)'), 'importoPerTesto per la ditta scelta');
+    assert.ok(sorgente.includes('importoPerTesto(p.importo)'), 'importoPerTesto per le offerte');
+    assert.ok(sorgente.includes('avvisiImportiNonChiari(preventivi)'), 'avviso per le forme non chiare');
   });
 }

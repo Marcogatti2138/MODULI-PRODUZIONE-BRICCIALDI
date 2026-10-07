@@ -14,6 +14,24 @@ function parseImportoIt(s) {
   return parseFloat(pulito);
 }
 
+// Un importo è in forma chiara se, tolti € e spazi, è un intero ("12000"), ha i punti
+// delle migliaia ("12.000", "1.234,50"), i decimali con la virgola ("1234,5") o un
+// solo punto con 1-2 decimali ("1234.56"). "1,234" o "1.234.56" non lo sono.
+function importoInFormaChiara(s) {
+  if (!s) return false;
+  var pulito = String(s).trim().replace(/[€\s]/g, '');
+  return /^\d+$/.test(pulito) || /^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(pulito) ||
+    /^\d+,\d{1,2}$/.test(pulito) || /^\d+\.\d{1,2}$/.test(pulito);
+}
+
+// Importo da scrivere in una Determina: "12000" → "12.000,00", con la stessa lettura
+// usata per IVA e totale (parseImportoIt). Se non è leggibile o non è in forma
+// chiara resta com'è scritto (la Determina lo segnala con un avviso).
+function importoPerTesto(s) {
+  var n = parseImportoIt(s);
+  return (isNaN(n) || !importoInFormaChiara(s)) ? s : formattaImportoIt(n);
+}
+
 // Arrotonda al centesimo, metà per eccesso (0,495 → 0,50), senza gli errori della
 // rappresentazione binaria: nel calcolatore 2,25 × 0,22 vale 0,4949999…, e un
 // arrotondamento diretto darebbe 0,49.

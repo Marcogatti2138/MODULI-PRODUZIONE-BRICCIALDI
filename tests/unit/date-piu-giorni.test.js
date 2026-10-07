@@ -10,7 +10,8 @@ const { caricaFile } = require('../helpers/estrai-funzioni');
 
 const importi = caricaFile('importi.js');
 function legale(giorni) {
-  const ctx = { parseImportoIt: importi.parseImportoIt, formattaImportoIt: importi.formattaImportoIt, calcolaIva22: importi.calcolaIva22 };
+  const ctx = { parseImportoIt: importi.parseImportoIt, formattaImportoIt: importi.formattaImportoIt, calcolaIva22: importi.calcolaIva22,
+    importoPerTesto: importi.importoPerTesto, importoInFormaChiara: importi.importoInFormaChiara };
   if (giorni) ctx.giorniEventoPerDocumenti = () => giorni;
   return caricaFile('determina-legale.js', ctx);
 }

@@ -45,7 +45,8 @@ for (const [sigla, file] of Object.entries(PAGINE)) {
 test('Determina Trasporti con preventivo "12.000": importo, IVA e RUP corretti', () => {
   const parseImportoIt = parseImportoItDellaPagina(PAGINE.M1);
   const formattaImportoIt = funzioneDellaPagina(PAGINE.M1, 'formattaImportoIt');
-  const ctx = caricaFile('determina-legale.js', { parseImportoIt, formattaImportoIt, calcolaIva22: caricaFile('importi.js').calcolaIva22 });
+  const { calcolaIva22, importoPerTesto, importoInFormaChiara } = caricaFile('importi.js');
+  const ctx = caricaFile('determina-legale.js', { parseImportoIt, formattaImportoIt, calcolaIva22, importoPerTesto, importoInFormaChiara });
   const scelto = { ditta: 'Ditta Prova Uno', importo: '12.000', prot: '0001', data: '01/01/2030', indirizzo: 'Via Inventata 1, Paese Prova', piva: '00000000000' };
   const righe = ctx.costruisciTestoDeterminaTrasporti({
     scelto: scelto,
@@ -131,6 +132,7 @@ function determina(costruttore, cfgExtra) {
   const parseImportoIt = funzioneDellaPagina(PAGINE.M1, 'parseImportoIt');
   const importi = caricaFile('importi.js');
   const ctx = caricaFile('determina-legale.js', { parseImportoIt, formattaImportoIt, calcolaIva22: importi.calcolaIva22,
+    importoPerTesto: importi.importoPerTesto, importoInFormaChiara: importi.importoInFormaChiara,
     metadati: { id: '9401', titolo: 'Progetto di prova', delibera: '00', data_delibera: '01/01/2030' } });
   const scelto = { ditta: 'Ditta Prova Uno', importo: '2,25', prot: '0001', data: '01/01/2030', indirizzo: 'Via Inventata 1, Paese Prova', piva: '00000000000' };
   return ctx[costruttore](Object.assign({

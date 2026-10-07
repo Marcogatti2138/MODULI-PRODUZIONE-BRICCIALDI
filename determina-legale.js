@@ -68,6 +68,17 @@ function dateEventoPiuGiorni() {
   return { date: elencoConE(date), dateConLuoghi: dateConLuoghi, luoghi: elencoConE(luoghi) };
 }
 
+// Un avviso per ogni offerta con l'importo leggibile ma scritto in una forma non
+// chiara ("1,234", "1.234.56"): nel testo resta com'è scritto (importoPerTesto,
+// importi.js). Usata anche dalle Determine scritte dentro i moduli.
+function avvisiImportiNonChiari(preventivi) {
+  return preventivi.filter(function(p) {
+    return !isNaN(parseImportoIt(p.importo)) && !importoInFormaChiara(p.importo);
+  }).map(function(p) {
+    return '⚠ Importo scritto in forma non chiara: € ' + p.importo + ' (' + p.ditta + ') — verificare il formato (es. 850,00) prima di inviare.';
+  });
+}
+
 function costruisciTestoDeterminaTrasporti(cfg) {
   var scelto = cfg.scelto;
   var preventivi = cfg.preventivi;
@@ -110,7 +121,7 @@ function costruisciTestoDeterminaTrasporti(cfg) {
   lines.push('CONSIDERATO che, entro il termine sopra indicato sono pervenute n. ' + preventivi.length + ' offerta/e dalle seguenti ditte:');
   lines.push('');
   preventivi.forEach(function(p) {
-    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA;');
+    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + importoPerTesto(p.importo) + ' oltre IVA;');
   });
   lines.push('CONSIDERATO che le offerte pervenute risultano [___ di pari importo / di importo diverso — completare a cura di Acquisti/Ragioneria ___] e che, ' + (!isNaN(importoScelto) && importoScelto < 5000 ? 'trattandosi di affidamento di importo inferiore a € 5.000,00, non ricorre l\'obbligo di applicazione del principio di rotazione ai sensi dell\'art. 49, comma 6, del D.Lgs. 36/2023, ma che il RUP ha ritenuto opportuno applicarlo comunque in via facoltativa, in ossequio ai principi generali di cui all\'art. 1 e all\'art. 49, commi 1 e 2, del medesimo Codice [___ completare motivazione scelta operatore, se applicabile ___];' : 'nel rispetto del principio di rotazione degli affidamenti di cui all\'art. 49 del D.Lgs. 36/2023;'));
   lines.push('');
@@ -120,6 +131,7 @@ function costruisciTestoDeterminaTrasporti(cfg) {
   lines.push('');
   lines.push('DATO ATTO che l\'affidamento in parola si connota come acquisizione di modesto importo, non rilevante rispetto alle dinamiche concorrenziali del settore di riferimento;');
   lines.push('');
+  avvisiImportiNonChiari(preventivi).forEach(function(a) { lines.push(a); lines.push(''); });
   if (isNaN(importoScelto)) {
     lines.push('⚠ Importo non riconosciuto — verificare il formato (es. 850,00) prima di inviare.');
   } else if (importoScelto >= 140000) {
@@ -150,7 +162,7 @@ function costruisciTestoDeterminaTrasporti(cfg) {
   lines.push('');
   lines.push('– Importo del contratto:');
   lines.push('');
-  lines.push('€ ' + scelto.importo + ' oltre IVA split payment;');
+  lines.push('€ ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment;');
   lines.push('');
   lines.push('– Forma del contratto:');
   lines.push('');
@@ -174,11 +186,11 @@ function costruisciTestoDeterminaTrasporti(cfg) {
   lines.push('');
   lines.push('VISTA la delibera del Consiglio di Amministrazione n. [___ N. Delibera Bilancio ___] del [___ data ___] di approvazione del Bilancio di Previsione e.f. [___ anno ___];');
   lines.push('');
-  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + scelto.importo + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
+  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasporto materiale didattico (arredi e attrezzature)' + cfg.fraseDeterminaFinale + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
+  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasporto materiale didattico (arredi e attrezzature)' + cfg.fraseDeterminaFinale + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + importoPerTesto(scelto.importo) + ') oltre IVA split payment;');
   lines.push('');
   lines.push('di impegnare la somma complessiva di € ' + formattaImportoIt(totaleConIva) + ', di cui € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment, dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica;');
   lines.push('');
@@ -339,7 +351,7 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('CONSIDERATO che, entro il termine sopra indicato sono pervenute n. ' + preventivi.length + ' offerta/e dalle seguenti ditte:');
   lines.push('');
   preventivi.forEach(function(p) {
-    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA;');
+    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + importoPerTesto(p.importo) + ' oltre IVA;');
     lines.push('');
   });
   lines.push('CONSIDERATO che la ditta ' + scelto.ditta + ' si è resa disponibile a svolgere il servizio alle condizioni economiche più vantaggiose e con le modalità richieste da questo Ente;');
@@ -348,6 +360,7 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('');
   lines.push('DATO ATTO che l\'affidamento in parola si connota come acquisizione di modesto importo, non rilevante rispetto alle dinamiche concorrenziali del settore di riferimento;');
   lines.push('');
+  avvisiImportiNonChiari(preventivi).forEach(function(a) { lines.push(a); lines.push(''); });
   if (isNaN(importoScelto)) {
     lines.push('⚠ Importo non riconosciuto — verificare il formato (es. 850,00) prima di inviare.');
   } else if (importoScelto >= 140000) {
@@ -374,7 +387,7 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('');
   lines.push('– Importo del contratto:');
   lines.push('');
-  lines.push('€ ' + scelto.importo + ' oltre IVA split payment;');
+  lines.push('€ ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment;');
   lines.push('');
   lines.push('– Forma del contratto:');
   lines.push('');
@@ -398,11 +411,11 @@ function costruisciTestoDeterminaNoleggio(cfg) {
   lines.push('');
   lines.push('VISTA la delibera del Consiglio di Amministrazione n. [___ N. Delibera Bilancio ___] del [___ data ___] di approvazione del Bilancio di Previsione e.f. [___ anno ___];');
   lines.push('');
-  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + scelto.importo + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
+  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, della fornitura di beni/servizi' + cfg.fraseDeterminaFinale + ', alla ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
+  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, della fornitura di beni/servizi' + cfg.fraseDeterminaFinale + ', alla ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + importoPerTesto(scelto.importo) + ') oltre IVA split payment;');
   lines.push('');
   lines.push('di impegnare la somma complessiva di € ' + formattaImportoIt(totaleConIva) + ', di cui € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment, dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica;');
   lines.push('');
@@ -1023,7 +1036,7 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
     lines.push('Entro il termine sopra indicato sono pervenute n. ' + preventivi.length + ' offerte dalle seguenti ditte/cooperative:');
     lines.push('');
     preventivi.forEach(function(p) {
-      lines.push('– ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA' + (p === scelto ? ' — SCELTA' : '') + ';');
+      lines.push('– ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + importoPerTesto(p.importo) + ' oltre IVA' + (p === scelto ? ' — SCELTA' : '') + ';');
     });
   }
   lines.push('');
@@ -1032,7 +1045,7 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   lines.push('non ravvisando soluzioni alternative praticabili e vista l\'impossibilità di rinviare l\'evento senza arrecare pregiudizio agli studenti;');
   lines.push('');
   lines.push('TENUTO CONTO');
-  lines.push('Dell\'offerta economica di ' + scelto.ditta + ', per un importo complessivo di € ' + scelto.importo + ' oltre IVA, ritenuta congrua e vantaggiosa in relazione alla natura specialistica del servizio;');
+  lines.push('Dell\'offerta economica di ' + scelto.ditta + ', per un importo complessivo di € ' + importoPerTesto(scelto.importo) + ' oltre IVA, ritenuta congrua e vantaggiosa in relazione alla natura specialistica del servizio;');
   lines.push('');
   lines.push('Che ' + scelto.ditta + ' [___ è / non è già iscritta all\'Albo Fornitori del Conservatorio — completare ___];');
   lines.push('');
@@ -1069,13 +1082,14 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   lines.push('');
   lines.push('Oggetto del contratto: Servizio di personale artistico esterno (strumentisti/ruoli)' + (metadati.titolo ? ' per "' + metadati.titolo + '"' : '') + (dataEventoTesto ? ' — ' + dataEventoTesto : '') + (luogoEventoTesto ? ', ' + luogoEventoTesto : ''));
   lines.push('Operatore economico affidatario: ' + scelto.ditta + ' – ' + sedeScelto + ' – Rappresentante legale: [___ nome ___]');
-  lines.push('Importo del contratto: € ' + scelto.importo + ' oltre IVA' + (isNaN(totaleConIva) ? '' : ' = € ' + formattaImportoIt(totaleConIva) + ' totale') + ' (split payment)');
+  lines.push('Importo del contratto: € ' + importoPerTesto(scelto.importo) + ' oltre IVA' + (isNaN(totaleConIva) ? '' : ' = € ' + formattaImportoIt(totaleConIva) + ' totale') + ' (split payment)');
   lines.push('Modalità di svolgimento: [___ luogo prove/orari, a carico di chi — completare ___]');
   lines.push('Forma del contratto: Scambio di lettere tramite PEC/sistemi elettronici di recapito certificato qualificato, ai sensi dell\'art. 18, Allegato I.1 D.Lgs. 36/2023');
   lines.push('Modalità di scelta del contraente: Affidamento diretto ai sensi dell\'art. 50, co. 1, lett. b), D.Lgs. 36/2023');
   lines.push('Copertura finanziaria: ' + capitolo + ' — Bilancio [___ anno ___]');
   lines.push('Tracciabilità (L. 136/2010): IBAN ' + (cfg.iban || '[___ IBAN ___]') + ' – [___ Istituto bancario ___] – Intestato a: ' + scelto.ditta);
   lines.push('');
+  avvisiImportiNonChiari(preventivi).forEach(function(a) { lines.push(a); lines.push(''); });
   if (isNaN(importoScelto)) {
     lines.push('⚠ Importo non riconosciuto — verificare il formato (es. 850,00) prima di inviare.');
     lines.push('');
@@ -1102,7 +1116,7 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   lines.push('');
   lines.push('DI AFFIDARE per le motivazioni espresse in premessa il servizio di personale artistico esterno (strumentisti/ruoli)' + (dataEventoTesto ? ' per l\'evento del ' + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ' a ' + scelto.ditta + ' – ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ' (P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ').');
   lines.push('');
-  lines.push('DI IMPEGNARE la somma complessiva di € ' + (isNaN(totaleConIva) ? scelto.importo + ' oltre IVA' : formattaImportoIt(totaleConIva) + ' (di cui € ' + scelto.importo + ' per imponibile ed € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment)') + ' sul ' + capitolo + ' del Bilancio [___ anno ___], dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica.');
+  lines.push('DI IMPEGNARE la somma complessiva di € ' + (isNaN(totaleConIva) ? importoPerTesto(scelto.importo) + ' oltre IVA' : formattaImportoIt(totaleConIva) + ' (di cui € ' + importoPerTesto(scelto.importo) + ' per imponibile ed € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment)') + ' sul ' + capitolo + ' del Bilancio [___ anno ___], dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica.');
   lines.push('');
   lines.push('DI NOMINARE ' + nomeRUP + ' quale Responsabile Unico del Progetto (RUP) ai sensi dell\'art. 15 del D.Lgs. 36/2023; le funzioni di Direttore dell\'Esecuzione del Contratto sono svolte dalla medesima ' + nomeRUP + ' in qualità di RUP, ai sensi dell\'art. 114, comma 3, del D.Lgs. n. 36/2023, data la modesta entità e la limitata complessità del contratto.');
   lines.push('');

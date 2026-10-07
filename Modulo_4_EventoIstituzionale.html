@@ -5324,7 +5324,7 @@ function generaBozzaDeterminaTrasportoPersone() {
   lines.push('CONSIDERATO che, entro il termine sopra indicato sono pervenute n. ' + preventivi.length + ' offerta/e dalle seguenti ditte:');
   lines.push('');
   preventivi.forEach(function(p) {
-    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA;');
+    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + importoPerTesto(p.importo) + ' oltre IVA;');
     lines.push('');
   });
   lines.push('CONSIDERATO che le offerte pervenute risultano [___ di pari importo / di importo diverso — completare a cura di Acquisti/Ragioneria ___] e che, ' + (!isNaN(importoScelto) && importoScelto < 5000 ? 'trattandosi di affidamento di importo inferiore a € 5.000,00, non ricorre l\'obbligo di applicazione del principio di rotazione ai sensi dell\'art. 49, comma 6, del D.Lgs. 36/2023, ma che il RUP ha ritenuto opportuno applicarlo comunque in via facoltativa, in ossequio ai principi generali di cui all\'art. 1 e all\'art. 49, commi 1 e 2, del medesimo Codice [___ completare motivazione scelta operatore, se applicabile ___];' : 'nel rispetto del principio di rotazione degli affidamenti di cui all\'art. 49 del D.Lgs. 36/2023;'));
@@ -5335,6 +5335,7 @@ function generaBozzaDeterminaTrasportoPersone() {
   lines.push('');
   lines.push('DATO ATTO che l\'affidamento in parola si connota come acquisizione di modesto importo, non rilevante rispetto alle dinamiche concorrenziali del settore di riferimento;');
   lines.push('');
+  avvisiImportiNonChiari(preventivi).forEach(function(a) { lines.push(a); lines.push(''); });
   if (isNaN(importoScelto)) {
     lines.push('⚠ Importo non riconosciuto — verificare il formato (es. 850,00) prima di inviare.');
   } else if (importoScelto >= 140000) {
@@ -5359,7 +5360,7 @@ function generaBozzaDeterminaTrasportoPersone() {
   lines.push('');
   lines.push('– Importo del contratto:');
   lines.push('');
-  lines.push('€ ' + scelto.importo + ' oltre IVA split payment;');
+  lines.push('€ ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment;');
   lines.push('');
   lines.push('– Forma del contratto:');
   lines.push('');
@@ -5383,11 +5384,11 @@ function generaBozzaDeterminaTrasportoPersone() {
   lines.push('');
   lines.push('VISTA la delibera del Consiglio di Amministrazione n. [___ N. Delibera Bilancio ___] del [___ data ___] di approvazione del Bilancio di Previsione e.f. [___ anno ___];');
   lines.push('');
-  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + scelto.importo + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
+  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasferta persone (pullman/bus)' + (dataEventoTesto ? (piuGiorni ? ' per l\'evento dei giorni ' : ' per l\'evento del ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
+  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasferta persone (pullman/bus)' + (dataEventoTesto ? (piuGiorni ? ' per l\'evento dei giorni ' : ' per l\'evento del ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + importoPerTesto(scelto.importo) + ') oltre IVA split payment;');
   lines.push('');
   lines.push('di impegnare la somma complessiva di € ' + formattaImportoIt(totaleConIva) + ', di cui € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment, dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica;');
   lines.push('');
@@ -5807,7 +5808,7 @@ function generaBozzaDeterminaTrasporti(istanza) {
   lines.push('CONSIDERATO che, entro il termine sopra indicato sono pervenute n. ' + preventivi.length + ' offerta/e dalle seguenti ditte:');
   lines.push('');
   preventivi.forEach(function(p) {
-    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + p.importo + ' oltre IVA;');
+    lines.push('- ditta ' + p.ditta + ', con sede in ' + (p.indirizzo || '[___ indirizzo ___]') + ' (P.IVA/C.F. ' + (p.piva || '[___ P.IVA/C.F. ___]') + '), acquisita al prot. n. ' + (p.prot || '[___ prot. ___]') + (p.data ? ' del ' + p.data : ' del [___ data ___]') + ', per un importo di € ' + importoPerTesto(p.importo) + ' oltre IVA;');
   });
   lines.push('CONSIDERATO che le offerte pervenute risultano [___ di pari importo / di importo diverso — completare a cura di Acquisti/Ragioneria ___] e che, ' + (!isNaN(importoScelto) && importoScelto < 5000 ? 'trattandosi di affidamento di importo inferiore a € 5.000,00, non ricorre l\'obbligo di applicazione del principio di rotazione ai sensi dell\'art. 49, comma 6, del D.Lgs. 36/2023, ma che il RUP ha ritenuto opportuno applicarlo comunque in via facoltativa, in ossequio ai principi generali di cui all\'art. 1 e all\'art. 49, commi 1 e 2, del medesimo Codice [___ completare motivazione scelta operatore, se applicabile ___];' : 'nel rispetto del principio di rotazione degli affidamenti di cui all\'art. 49 del D.Lgs. 36/2023;'));
   lines.push('');
@@ -5817,6 +5818,7 @@ function generaBozzaDeterminaTrasporti(istanza) {
   lines.push('');
   lines.push('DATO ATTO che l\'affidamento in parola si connota come acquisizione di modesto importo, non rilevante rispetto alle dinamiche concorrenziali del settore di riferimento;');
   lines.push('');
+  avvisiImportiNonChiari(preventivi).forEach(function(a) { lines.push(a); lines.push(''); });
   if (isNaN(importoScelto)) {
     lines.push('⚠ Importo non riconosciuto — verificare il formato (es. 850,00) prima di inviare.');
   } else if (importoScelto >= 140000) {
@@ -5853,7 +5855,7 @@ function generaBozzaDeterminaTrasporti(istanza) {
   lines.push('');
   lines.push('– Importo del contratto:');
   lines.push('');
-  lines.push('€ ' + scelto.importo + ' oltre IVA split payment;');
+  lines.push('€ ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment;');
   lines.push('');
   lines.push('– Forma del contratto:');
   lines.push('');
@@ -5877,11 +5879,11 @@ function generaBozzaDeterminaTrasporti(istanza) {
   lines.push('');
   lines.push('VISTA la delibera del Consiglio di Amministrazione n. [___ N. Delibera Bilancio ___] del [___ data ___] di approvazione del Bilancio di Previsione e.f. [___ anno ___];');
   lines.push('');
-  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + scelto.importo + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
+  lines.push('VISTO e ritenuto pertanto necessario provvedere a un impegno di spesa pari a € ' + importoPerTesto(scelto.importo) + ' oltre IVA split payment, data la disponibilità sull\'U.P.B. 1.2.1 art. 255 "Produzione artistica e ricerca";');
   lines.push('');
   lines.push('DETERMINA');
   lines.push('');
-  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasporto materiale' + (dataEventoTesto ? (piuGiorni ? ' per l\'evento dei giorni ' : ' per l\'evento del ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + scelto.importo + ') oltre IVA split payment;');
+  lines.push('Di procedere all\'affidamento diretto per le motivazioni espresse in premessa, che si intendono integralmente riportate, del servizio di trasporto materiale' + (dataEventoTesto ? (piuGiorni ? ' per l\'evento dei giorni ' : ' per l\'evento del ') + dataEventoTesto : '') + (luogoEventoTesto ? ' presso ' + luogoEventoTesto : '') + ', alla Ditta ' + scelto.ditta + ', ' + (scelto.indirizzo || '[___ indirizzo completo ___]') + ', P.IVA/C.F. ' + (scelto.piva || '[___ P.IVA/C.F. ___]') + ', alle condizioni previste nell\'offerta prot. n. ' + (scelto.prot || '[___ prot. ___]') + ' e specificamente euro [___ importo in lettere ___]/00 (€ ' + importoPerTesto(scelto.importo) + ') oltre IVA split payment;');
   lines.push('');
   lines.push('di impegnare la somma complessiva di € ' + formattaImportoIt(totaleConIva) + ', di cui € ' + formattaImportoIt(ivaCalcolata) + ' per IVA al 22% in regime di split payment, dando atto che la liquidazione della spesa avverrà con successivo e separato provvedimento, previa verifica della regolare esecuzione del servizio e ricezione di regolare fattura elettronica;');
   lines.push('');
