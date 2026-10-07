@@ -10,7 +10,7 @@
 //     AGGIORNA_ATTESI=1 npx playwright test e2e/pulsanti-m1.spec.js
 // I pulsanti si premono con un clic sull'elemento (anche se la sua sezione è chiusa):
 // parte lo stesso onclick che parte col mouse.
-// Bug trovati e non corretti: test.fail in fondo (K, L).
+// Bug trovati e non corretti: test.fail in fondo (L). Bug K corretto: controllato nel test degli Spazi.
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -148,7 +148,9 @@ test.describe('M1 — pulsanti di generazione', () => {
 
     const spazi = await finestra(page, ambiente, stato, 'generaRichiestaSpazi()', 'modal-spazi', 'Conferma spazi — Ufficio Produzione');
     for (let p = 1; p <= 6; p++) expect(spazi).toContain('- Prova ' + p + ' — ' + PROGETTO.dati_referente['prova_data_' + p] + ' ore 14:30–19:00 — con margine di preparazione, prova 15:00 – 18:30 — Spazio: Sala Orologio');
-    expect(spazi).toContain('- Concerto — 15/03/2031 ore 21:00–23:15'); // 21:00 + 90' + smontaggio 45'
+    // 21:00 + 90' + smontaggio 45'; "inizio ore" con il solo orario di inizio (bug K, corretto)
+    expect(spazi).toContain('- Concerto — 15/03/2031 ore 21:00–23:15 — con margine di preparazione, inizio ore 21:00, durata 90\' — Spazio: Teatro Secci');
+    expect(spazi).toContain('- Replica 2 — 29/03/2031 ore 21:00–23:15 — con margine di preparazione, inizio ore 21:00, durata 90\' — Spazio: Sede Prova Replica 2');
     expect(spazi).toContain('Spazio: Teatro Secci');
     expect(spazi).toContain('- Pianoforte / Grancoda: 1 — Già presente nella struttura di prova');
     confrontaConAttesi(ATTESI, 'richiestaSpazi', spazi);
@@ -370,16 +372,6 @@ test.describe('M1 — Sollecito con un dato mancante', () => {
 // corretto il test diventa rosso: togliere test.fail e aggiornare gli attesi.
 test.describe('M1 — bug noti dei pulsanti', () => {
   test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: PROGETTO } } });
-
-  // Bug K: nella Richiesta Spazi l'orario di concerto e repliche viene esteso due
-  // volte: la tabella contiene già "21:00–23:15" e la nota diventa
-  // "inizio ore 21:00–23:15" invece di "inizio ore 21:00". Stesso codice nei Mod. 2 e 4.
-  test.fail('bug K — Richiesta Spazi: "inizio ore" del concerto con il solo orario di inizio', async ({ page, ambiente }) => {
-    const stato = await apri(page);
-    await premi(page, ambiente, stato, 'costruisciTabellaSpazi()');
-    const spazi = await finestra(page, ambiente, stato, 'generaRichiestaSpazi()', 'modal-spazi', 'Conferma spazi — Ufficio Produzione');
-    expect(spazi).toContain('- Concerto — 15/03/2031 ore 21:00–23:15 — con margine di preparazione, inizio ore 21:00, durata 90\'');
-  });
 
   // Bug L: Mail Centralino con Dotazione e Assistenza insieme: la sezione
   // Assistenza tiene la sua chiusura ("Grazie per la collaborazione. / Cordiali

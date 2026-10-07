@@ -13,7 +13,8 @@
 // Differenze dal Mod. 1: niente Biblioteca né Personale esterno; Richiesta
 // Dotazione/Materiale; Trasporti senza tratte (elenco destinazioni; tratte del
 // prestito: backlog).
-// Bug trovati e non corretti: test.fail in fondo (K, L, R). Bug Q corretto: test in fondo.
+// Bug trovati e non corretti: test.fail in fondo (L, R). Bug Q corretto: test in fondo.
+// Bug K corretto: controllato nella variante (Richiesta Spazi).
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
@@ -292,9 +293,9 @@ test.describe('M4 — variante: date aggiuntive Concerto con la loro durata', ()
     // Spazi: inizio + durata della data (2 ore, 75') + smontaggio 45'.
     const spazi = await finestra(page, ambiente, stato, 'generaRichiestaSpazi()', 'modal-spazi', 'Conferma spazi — Ufficio Produzione');
     expect(spazi).toContain('- Replica 1 (Concerto) — 22/03/2031 ore 21:00–23:45');
-    expect(spazi).toContain('durata 120\' — Spazio: Sede Prova Replica 1');
+    expect(spazi).toContain('- Replica 1 (Concerto) — 22/03/2031 ore 21:00–23:45 — con margine di preparazione, inizio ore 21:00, durata 120\' — Spazio: Sede Prova Replica 1');
     expect(spazi).toContain('- Replica 2 (Concerto) — 29/03/2031 ore 21:00–23:00');
-    expect(spazi).toContain('durata 75\' — Spazio: Sede Prova Replica 2');
+    expect(spazi).toContain('- Replica 2 (Concerto) — 29/03/2031 ore 21:00–23:00 — con margine di preparazione, inizio ore 21:00, durata 75\' — Spazio: Sede Prova Replica 2'); // "inizio ore" con il solo orario di inizio (bug K, corretto)
     confrontaConAttesi(ATTESI, 'varianteRichiestaSpazi', spazi);
     await chiudiFinestre(page);
 
@@ -360,15 +361,6 @@ test.describe('M4 — Sollecito con un dato mancante', () => {
 // corretto il test diventa rosso: togliere test.fail e aggiornare gli attesi.
 test.describe('M4 — bug noti dei pulsanti', () => {
   test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: VARIANTE } } });
-
-  // Bug K: nella Richiesta Spazi l'orario di evento e date aggiuntive viene esteso
-  // due volte ("inizio ore 21:00–23:45" invece di "inizio ore 21:00"). Mod. 1, 2, 4.
-  test.fail('bug K — Richiesta Spazi: "inizio ore" con il solo orario di inizio', async ({ page, ambiente }) => {
-    const stato = await apri(page, VARIANTE);
-    await premi(page, ambiente, stato, 'costruisciTabellaSpazi()');
-    const spazi = await finestra(page, ambiente, stato, 'generaRichiestaSpazi()', 'modal-spazi', 'Conferma spazi — Ufficio Produzione');
-    expect(spazi).toContain('- Replica 1 (Concerto) — 22/03/2031 ore 21:00–23:45 — con margine di preparazione, inizio ore 21:00, durata 120\'');
-  });
 
   // Bug L: Mail Centralino con Dotazione e Assistenza: due saluti finali. Mod. 1-4.
   test.fail('bug L — Mail Centralino: un solo saluto finale', async ({ page, ambiente }) => {

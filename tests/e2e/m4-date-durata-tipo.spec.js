@@ -52,8 +52,8 @@ test.describe('M4 — durata e tipo delle date aggiuntive (intervento D)', () =>
       const t = await testi(page);
       expect(t.tabellaSpazi).toContain('Replica 1 | 22/03/2031 | 21:00–23:15 |'); // durata della data principale (1h30)
       expect(t.tabellaSpazi).toContain('Replica 2 (Concerto) | 29/03/2031 | 21:00–23:45 |'); // 2 ore + 45'
-      expect(t.richiestaSpazi).toContain('- Replica 1 — 22/03/2031 ore 21:00–23:15 — con margine di preparazione, inizio ore 21:00–23:15, durata 90\' — Spazio: Sede Prova Replica 1');
-      expect(t.richiestaSpazi).toContain('- Replica 2 (Concerto) — 29/03/2031 ore 21:00–23:45 — con margine di preparazione, inizio ore 21:00–23:45, durata 120\' — Spazio: Sala Orologio');
+      expect(t.richiestaSpazi).toContain('- Replica 1 — 22/03/2031 ore 21:00–23:15 — con margine di preparazione, inizio ore 21:00, durata 90\' — Spazio: Sede Prova Replica 1'); // bug K, corretto
+      expect(t.richiestaSpazi).toContain('- Replica 2 (Concerto) — 29/03/2031 ore 21:00–23:45 — con margine di preparazione, inizio ore 21:00, durata 120\' — Spazio: Sala Orologio');
       expect(t.notificaSpaziReferente).toContain('- Replica 2 (Concerto) — 29/03/2031 ore 21:00–23:45\n  Spazio assegnato: Sala Orologio — Proposta iniziale: Sede Prova Replica 2');
       expect(ambiente.eccezioni).toEqual([]);
     });

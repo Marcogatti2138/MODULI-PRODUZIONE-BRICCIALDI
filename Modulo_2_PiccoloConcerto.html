@@ -5310,7 +5310,7 @@ function calcolaOrarioEsteso(tipo, oraStr) {
   if (inizioC === null) return null;
   var durataMin = estraiDurataMinuti(getField('durata'));
   if (durataMin === null) return null;
-  return { esteso: minutiAOra(inizioC) + '–' + minutiAOra(inizioC + durataMin + MINUTI_SMONTAGGIO_CONCERTO), nota: 'inizio ore ' + oraStr + ', durata ' + durataMin + '\'' };
+  return { esteso: minutiAOra(inizioC) + '–' + minutiAOra(inizioC + durataMin + MINUTI_SMONTAGGIO_CONCERTO), nota: 'inizio ore ' + minutiAOra(inizioC) + ', durata ' + durataMin + '\'' }; // solo l'ora di inizio: oraStr può essere già l'orario esteso della tabella Spazi
 }
 
 function generaRichiestaSpazi() {
