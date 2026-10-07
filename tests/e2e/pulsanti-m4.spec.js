@@ -13,7 +13,7 @@
 // Differenze dal Mod. 1: niente Biblioteca né Personale esterno; Richiesta
 // Dotazione/Materiale; Trasporti senza tratte (elenco destinazioni; tratte del
 // prestito: backlog).
-// Bug trovati e non corretti: test.fail in fondo (R). Bug Q corretto: test in fondo.
+// Bug corretti: Q (test in fondo), R (test della Trasferta persone).
 // Bug K corretto: controllato nella variante (Richiesta Spazi). Bug L corretto: test del Centralino.
 // "Oggi" = 15/01/2031. Dati inventati.
 
@@ -244,7 +244,8 @@ test.describe('M4 — pulsanti di generazione', () => {
 
     const richiesta = await finestra(page, ambiente, stato, 'generaRichiestaTrasfertaPersone()', 'modal-trasferta-persone', 'Richiesta trasferta persone — Ufficio Acquisti');
     for (const atteso of ['Destinazione: ' + R.dest_trasferta, 'Modalità trasporto: Pullman', '· Replica 1: Sede Prova Replica 1 — 22/03/2031', '· Replica 2: Sede Prova Replica 2 — 29/03/2031',
-      'Persone da trasportare: 3', 'Modalità trasporto: Mezzi propri', 'Vitto: ' + R.replica_vitto_1, 'Alloggio: ' + R.replica_alloggio_2]) expect(richiesta).toContain(atteso);
+      'Persone da trasportare: 3', 'Modalità trasporto: Mezzi propri', 'Vitto: ' + R.replica_vitto_1, 'Alloggio: ' + R.replica_alloggio_2,
+      'Si prega di confermare disponibilità e procedere con quanto necessario.']) expect(richiesta).toContain(atteso); // "disponibilità" con l'accento (bug R, corretto)
     confrontaConAttesi(ATTESI, 'richiestaTrasfertaPersone', richiesta);
     await mail(page, ambiente, stato, 'apriMailTrasfertaPersone()', { a: 'acquisti@briccialditerni.it', cc: 'produzione@briccialditerni.it', oggetto: '[Richiesta trasferta persone] ' + TITOLO }, richiesta);
     await chiudiFinestre(page);
@@ -365,20 +366,6 @@ test.describe('M4 — Sollecito con un dato mancante', () => {
     expect(sollecito).toContain('mancano ancora i seguenti dati:\n\n- Ora inizio evento\n\n');
     confrontaConAttesi(ATTESI, 'sollecitoOraMancante', sollecito);
     await mail(page, ambiente, stato, 'apriMailSollecito()', { a: R.doc_email_1, cc: 'produzione@briccialditerni.it', oggetto: '[' + TITOLO + '] Richiesta integrazione dati' }, sollecito);
-  });
-});
-
-// Bug trovati con questi test, segnalati e NON corretti: test.fail = il test
-// descrive il comportamento giusto e oggi fallisce. Quando il bug viene
-// corretto il test diventa rosso: togliere test.fail e aggiornare gli attesi.
-test.describe('M4 — bug noti dei pulsanti', () => {
-  test.use({ accettaConferme: true, datiIniziali: { progetti: { [ID]: VARIANTE } } });
-
-  // Bug R: Richiesta trasferta persone, refuso "confermare disponibilita" (senza accento). Solo Mod. 4.
-  test.fail('bug R — Richiesta trasferta persone: "disponibilità" con l\'accento', async ({ page, ambiente }) => {
-    const stato = await apri(page, VARIANTE);
-    const richiesta = await finestra(page, ambiente, stato, 'generaRichiestaTrasfertaPersone()', 'modal-trasferta-persone', 'Richiesta trasferta persone — Ufficio Acquisti');
-    expect(richiesta).toContain('Si prega di confermare disponibilità e procedere');
   });
 });
 
