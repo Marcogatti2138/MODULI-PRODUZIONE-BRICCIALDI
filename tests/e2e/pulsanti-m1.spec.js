@@ -14,7 +14,7 @@
 // "Oggi" = 15/01/2031. Dati inventati.
 
 const { test, expect } = require('./ambiente');
-const { predisponi, premi, chiudiFinestre, confrontaConAttesi } = require('./pulsanti');
+const { predisponi, premi, chiudiFinestre, confrontaConAttesi, stessoTestoDellaBozza } = require('./pulsanti');
 
 const FILE = 'Modulo_1_SinfonicoCORALE.html';
 const PROGETTO = require('../progetti-prova/completo-m1.json');
@@ -81,8 +81,7 @@ async function determina(page, ambiente, stato, { bozza, docx, apriMail, idModal
   const esito = await premi(page, ambiente, stato, docx);
   senzaProblemi(esito, docx);
   expect(esito.docx.map(d => d.nome)).toEqual([nomeDocx]);
-  const spazi = s => s.replace(/\s+/g, ' ').trim();
-  expect(spazi(esito.docx[0].testo), docx + ': stesso testo della bozza').toBe(spazi(testo));
+  stessoTestoDellaBozza(esito.docx[0].testo, testo, docx);
   await mail(page, ambiente, stato, apriMail, { a: 'direttoreamministrativo@briccialditerni.it', cc: 'produzione@briccialditerni.it', oggetto }, testo);
   await chiudiFinestre(page);
   return testo;

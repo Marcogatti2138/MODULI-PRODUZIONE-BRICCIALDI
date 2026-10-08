@@ -111,4 +111,37 @@ function confrontaConAttesi(nomeFile, voce, valore) {
   expect(valore, voce + ' (testo registrato in attesi/' + nomeFile + '.json)').toEqual(attesi[voce]);
 }
 
-module.exports = { predisponi, premi, chiudiFinestre, confrontaConAttesi };
+// DOCX di una Determina = testo della bozza, a spazi normalizzati. Fa eccezione
+// solo il blocco firme (dalla prima riga con la tabulazione, o dal "Per la copertura
+// finanziaria" scritto da solo subito prima, all'ultima con la tabulazione): nel Word
+// è una tabella a due colonne e si legge colonna per colonna, quindi lì si controlla
+// che ci siano gli stessi pezzi, interi, in qualunque ordine.
+function stessoTestoDellaBozza(testoDocx, bozza, nome) {
+  const spazi = s => s.replace(/\s+/g, ' ').trim();
+  const righe = bozza.split('\n');
+  const primaTab = righe.findIndex(r => r.includes('\t'));
+  if (primaTab === -1) {
+    expect(spazi(testoDocx), nome + ': stesso testo della bozza').toBe(spazi(bozza));
+    return;
+  }
+  let inizio = primaTab;
+  for (let k = primaTab - 1; k >= 0 && (righe[k].trim() === '' || righe[k].trim() === 'Per la copertura finanziaria'); k--) {
+    if (righe[k].trim()) { inizio = k; break; }
+  }
+  let fine = primaTab;
+  for (let j = primaTab + 1; j < righe.length && (righe[j].includes('\t') || righe[j].trim() === ''); j++) if (righe[j].includes('\t')) fine = j;
+  const prima = spazi(righe.slice(0, inizio).join('\n'));
+  const dopo = spazi(righe.slice(fine + 1).join('\n'));
+  const tutto = spazi(testoDocx);
+  expect(tutto.startsWith(prima), nome + ': stesso testo della bozza fino alle firme').toBe(true);
+  expect(tutto.endsWith(dopo), nome + ': stesso testo della bozza dopo le firme').toBe(true);
+  let firme = ' ' + tutto.slice(prima.length, tutto.length - dopo.length).trim() + ' ';
+  const pezzi = righe.slice(inizio, fine + 1).join('\t').split('\t').map(spazi).filter(Boolean).sort((a, b) => b.length - a.length);
+  for (const p of pezzi) {
+    expect(firme.includes(' ' + p + ' '), nome + ': firma "' + p + '" nel Word').toBe(true);
+    firme = firme.replace(' ' + p + ' ', ' ');
+  }
+  expect(firme.trim(), nome + ': nel blocco firme del Word nient\'altro').toBe('');
+}
+
+module.exports = { predisponi, premi, chiudiFinestre, confrontaConAttesi, stessoTestoDellaBozza };

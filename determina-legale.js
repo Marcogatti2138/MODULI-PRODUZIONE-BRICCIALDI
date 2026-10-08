@@ -8,7 +8,9 @@
 // Materiale — e mantiene la propria versione locale di
 // generaBozzaDeterminaTrasporti).
 //
-// generaBozzaDeterminaNoleggio() è invece condivisa da TUTTI E 4 i moduli.
+// generaBozzaDeterminaNoleggio() è invece condivisa da TUTTI E 4 i moduli,
+// come scaricaDocxDetermina() (documento Word di tutte le Determine, in fondo
+// al file): il file è oggi caricato da tutti e 4 i moduli.
 //
 // Ogni modulo chiamante passa un secondo parametro cfgSezioni con i
 // riferimenti "Sezione X" corretti per la propria numerazione (che
@@ -1133,4 +1135,423 @@ function costruisciTestoDeterminaPersonaleEsterno(cfg) {
   lines.push('Documento informatico firmato digitalmente ai sensi dell\'art. 24 del D.Lgs. 82/2005 e ss.mm.ii. Pubblicato sul sito internet www.briccialditerni.it alla voce – "Amministrazione Trasparente" – "Bandi di Gara Contratti".');
 
   return lines;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Documento Word delle Determine (Trasporti, Noleggio/Service, Personale
+// Esterno, Trasporto persone) — una sola impaginazione per tutte.
+//
+// Il Word si ricava riga per riga dal testo della casella (che l'utente può
+// aver corretto a mano): il testo resta quello della bozza, cambia solo
+// l'aspetto. Modello: Determina_Personale_Esterno_impaginazione_proposta.docx
+// (Marco, 07/10/2026). Decisioni di Marco:
+//  - evidenziatore giallo solo sui campi [___ … ___] da compilare;
+//  - righe "⚠" evidenziate in turchese;
+//  - tabella grigia dei DATO ATTO solo nella Personale Esterno, con i due
+//    punti nella cella dell'etichetta; nelle altre le etichette "– X:" in
+//    grassetto con rientro sporgente;
+//  - trattino automatico di Word solo dove la bozza non lo scrive (VISTI,
+//    RILEVATO CHE); dove c'è, resta il trattino scritto con il rientro;
+//  - firme in tabella senza bordi, non spezzabile, ~3 righe di spazio sopra
+//    i nomi in grassetto;
+//  - piè di pagina "Pagina X di Y".
+// docx 7.1.0 scrive anche w:highlightCs (non valido per lo schema) se non si
+// passa highlightComplexScript: false.
+// ═══════════════════════════════════════════════════════════════════
+
+var DETERMINA_DOCX = {
+  font: 'Times New Roman',
+  corpo: 24,             // mezzi punti: 12 pt
+  titolo: 26,            // 13 pt
+  piede: 18,             // 9 pt
+  interlinea: 264,
+  rientro: 567,          // 1 cm
+  sporgente: 283,        // 0,5 cm
+  larghezza: 9026,       // A4 meno i margini sinistro e destro
+  colonnaEtichetta: 2700
+};
+
+var SEGNAPOSTO_DETERMINA = /\[___[\s\S]*?___\]/g;
+
+// Runs di una riga: i campi [___ … ___] con l'evidenziatore giallo.
+// stile: bold, italics, size, highlight (per tutta la riga, es. turchese).
+function runsDetermina(docxLib, testo, stile) {
+  stile = stile || {};
+  var runs = [];
+  var aggiungi = function(pezzo, segnaposto) {
+    if (!pezzo) return;
+    var evidenzia = segnaposto ? 'yellow' : stile.highlight;
+    var opz = { text: pezzo, font: DETERMINA_DOCX.font, size: stile.size || DETERMINA_DOCX.corpo, bold: !!stile.bold, italics: !!stile.italics };
+    if (evidenzia) { opz.highlight = evidenzia; opz.highlightComplexScript = false; }
+    runs.push(new docxLib.TextRun(opz));
+  };
+  var ultimo = 0;
+  testo.replace(SEGNAPOSTO_DETERMINA, function(m, pos) {
+    aggiungi(testo.slice(ultimo, pos), false);
+    aggiungi(m, true);
+    ultimo = pos + m.length;
+    return m;
+  });
+  aggiungi(testo.slice(ultimo), false);
+  return runs;
+}
+
+// Come runsDetermina, con i primi `quanti` caratteri in grassetto.
+function runsDeterminaConGrassetto(docxLib, testo, quanti, stile) {
+  stile = stile || {};
+  return runsDetermina(docxLib, testo.slice(0, quanti), Object.assign({}, stile, { bold: true }))
+    .concat(runsDetermina(docxLib, testo.slice(quanti), stile));
+}
+
+// Intestazione di sezione: "PREMESSO CHE", "VISTI", "PREMESSO che"…
+function eIntestazioneDetermina(riga) {
+  return riga.length <= 40 && /^[A-ZÀÈÉÌÒÙ' ]+(?: che| CHE)?$/.test(riga) && /[A-Z]{2}/.test(riga);
+}
+
+// Formule d'apertura in grassetto ("CONSIDERATO che", "DI AFFIDARE per", "DATO ATTO, ai sensi"):
+// elenco chiuso, solo a inizio riga, così una sigla (CIG, IVA, DURC…) non diventa mai
+// grassetto, nemmeno su una riga scritta a mano che comincia con lei. Le più lunghe
+// prima ("DI DARE ATTO" prima di "DI").
+var FORMULE_GRASSETTO_DETERMINA = [
+  'ACCERTATA', 'ACCERTATO', 'CONSIDERATA', 'CONSIDERATO', 'DATO ATTO', 'PRESO ATTO',
+  'RAVVISATA', 'RILEVATO', 'TENUTO CONTO', 'VISTA', 'VISTO',
+  'DI AFFIDARE', 'DI DARE ATTO', 'DI DISPORRE', 'DI IMPEGNARE', 'DI NOMINARE'
+];
+// Lunghezza del pezzo da mettere in grassetto (la formula, con la virgola se c'è), 0 se nessuna.
+function grassettoInizialeDetermina(riga) {
+  for (var i = 0; i < FORMULE_GRASSETTO_DETERMINA.length; i++) {
+    var f = FORMULE_GRASSETTO_DETERMINA[i];
+    if (riga.indexOf(f) !== 0) continue;
+    var dopo = riga.charAt(f.length);
+    if (dopo === ',') return f.length + 1;
+    if (dopo === ' ' || dopo === '') return f.length;
+  }
+  return 0;
+}
+
+function eTrattinoScrittoDetermina(riga) {
+  return /^[–-] /.test(riga);
+}
+
+// Blocco firme: dalla prima riga con la tabulazione (o dal "Per la copertura
+// finanziaria" scritto da solo subito prima) all'ultima riga con la tabulazione.
+// Restituisce { inizio, fine } (indici di righe) o null.
+function bloccoFirmeDetermina(righe) {
+  var primo = -1;
+  for (var i = 0; i < righe.length; i++) { if (righe[i].indexOf('\t') !== -1) { primo = i; break; } }
+  if (primo === -1) return null;
+  var fine = primo;
+  for (var j = primo + 1; j < righe.length; j++) {
+    if (righe[j].indexOf('\t') !== -1) fine = j;
+    else if (righe[j].trim() !== '') break;
+  }
+  var inizio = primo;
+  for (var k = primo - 1; k >= 0; k--) {
+    if (righe[k].trim() === '') continue;
+    if (righe[k].trim() === 'Per la copertura finanziaria') inizio = k;
+    break;
+  }
+  return { inizio: inizio, fine: fine };
+}
+
+// Le due colonne delle firme. Una riga senza tabulazione ("Per la copertura
+// finanziaria") va nella colonna di destra, come nel modello.
+function colonneFirmeDetermina(righe) {
+  var sinistra = [], destra = [];
+  righe.forEach(function(r) {
+    if (r.trim() === '') return;
+    if (r.indexOf('\t') === -1) { destra.push(r.trim()); return; }
+    var parti = r.split('\t');
+    if (parti[0].trim()) sinistra.push(parti[0].trim());
+    var resto = parti.slice(1).join(' ').trim();
+    if (resto) destra.push(resto);
+  });
+  return [sinistra, destra];
+}
+
+function tabellaFirmeDetermina(docxLib, colonne) {
+  var nessuno = { style: docxLib.BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  var bordi = { top: nessuno, bottom: nessuno, left: nessuno, right: nessuno };
+  var metà = DETERMINA_DOCX.larghezza / 2;
+  // Righe di ruolo (tutte tranne l'ultima, il nome) allineate in alto; i nomi
+  // alla stessa altezza, con almeno 3 righe vuote sopra in entrambe le colonne.
+  var ruoliMax = Math.max.apply(null, colonne.map(function(c) { return Math.max(c.length - 1, 0); }));
+  var paragrafo = function(testo, grassetto) {
+    return new docxLib.Paragraph({
+      keepNext: true,
+      alignment: docxLib.AlignmentType.CENTER,
+      spacing: { before: 0, after: 0, line: DETERMINA_DOCX.interlinea },
+      children: testo ? runsDetermina(docxLib, testo, { bold: grassetto }) : []
+    });
+  };
+  var celle = colonne.map(function(c) {
+    var par = [];
+    var ruoli = c.slice(0, -1);
+    ruoli.forEach(function(r) { par.push(paragrafo(r, false)); });
+    for (var v = 0; v < ruoliMax - ruoli.length + 3; v++) par.push(paragrafo('', false));
+    if (c.length) par.push(paragrafo(c[c.length - 1], true));
+    return new docxLib.TableCell({
+      width: { size: metà, type: docxLib.WidthType.DXA },
+      borders: bordi,
+      children: par.length ? par : [paragrafo('', false)]
+    });
+  });
+  return new docxLib.Table({
+    width: { size: DETERMINA_DOCX.larghezza, type: docxLib.WidthType.DXA },
+    columnWidths: [metà, metà],
+    borders: { top: nessuno, bottom: nessuno, left: nessuno, right: nessuno, insideHorizontal: nessuno, insideVertical: nessuno },
+    rows: [new docxLib.TableRow({ cantSplit: true, children: celle })]
+  });
+}
+
+// Tabella grigia dei DATO ATTO (solo Personale Esterno): righe [etichetta con ":", valore].
+function tabellaDatoAttoDetermina(docxLib, righe) {
+  var grigio = { style: docxLib.BorderStyle.SINGLE, size: 4, color: '999999' };
+  var bordi = { top: grigio, bottom: grigio, left: grigio, right: grigio };
+  var margini = { top: 60, bottom: 60, left: 100, right: 100 };
+  var larghezze = [DETERMINA_DOCX.colonnaEtichetta, DETERMINA_DOCX.larghezza - DETERMINA_DOCX.colonnaEtichetta];
+  var cella = function(testo, i) {
+    var opz = {
+      width: { size: larghezze[i], type: docxLib.WidthType.DXA },
+      borders: bordi,
+      margins: margini,
+      children: [new docxLib.Paragraph({
+        alignment: docxLib.AlignmentType.LEFT,
+        spacing: { before: 0, after: 0, line: DETERMINA_DOCX.interlinea },
+        children: runsDetermina(docxLib, testo, { bold: i === 0 })
+      })]
+    };
+    if (i === 0) opz.shading = { fill: 'F2F2F2', type: docxLib.ShadingType.CLEAR, color: 'auto' };
+    return new docxLib.TableCell(opz);
+  };
+  return new docxLib.Table({
+    width: { size: DETERMINA_DOCX.larghezza, type: docxLib.WidthType.DXA },
+    columnWidths: larghezze,
+    borders: { top: grigio, bottom: grigio, left: grigio, right: grigio, insideHorizontal: grigio, insideVertical: grigio },
+    rows: righe.map(function(r) {
+      return new docxLib.TableRow({ cantSplit: true, children: [cella(r[0], 0), cella(r[1], 1)] });
+    })
+  });
+}
+
+// Il documento Word di una Determina dal testo della bozza.
+// tipo: 'personale' (unica con la tabella dei DATO ATTO), 'trasporti', 'noleggio', 'trper'.
+// logoBytes: Uint8Array del logo jpg, o null.
+function costruisciDocDetermina(docxLib, testo, tipo, logoBytes) {
+  var D = DETERMINA_DOCX;
+  var righe = testo.replace(/\r/g, '').split('\n');
+  var firme = bloccoFirmeDetermina(righe);
+  var children = [];
+
+  if (logoBytes) {
+    children.push(new docxLib.Paragraph({
+      children: [new docxLib.ImageRun({ data: logoBytes, type: 'jpg', transformation: { width: 240, height: 240 * (289 / 1495) } })],
+      spacing: { after: 200 }
+    }));
+  }
+
+  var dopoTabella = false;  // il paragrafo subito dopo la tabella dei DATO ATTO prende un po' d'aria sopra
+  var par = function(runs, opz) {
+    opz = opz || {};
+    var prima = opz.before || 0;
+    if (dopoTabella) { prima = Math.max(prima, 120); dopoTabella = false; }
+    var p = {
+      alignment: opz.alignment || docxLib.AlignmentType.JUSTIFIED,
+      spacing: { before: prima, after: opz.after === undefined ? 120 : opz.after, line: D.interlinea },
+      children: runs
+    };
+    if (opz.keepNext) p.keepNext = true;
+    if (opz.indent) p.indent = opz.indent;
+    if (opz.numbering) p.numbering = { reference: 'trattino-determina', level: 0 };
+    if (opz.border) p.border = opz.border;
+    children.push(new docxLib.Paragraph(p));
+  };
+
+  // Indice della prossima riga non vuota dopo i (per tenere unito il paragrafo prima delle firme).
+  var prossimaPiena = function(i) {
+    for (var j = i + 1; j < righe.length; j++) if (righe[j].trim() !== '') return j;
+    return -1;
+  };
+
+  var sezione = '';
+  var elencoAutomatico = false;   // VISTI, RILEVATO CHE: trattino di Word
+  var bloccoEtichetta = false;    // dopo "– Etichetta:" (Trasporti, Noleggio, Trasporto persone)
+  var tabellaAperta = false;      // DATO ATTO della Personale, dopo la riga con i due punti
+  var righeTabella = [];
+  var chiudiTabella = function() {
+    if (righeTabella.length) { children.push(tabellaDatoAttoDetermina(docxLib, righeTabella)); dopoTabella = true; }
+    righeTabella = [];
+    tabellaAperta = false;
+  };
+
+  for (var i = 0; i < righe.length; i++) {
+    var riga = righe[i].trim();
+
+    if (firme && i === firme.inizio) {
+      chiudiTabella();
+      children.push(tabellaFirmeDetermina(docxLib, colonneFirmeDetermina(righe.slice(firme.inizio, firme.fine + 1))));
+      i = firme.fine;
+      continue;
+    }
+
+    if (tabellaAperta) {
+      var m = /^([^:]{2,60}:) (.*)$/.exec(riga);
+      if (m) { righeTabella.push([m[1], m[2]]); continue; }
+      if (riga === '' && !righeTabella.length) continue;
+      chiudiTabella();
+    }
+
+    if (riga === '') continue;
+
+    var primaDelleFirme = firme && prossimaPiena(i) === firme.inizio;
+    var tieni = primaDelleFirme || /:$/.test(riga);
+    var dopo = primaDelleFirme ? 360 : undefined;
+
+    if (riga.charAt(0) === '⚠') {
+      par(runsDetermina(docxLib, riga, { highlight: 'cyan' }), { keepNext: tieni, after: dopo });
+      continue;
+    }
+    if (riga === 'Amministrazione') {
+      par(runsDetermina(docxLib, riga, { italics: true }), { alignment: docxLib.AlignmentType.LEFT, after: 0 });
+      continue;
+    }
+    if (/^Terni,/.test(riga)) {
+      par(runsDetermina(docxLib, riga), { alignment: docxLib.AlignmentType.RIGHT, after: 200 });
+      continue;
+    }
+    if (/^Determina n\./.test(riga)) {
+      par(runsDetermina(docxLib, riga, { bold: true }), { alignment: docxLib.AlignmentType.LEFT });
+      continue;
+    }
+    if (/^(?:OGGETTO|Oggetto):/.test(riga)) {
+      par(runsDeterminaConGrassetto(docxLib, riga, riga.indexOf(':') + 1));
+      continue;
+    }
+    if (/^CIG\b/.test(riga)) {
+      par(runsDeterminaConGrassetto(docxLib, riga, /^CIG:?/.exec(riga)[0].length), {
+        alignment: docxLib.AlignmentType.LEFT, after: 200,
+        border: { bottom: { style: docxLib.BorderStyle.SINGLE, size: 6, color: '000000', space: 8 } }
+      });
+      continue;
+    }
+    if (riga === 'IL DIRETTORE AMMINISTRATIVO' || riga === 'DETERMINA') {
+      var eDetermina = riga === 'DETERMINA';
+      elencoAutomatico = false; bloccoEtichetta = false; sezione = riga;
+      par(runsDetermina(docxLib, riga, { bold: true, size: D.titolo }), {
+        alignment: docxLib.AlignmentType.CENTER, keepNext: eDetermina,
+        before: eDetermina ? 320 : 120, after: eDetermina ? 160 : 120
+      });
+      continue;
+    }
+    if (/^Documento informatico/.test(riga)) {
+      par(runsDetermina(docxLib, riga, { italics: true, size: 20 }), {
+        before: 360, after: 0,
+        border: { top: { style: docxLib.BorderStyle.SINGLE, size: 4, color: '999999', space: 6 } }
+      });
+      continue;
+    }
+    if (eIntestazioneDetermina(riga)) {
+      sezione = riga.toUpperCase();
+      elencoAutomatico = sezione === 'VISTI';
+      bloccoEtichetta = false;
+      par(runsDetermina(docxLib, riga, { bold: true }), { alignment: docxLib.AlignmentType.LEFT, keepNext: true, before: 240, after: 100 });
+      continue;
+    }
+
+    var grassetto = grassettoInizialeDetermina(riga);
+    if (grassetto) { elencoAutomatico = false; bloccoEtichetta = false; }
+
+    if (eTrattinoScrittoDetermina(riga) && /:$/.test(riga)) {
+      // "– Fine che con il contratto si intende perseguire e relativo oggetto:"
+      bloccoEtichetta = true;
+      par(runsDetermina(docxLib, riga, { bold: true }), { keepNext: true, before: 60, after: 60, indent: { left: D.rientro, hanging: D.sporgente } });
+      continue;
+    }
+    if (eTrattinoScrittoDetermina(riga)) {
+      var sinistra = bloccoEtichetta ? D.rientro + D.sporgente : D.rientro;
+      par(runsDetermina(docxLib, riga), { keepNext: tieni, after: dopo === undefined ? 80 : dopo, indent: { left: sinistra, hanging: D.sporgente } });
+      continue;
+    }
+    if (elencoAutomatico && !grassetto) {
+      par(runsDetermina(docxLib, riga), { keepNext: tieni, after: dopo === undefined ? 80 : dopo, numbering: true });
+      continue;
+    }
+
+    var opz = { keepNext: tieni, after: dopo };
+    if (bloccoEtichetta) opz.indent = { left: D.rientro };
+    if (/:$/.test(riga)) opz.after = 80;
+    par(grassetto ? runsDeterminaConGrassetto(docxLib, riga, grassetto) : runsDetermina(docxLib, riga), opz);
+
+    // Dopo la riga con i due punti: elenco con il trattino di Word (RILEVATO CHE)
+    // o tabella (DATO ATTO della Personale Esterno).
+    if (/:$/.test(riga) && sezione === 'RILEVATO CHE') elencoAutomatico = true;
+    if (/:$/.test(riga) && sezione === 'DATO ATTO' && tipo === 'personale') tabellaAperta = true;
+  }
+  chiudiTabella();
+
+  return new docxLib.Document({
+    styles: { default: { document: { run: { font: D.font, size: D.corpo } } } },
+    numbering: { config: [{
+      reference: 'trattino-determina',
+      levels: [{
+        level: 0, format: docxLib.LevelFormat.BULLET, text: '–', alignment: docxLib.AlignmentType.LEFT,
+        style: { paragraph: { indent: { left: D.rientro, hanging: D.sporgente } }, run: { font: D.font } }
+      }]
+    }] },
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 11906, height: 16838 },
+          margin: { top: 1134, right: 1440, bottom: 1247, left: 1440, header: 708, footer: 567 }
+        }
+      },
+      footers: {
+        default: new docxLib.Footer({ children: [new docxLib.Paragraph({
+          alignment: docxLib.AlignmentType.CENTER,
+          children: [new docxLib.TextRun({ children: ['Pagina ', docxLib.PageNumber.CURRENT, ' di ', docxLib.PageNumber.TOTAL_PAGES], font: D.font, size: D.piede })]
+        })] })
+      },
+      children: children
+    }]
+  });
+}
+
+// Pulsante "Genera Documento Word Determina" di tutti i moduli: legge la bozza
+// dalla casella, costruisce il Word e lo scarica.
+async function scaricaDocxDetermina(idCasella, prefissoFile, nomePulsante, tipo) {
+  var testo = document.getElementById(idCasella).value;
+  if (!testo || !testo.trim()) {
+    alert('Genera prima la bozza (pulsante "' + nomePulsante + '") prima di creare il documento Word.');
+    return;
+  }
+  var docxLib = window.docx;
+  if (!docxLib) {
+    alert('Libreria Word non ancora caricata — verifica la connessione internet e riprova tra qualche secondo.');
+    return;
+  }
+
+  var logoBytes = null;
+  try {
+    var binaryStr = atob(LOGO_BRICCIALDI_BASE64.split(',')[1]);
+    logoBytes = new Uint8Array(binaryStr.length);
+    for (var bi = 0; bi < binaryStr.length; bi++) logoBytes[bi] = binaryStr.charCodeAt(bi);
+  } catch (e) {
+    // Se il logo non si decodifica per qualche motivo, si procede comunque col testo
+    logoBytes = null;
+  }
+
+  try {
+    var blob = await docxLib.Packer.toBlob(costruisciDocDetermina(docxLib, testo, tipo, logoBytes));
+    var nomeProgettoDocx = (metadati.titolo || 'Progetto').replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '');
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = prefissoFile + nomeProgettoDocx + '.docx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert('Errore nella generazione del documento Word: ' + (e && e.message ? e.message : e));
+  }
 }
